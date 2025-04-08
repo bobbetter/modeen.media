@@ -17,31 +17,8 @@ export function HeroSection() {
   return (
     <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
       <div className="container mx-auto px-4 z-10">
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="my-12"
-          >
-            <SoundWave />
-          </motion.div>
-        
-        <motion.div 
-          className="text-center mt-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-        >
-          <Button 
-            onClick={scrollToProducts}
-            className="bg-primary text-white px-8 py-6 rounded-full text-sm font-medium tracking-wide hover:bg-primary/90 transition duration-300 shadow-lg"
-          >
-            Explore Products
-            <ChevronDown className="ml-2 h-4 w-4" />
-          </Button>
-        </motion.div>
       </div>
-      
+
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background to-background"></div>
         <div className="absolute inset-0 bg-black opacity-80"></div>
