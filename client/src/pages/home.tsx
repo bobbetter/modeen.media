@@ -10,10 +10,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <HeroSection />
-      <ProductsSection />
-      <FeaturesSection />
-      <TestimonialsSection />
+      <div className="flex flex-col">
+        <HeroSection />
+        <div className="-mt-screen pt-24">
+          <ProductsSection />
+        </div>
+        <FeaturesSection />
+        <TestimonialsSection />
+      </div>
       <CTASection />
       <Footer />
     </div>
