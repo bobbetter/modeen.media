@@ -64,7 +64,7 @@ export function ProductsSection() {
   };
 
   return (
-    <section id="products" className="py-24 pt-32 bg-background/95 backdrop-blur-sm">
+    <section id="products" className="py-24 pt-32 min-h-[90vh] bg-background/95 backdrop-blur-sm">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-16">
           Our Products

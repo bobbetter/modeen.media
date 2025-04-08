@@ -6,8 +6,19 @@ import { Menu } from "lucide-react";
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
+  const scrollToProducts = () => {
+    const element = document.getElementById('products');
+    if (element) {
+      window.scrollTo({
+        top: element.offsetTop - 80,
+        behavior: 'smooth'
+      });
+      setMobileOpen(false);
+    }
+  };
+
+  const scrollToContact = () => {
+    const element = document.getElementById('contact');
     if (element) {
       window.scrollTo({
         top: element.offsetTop - 80,
@@ -35,25 +46,13 @@ export function Navbar() {
         
         <nav className="hidden md:flex space-x-8">
           <button 
-            onClick={() => scrollToSection('home')}
-            className="text-foreground hover:text-primary transition duration-300 text-sm font-medium"
-          >
-            Home
-          </button>
-          <button 
-            onClick={() => scrollToSection('products')}
+            onClick={scrollToProducts}
             className="text-foreground hover:text-primary transition duration-300 text-sm font-medium"
           >
             Products
           </button>
           <button 
-            onClick={() => scrollToSection('features')}
-            className="text-foreground hover:text-primary transition duration-300 text-sm font-medium"
-          >
-            Features
-          </button>
-          <button 
-            onClick={() => scrollToSection('contact')}
+            onClick={scrollToContact}
             className="text-foreground hover:text-primary transition duration-300 text-sm font-medium"
           >
             Contact
@@ -70,25 +69,13 @@ export function Navbar() {
           <SheetContent side="right" className="bg-background/95 backdrop-blur-md border-l border-white/5">
             <div className="flex flex-col space-y-6 mt-8">
               <button 
-                onClick={() => scrollToSection('home')}
-                className="text-foreground hover:text-primary transition duration-300 text-lg font-medium text-left"
-              >
-                Home
-              </button>
-              <button 
-                onClick={() => scrollToSection('products')}
+                onClick={scrollToProducts}
                 className="text-foreground hover:text-primary transition duration-300 text-lg font-medium text-left"
               >
                 Products
               </button>
               <button 
-                onClick={() => scrollToSection('features')}
-                className="text-foreground hover:text-primary transition duration-300 text-lg font-medium text-left"
-              >
-                Features
-              </button>
-              <button 
-                onClick={() => scrollToSection('contact')}
+                onClick={scrollToContact}
                 className="text-foreground hover:text-primary transition duration-300 text-lg font-medium text-left"
               >
                 Contact
