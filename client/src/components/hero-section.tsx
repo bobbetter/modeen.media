@@ -17,28 +17,14 @@ export function HeroSection() {
   return (
     <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
       <div className="container mx-auto px-4 z-10">
-        <motion.div 
-          className="text-center mb-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-4">
-            Premium Sound <span className="text-primary">Design</span>
-          </h1>
-          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto">
-            Crafting exceptional audio experiences for projects that demand perfection
-          </p>
-        </motion.div>
-        
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="my-12"
-        >
-          <SoundWave />
-        </motion.div>
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="my-12"
+          >
+            <SoundWave />
+          </motion.div>
         
         <motion.div 
           className="text-center mt-8"
