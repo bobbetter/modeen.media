@@ -106,12 +106,12 @@ export function ProductsSection() {
             transition={{ duration: 0.5, type: "spring", stiffness: 400 }}
             className="perspective-1000"
           >
-            <Card className="bg-white/95 backdrop-blur-sm border-gray-200/20 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.25),0_10px_20px_rgba(0,0,0,0.15),0_0_10px_5px_rgba(255,255,255,0.8)] h-full overflow-hidden relative group transform-gpu">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <Card className="bg-gray-950/50 backdrop-blur-xl border-gray-800/30 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.4),0_10px_20px_rgba(0,0,0,0.3),inset_0_0_20px_rgba(30,58,138,0.3)] h-full overflow-hidden relative group transform-gpu">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
               {/* 3D Effect Elements */}
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
               
               <CardContent className="p-10">
                 <div className="flex flex-col items-center relative z-10">
@@ -177,12 +177,12 @@ export function ProductsSection() {
             className="perspective-1000"
             id="contact"
           >
-            <Card className="bg-white/95 backdrop-blur-sm border-gray-200/20 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.25),0_10px_20px_rgba(0,0,0,0.15),0_0_10px_5px_rgba(255,255,255,0.8)] h-full overflow-hidden relative group transform-gpu">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <Card className="bg-gray-950/50 backdrop-blur-xl border-gray-800/30 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.4),0_10px_20px_rgba(0,0,0,0.3),inset_0_0_20px_rgba(30,58,138,0.3)] h-full overflow-hidden relative group transform-gpu">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
               {/* 3D Effect Elements */}
-              <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
+              <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
               
               <CardContent className="p-10 relative z-10">
                 <span className="text-primary text-sm font-light tracking-widest uppercase">Tailored Audio</span>
@@ -198,11 +198,11 @@ export function ProductsSection() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-muted-foreground/90 font-light">Name</FormLabel>
+                          <FormLabel className="text-white/80 font-light">Name</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="Your name" 
-                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light" 
+                              className="bg-gray-900/70 border border-gray-700/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-white/20 text-white/90 font-light" 
                               {...field} 
                             />
                           </FormControl>
@@ -216,12 +216,12 @@ export function ProductsSection() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-muted-foreground/90 font-light">Email</FormLabel>
+                          <FormLabel className="text-white/80 font-light">Email</FormLabel>
                           <FormControl>
                             <Input 
                               type="email" 
                               placeholder="your@email.com" 
-                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light"
+                              className="bg-gray-900/70 border border-gray-700/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-white/20 text-white/90 font-light"
                               {...field} 
                             />
                           </FormControl>
@@ -235,11 +235,11 @@ export function ProductsSection() {
                       name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-muted-foreground/90 font-light">Project Details</FormLabel>
+                          <FormLabel className="text-white/80 font-light">Project Details</FormLabel>
                           <FormControl>
                             <Textarea 
                               placeholder="Tell us about your project..." 
-                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-4 resize-none placeholder:text-muted-foreground/30 font-light"
+                              className="bg-gray-900/70 border border-gray-700/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-4 resize-none placeholder:text-white/20 text-white/90 font-light"
                               rows={4}
                               {...field} 
                             />
@@ -260,7 +260,7 @@ export function ProductsSection() {
                         <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
                       </Button>
                       
-                      <div className="text-muted-foreground/70 text-sm font-light">
+                      <div className="text-primary/80 text-sm font-light">
                         Response within 24h
                       </div>
                     </div>

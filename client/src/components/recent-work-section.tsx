@@ -96,11 +96,11 @@ export function RecentWorkSection() {
   }
 
   return (
-    <section id="recent-work" className="py-24 relative overflow-hidden bg-gradient-to-b from-transparent to-gray-100/40 dark:to-gray-900/20">
+    <section id="recent-work" className="py-24 relative overflow-hidden bg-gradient-to-b from-transparent to-blue-900/10">
       {/* Background Effects */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-primary/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 right-1/4 w-64 h-64 bg-primary/15 rounded-full blur-3xl"></div>
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
@@ -118,18 +118,18 @@ export function RecentWorkSection() {
           {/* Navigation Buttons */}
           <Button 
             onClick={handlePrev} 
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-xl hover:bg-white hover:scale-105 transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 -ml-6 md:ml-0"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -ml-6 md:ml-0"
             variant="ghost"
           >
-            <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            <ChevronLeft className="h-6 w-6 text-white/80" />
           </Button>
           
           <Button 
             onClick={handleNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-xl hover:bg-white hover:scale-105 transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 -mr-6 md:mr-0"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -mr-6 md:mr-0"
             variant="ghost"
           >
-            <ChevronRight className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            <ChevronRight className="h-6 w-6 text-white/80" />
           </Button>
           
           {/* Video Slider */}
@@ -143,7 +143,7 @@ export function RecentWorkSection() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="w-full md:w-1/3 flex-shrink-0"
                 >
-                  <Card className="h-full overflow-hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-gray-200/20 dark:border-gray-800/20 rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_25px_40px_rgba(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-2">
+                  <Card className="h-full overflow-hidden bg-gray-950/50 backdrop-blur-xl border-gray-800/30 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.4),0_10px_20px_rgba(0,0,0,0.3),inset_0_0_20px_rgba(30,58,138,0.3)] hover:shadow-[0_35px_60px_rgba(0,0,0,0.6),0_10px_30px_rgba(30,58,138,0.3)] transition-all duration-300 transform hover:-translate-y-2">
                     <div className="aspect-video relative overflow-hidden rounded-t-2xl">
                       <img 
                         src={video.thumbnailUrl} 
@@ -183,7 +183,7 @@ export function RecentWorkSection() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
-            className="w-full max-w-5xl bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl"
+            className="w-full max-w-5xl bg-gray-900/95 rounded-2xl overflow-hidden shadow-2xl border border-gray-800/50 backdrop-blur-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="aspect-video w-full">
