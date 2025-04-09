@@ -35,8 +35,8 @@ const videoData: Video[] = [
   },
   {
     id: 3,
-    title: "Sunnah Shop",
-    client: "Premium Dates & Islamic Products",
+    title: "Sunnah-shop.de",
+    client: "Online Shop",
     thumbnailUrl: SunnahshopThumbnail,
     videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho",
     description: "Professional audio production for premium Islamic store featuring authentic organic dates, black seed oil, and other high-quality traditional products."

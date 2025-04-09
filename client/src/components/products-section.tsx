@@ -11,7 +11,7 @@ import { ArrowRight, Star, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { contactFormSchema, type ContactFormData, submitContactForm } from "@/lib/contact-api";
 import { useMutation } from "@tanstack/react-query";
-import AlbumCover from "../assets/whale-cover.png";
+import AlbumCover from "../assets/signature-soundpack-cover.png";
 
 export function ProductsSection() {
   const { toast } = useToast();
