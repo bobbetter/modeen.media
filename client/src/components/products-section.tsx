@@ -119,7 +119,7 @@ export function ProductsSection() {
                     <motion.img 
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.5 }}
-                      src="https://images.unsplash.com/photo-1587602945121-097a6385a7be?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" 
+                      src="https://images.unsplash.com/photo-1671141136151-5a21b0f58bd7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" 
                       alt="Signature Soundpack" 
                       className="w-full h-full object-cover"
                     />
@@ -155,7 +155,7 @@ export function ProductsSection() {
                 <div className="mt-6 pt-6 border-t border-white/5 relative z-10">
                   <div className="flex flex-wrap gap-2">
                     <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Sound Effects</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Music Beds</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Vocal Beds</span>
                     <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Transitions</span>
                     <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Ambient</span>
                     <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">UI Sounds</span>
