@@ -64,8 +64,14 @@ export function ProductsSection() {
   };
 
   return (
-    <section id="products" className="py-24 pt-10 min-h-[90vh] bg-background/95 backdrop-blur-sm">
-      <div className="container mx-auto px-4">
+    <section id="products" className="py-24 pt-10 min-h-[90vh] relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 right-1/3 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
+      </div>
+      <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-20">
           <div className="relative inline-block">
             <motion.div
@@ -103,7 +109,7 @@ export function ProductsSection() {
             transition={{ duration: 0.5, type: "spring", stiffness: 400 }}
             className="perspective-1000"
           >
-            <Card className="bg-card/40 backdrop-blur-sm border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] h-full overflow-hidden relative group transform-gpu">
+            <Card className="bg-card/40 backdrop-blur-sm border-white/10 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.5),0_10px_20px_rgba(0,0,0,0.4),0_0_10px_5px_rgba(255,255,255,0.05)] h-full overflow-hidden relative group transform-gpu">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
               {/* 3D Effect Elements */}
@@ -172,7 +178,7 @@ export function ProductsSection() {
             className="perspective-1000"
             id="contact"
           >
-            <Card className="bg-card/40 backdrop-blur-sm border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] h-full overflow-hidden relative group transform-gpu">
+            <Card className="bg-card/40 backdrop-blur-sm border-white/10 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.5),0_10px_20px_rgba(0,0,0,0.4),0_0_10px_5px_rgba(255,255,255,0.05)] h-full overflow-hidden relative group transform-gpu">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
               {/* 3D Effect Elements */}
