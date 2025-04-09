@@ -109,8 +109,8 @@ export function ProductsSection() {
             transition={{ duration: 0.5, type: "spring", stiffness: 400 }}
             className="perspective-1000"
           >
-            <Card className="bg-card/40 backdrop-blur-sm border-white/10 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.5),0_10px_20px_rgba(0,0,0,0.4),0_0_10px_5px_rgba(255,255,255,0.05)] h-full overflow-hidden relative group transform-gpu">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <Card className="bg-white/90 backdrop-blur-sm border-gray-200/20 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.15),0_10px_20px_rgba(0,0,0,0.1),0_0_10px_5px_rgba(255,255,255,0.8)] h-full overflow-hidden relative group transform-gpu">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
               {/* 3D Effect Elements */}
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
@@ -178,8 +178,8 @@ export function ProductsSection() {
             className="perspective-1000"
             id="contact"
           >
-            <Card className="bg-card/40 backdrop-blur-sm border-white/10 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.5),0_10px_20px_rgba(0,0,0,0.4),0_0_10px_5px_rgba(255,255,255,0.05)] h-full overflow-hidden relative group transform-gpu">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <Card className="bg-white/90 backdrop-blur-sm border-gray-200/20 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.15),0_10px_20px_rgba(0,0,0,0.1),0_0_10px_5px_rgba(255,255,255,0.8)] h-full overflow-hidden relative group transform-gpu">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
               {/* 3D Effect Elements */}
               <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
@@ -203,7 +203,7 @@ export function ProductsSection() {
                           <FormControl>
                             <Input 
                               placeholder="Your name" 
-                              className="bg-background/20 border border-white/10 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light" 
+                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light" 
                               {...field} 
                             />
                           </FormControl>
@@ -222,7 +222,7 @@ export function ProductsSection() {
                             <Input 
                               type="email" 
                               placeholder="your@email.com" 
-                              className="bg-background/20 border border-white/10 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light"
+                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light"
                               {...field} 
                             />
                           </FormControl>
@@ -240,7 +240,7 @@ export function ProductsSection() {
                           <FormControl>
                             <Textarea 
                               placeholder="Tell us about your project..." 
-                              className="bg-background/20 border border-white/10 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-4 resize-none placeholder:text-muted-foreground/30 font-light"
+                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-4 resize-none placeholder:text-muted-foreground/30 font-light"
                               rows={4}
                               {...field} 
                             />
