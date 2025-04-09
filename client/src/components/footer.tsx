@@ -27,7 +27,7 @@ export function Footer() {
               </span>
             </a>
             <p className="text-muted-foreground/80 text-sm mb-4 font-light">
-              Premium audio solutions by Mo Deen
+              Premium audio solutions for creators
             </p>
             <div className="flex space-x-5 mb-6">
               <a href="#" className="text-muted-foreground/60 hover:text-primary transition-all duration-500">
