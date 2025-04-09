@@ -109,7 +109,7 @@ export function ProductsSection() {
             transition={{ duration: 0.5, type: "spring", stiffness: 400 }}
             className="perspective-1000"
           >
-            <Card className="bg-white/90 backdrop-blur-sm border-gray-200/20 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.15),0_10px_20px_rgba(0,0,0,0.1),0_0_10px_5px_rgba(255,255,255,0.8)] h-full overflow-hidden relative group transform-gpu">
+            <Card className="bg-white/95 backdrop-blur-sm border-gray-200/20 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.25),0_10px_20px_rgba(0,0,0,0.15),0_0_10px_5px_rgba(255,255,255,0.8)] h-full overflow-hidden relative group transform-gpu">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
               {/* 3D Effect Elements */}
@@ -178,7 +178,7 @@ export function ProductsSection() {
             className="perspective-1000"
             id="contact"
           >
-            <Card className="bg-white/90 backdrop-blur-sm border-gray-200/20 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.15),0_10px_20px_rgba(0,0,0,0.1),0_0_10px_5px_rgba(255,255,255,0.8)] h-full overflow-hidden relative group transform-gpu">
+            <Card className="bg-white/95 backdrop-blur-sm border-gray-200/20 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.25),0_10px_20px_rgba(0,0,0,0.15),0_0_10px_5px_rgba(255,255,255,0.8)] h-full overflow-hidden relative group transform-gpu">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
               {/* 3D Effect Elements */}
