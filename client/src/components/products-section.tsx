@@ -66,30 +66,56 @@ export function ProductsSection() {
   return (
     <section id="products" className="py-24 pt-10 min-h-[90vh] bg-background/95 backdrop-blur-sm">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-foreground">
-            modeen<span className="text-primary">.media</span>
-          </h1>
-          <p className="text-muted-foreground mt-2">Premium audio solutions for creators</p>
+        <div className="text-center mb-20">
+          <div className="relative inline-block">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="mb-1 text-muted-foreground/70 font-light tracking-widest uppercase text-sm"
+            >
+              Mo Deen - The Producer
+            </motion.div>
+            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-4 relative z-10 font-sans">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary/90 to-primary/60">modeen</span>
+              <span className="font-light">.media</span>
+            </h1>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              className="absolute -inset-4 bg-primary/5 rounded-xl blur-2xl z-0"
+            />
+          </div>
+          <p className="text-muted-foreground mt-4 font-light text-lg max-w-md mx-auto">
+            Premium audio solutions crafted for today's creators and producers
+          </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
           {/* Soundpack Card */}
           <motion.div
             variants={cardVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
-            whileHover={{ y: -4 }}
-            transition={{ duration: 0.3 }}
+            whileHover={{ y: -8, rotateY: 2 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 400 }}
+            className="perspective-1000"
           >
-            <Card className="bg-card/60 border-white/5 rounded-2xl shadow-2xl h-full overflow-hidden relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <Card className="bg-card/40 backdrop-blur-sm border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] h-full overflow-hidden relative group transform-gpu">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
-              <CardContent className="p-8">
-                <div className="flex flex-col md:flex-row md:items-center gap-6 relative z-10">
-                  <div className="flex-shrink-0 w-full md:w-48 h-48 rounded-xl overflow-hidden">
-                    <img 
+              {/* 3D Effect Elements */}
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
+              
+              <CardContent className="p-10">
+                <div className="flex flex-col md:flex-row md:items-center gap-8 relative z-10">
+                  <div className="flex-shrink-0 w-full md:w-48 h-48 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5">
+                    <motion.img 
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.5 }}
                       src="https://images.unsplash.com/photo-1587602945121-097a6385a7be?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" 
                       alt="Signature Soundpack" 
                       className="w-full h-full object-cover"
@@ -97,8 +123,8 @@ export function ProductsSection() {
                   </div>
                   
                   <div className="flex-grow">
-                    <span className="text-primary text-sm font-medium tracking-wider uppercase">Premium Collection</span>
-                    <h3 className="text-2xl font-bold text-foreground mt-2 mb-3">Signature Soundpack</h3>
+                    <span className="text-primary text-sm font-light tracking-widest uppercase">Premium Collection</span>
+                    <h3 className="text-2xl font-bold text-foreground mt-2 mb-3 tracking-tight">Signature Soundpack</h3>
                     <div className="flex items-center mb-4">
                       <div className="flex items-center text-yellow-400">
                         {[1, 2, 3, 4].map((i) => (
@@ -106,16 +132,17 @@ export function ProductsSection() {
                         ))}
                         <Star className="h-4 w-4 fill-current opacity-50" />
                       </div>
-                      <span className="text-muted-foreground text-sm ml-2">4.7 (128 reviews)</span>
+                      <span className="text-muted-foreground text-sm ml-2 font-light">4.7 (128 reviews)</span>
                     </div>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
+                    <p className="text-muted-foreground leading-relaxed mb-5 text-sm">
                       A collection of 200+ handcrafted sounds, designed for professionals. Perfect for filmmakers, game developers, and content creators seeking premium audio elements.
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-foreground text-xl font-bold">$149.99</span>
-                      <Button className="bg-primary hover:bg-primary/90 text-white" size="sm">
-                        Buy Now
-                        <ArrowRight className="ml-1 h-4 w-4" />
+                      <Button className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" size="sm">
+                        <span className="relative z-10">Buy Now</span>
+                        <ArrowRight className="relative z-10 ml-1 h-4 w-4" />
+                        <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
                       </Button>
                     </div>
                   </div>
@@ -123,11 +150,11 @@ export function ProductsSection() {
                 
                 <div className="mt-6 pt-6 border-t border-white/5 relative z-10">
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 rounded-full bg-secondary/10 text-muted-foreground text-xs">Sound Effects</span>
-                    <span className="px-3 py-1 rounded-full bg-secondary/10 text-muted-foreground text-xs">Music Beds</span>
-                    <span className="px-3 py-1 rounded-full bg-secondary/10 text-muted-foreground text-xs">Transitions</span>
-                    <span className="px-3 py-1 rounded-full bg-secondary/10 text-muted-foreground text-xs">Ambient</span>
-                    <span className="px-3 py-1 rounded-full bg-secondary/10 text-muted-foreground text-xs">UI Sounds</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Sound Effects</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Music Beds</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Transitions</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Ambient</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">UI Sounds</span>
                   </div>
                 </div>
               </CardContent>
@@ -140,17 +167,22 @@ export function ProductsSection() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
-            whileHover={{ y: -4 }}
-            transition={{ duration: 0.3 }}
+            whileHover={{ y: -8, rotateY: -2 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 400 }}
+            className="perspective-1000"
             id="contact"
           >
-            <Card className="bg-card/60 border-white/5 rounded-2xl shadow-2xl h-full overflow-hidden relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <Card className="bg-card/40 backdrop-blur-sm border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] h-full overflow-hidden relative group transform-gpu">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               
-              <CardContent className="p-8 relative z-10">
-                <span className="text-primary text-sm font-medium tracking-wider uppercase">Tailored Audio</span>
-                <h3 className="text-2xl font-bold text-foreground mt-2 mb-4">Custom Soundtrack or Voiceover</h3>
-                <p className="text-muted-foreground leading-relaxed mb-6">
+              {/* 3D Effect Elements */}
+              <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
+              
+              <CardContent className="p-10 relative z-10">
+                <span className="text-primary text-sm font-light tracking-widest uppercase">Tailored Audio</span>
+                <h3 className="text-2xl font-bold text-foreground mt-2 mb-4 tracking-tight">Custom Soundtrack or Voiceover</h3>
+                <p className="text-muted-foreground leading-relaxed mb-6 text-sm">
                   Need something unique? Let us craft a custom audio experience specifically for your project. Our team specializes in bespoke soundtracks and professional voiceovers.
                 </p>
                 
@@ -161,11 +193,11 @@ export function ProductsSection() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Name</FormLabel>
+                          <FormLabel className="text-muted-foreground/90 font-light">Name</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="Your name" 
-                              className="bg-background/5 border-b border-white/10 focus:border-primary rounded" 
+                              className="bg-background/20 border border-white/10 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light" 
                               {...field} 
                             />
                           </FormControl>
@@ -179,12 +211,12 @@ export function ProductsSection() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel className="text-muted-foreground/90 font-light">Email</FormLabel>
                           <FormControl>
                             <Input 
                               type="email" 
                               placeholder="your@email.com" 
-                              className="bg-background/5 border-b border-white/10 focus:border-primary rounded"
+                              className="bg-background/20 border border-white/10 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light"
                               {...field} 
                             />
                           </FormControl>
@@ -198,11 +230,11 @@ export function ProductsSection() {
                       name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Project Details</FormLabel>
+                          <FormLabel className="text-muted-foreground/90 font-light">Project Details</FormLabel>
                           <FormControl>
                             <Textarea 
                               placeholder="Tell us about your project..." 
-                              className="bg-background/5 border-b border-white/10 focus:border-primary rounded resize-none"
+                              className="bg-background/20 border border-white/10 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-4 resize-none placeholder:text-muted-foreground/30 font-light"
                               rows={4}
                               {...field} 
                             />
@@ -212,17 +244,18 @@ export function ProductsSection() {
                       )}
                     />
                     
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between pt-2">
                       <Button 
                         type="submit" 
-                        className="bg-primary hover:bg-primary/90 text-white shadow-lg"
+                        className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? "Sending..." : "Send Request"}
-                        <Send className="ml-2 h-4 w-4" />
+                        <span className="relative z-10">{isSubmitting ? "Sending..." : "Send Request"}</span>
+                        <Send className="relative z-10 ml-2 h-4 w-4" />
+                        <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
                       </Button>
                       
-                      <div className="text-muted-foreground text-sm">
+                      <div className="text-muted-foreground/70 text-sm font-light">
                         Response within 24h
                       </div>
                     </div>

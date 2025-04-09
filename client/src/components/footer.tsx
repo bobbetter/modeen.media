@@ -11,49 +11,53 @@ export function Footer() {
   };
   
   return (
-    <footer className="bg-card border-t border-white/5 py-12">
-      <div className="container mx-auto px-4">
+    <footer className="relative overflow-hidden border-t border-white/5 py-10 backdrop-blur-sm">
+      <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div>
             <a href="#" 
-              className="inline-block mb-4"
+              className="inline-block mb-3"
               onClick={(e) => {
                 e.preventDefault();
                 scrollToTop();
               }}
             >
-              <span className="text-xl font-semibold tracking-tighter text-foreground">
-                modeen<span className="text-primary">.media</span>
+              <span className="text-xl font-light tracking-tight text-foreground">
+                mo<span className="font-bold">deen</span><span className="text-primary font-light">.media</span>
               </span>
             </a>
-            <p className="text-muted-foreground text-sm mb-4">
-              Premium audio solutions for creators who demand excellence.
+            <p className="text-muted-foreground/70 text-sm mb-4 font-light">
+              Premium audio solutions by Mo Deen
             </p>
-            <div className="flex space-x-4 mb-6">
-              <a href="#" className="text-muted-foreground hover:text-primary transition duration-300">
-                <Facebook className="h-5 w-5" />
+            <div className="flex space-x-5 mb-6">
+              <a href="#" className="text-muted-foreground/50 hover:text-primary transition-all duration-500">
+                <Facebook className="h-5 w-5 hover:scale-110 transition-transform duration-300" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition duration-300">
-                <Twitter className="h-5 w-5" />
+              <a href="#" className="text-muted-foreground/50 hover:text-primary transition-all duration-500">
+                <Twitter className="h-5 w-5 hover:scale-110 transition-transform duration-300" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition duration-300">
-                <Instagram className="h-5 w-5" />
+              <a href="#" className="text-muted-foreground/50 hover:text-primary transition-all duration-500">
+                <Instagram className="h-5 w-5 hover:scale-110 transition-transform duration-300" />
               </a>
             </div>
           </div>
           
-          <div className="mt-8 md:mt-0">
-            <p className="text-muted-foreground text-sm">
+          <div className="mt-8 md:mt-0 text-right">
+            <p className="text-muted-foreground/50 text-sm font-light">
               &copy; {currentYear} modeen.media. All rights reserved.
             </p>
-            <div className="mt-4">
-              <a href="#" className="text-muted-foreground hover:text-primary text-sm transition duration-300">
+            <div className="mt-3">
+              <a href="#" className="text-muted-foreground/70 hover:text-primary text-sm transition-colors duration-300 font-light">
                 Made with ♥ for creators worldwide
               </a>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Background elements */}
+      <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-primary/10 rounded-full blur-3xl opacity-30"></div>
+      <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-t from-background/80 to-transparent opacity-50"></div>
     </footer>
   );
 }
