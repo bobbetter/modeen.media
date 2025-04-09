@@ -100,26 +100,22 @@ export function RecentWorkSection() {
         </div>
         
         <div className="relative" ref={videoSliderRef}>
-          {videoData.length > maxVisibleItems && (
-            <>
-              {/* Navigation Buttons */}
-              <Button 
-                onClick={handlePrev} 
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -ml-6 md:ml-0"
-                variant="ghost"
-              >
-                <ChevronLeft className="h-6 w-6 text-white/80" />
-              </Button>
-              
-              <Button 
-                onClick={handleNext}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -mr-6 md:mr-0"
-                variant="ghost"
-              >
-                <ChevronRight className="h-6 w-6 text-white/80" />
-              </Button>
-            </>
-          )}
+          {/* Navigation Buttons - Always showing to suggest more content in future */}
+          <Button 
+            onClick={handlePrev} 
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -ml-6 md:ml-0"
+            variant="ghost"
+          >
+            <ChevronLeft className="h-6 w-6 text-white/80" />
+          </Button>
+          
+          <Button 
+            onClick={handleNext}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -mr-6 md:mr-0"
+            variant="ghost"
+          >
+            <ChevronRight className="h-6 w-6 text-white/80" />
+          </Button>
           
           {/* Video Cards */}
           <div className="overflow-hidden px-6 md:px-12">
