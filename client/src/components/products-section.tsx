@@ -91,9 +91,7 @@ export function ProductsSection() {
               className="absolute -inset-4 bg-primary/5 rounded-xl blur-2xl z-0"
             />
           </div>
-          <p className="text-muted-foreground mt-4 font-light text-lg max-w-md mx-auto">
-            Premium audio solutions crafted for today's creators and producers
-          </p>
+
         </div>
         
         <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
