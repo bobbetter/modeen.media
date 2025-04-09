@@ -23,7 +23,7 @@ const videoData: Video[] = [
     title: "Deen Athletic",
     client: "Sports Brand",
     thumbnailUrl: DeenAthleticThumbnail,
-    videoUrl: "https://www.youtube.com/embed/2HEhWPJPfZY", // Placeholder until actual video is available
+    videoUrl: "/videos/deen-athletic.mp4", // Local video file
     description: "Custom audio design for sports brand promotional material featuring dynamic sound effects and voiceover."
   },
   {
@@ -183,13 +183,22 @@ export function RecentWorkSection() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="aspect-video w-full">
-              <iframe 
-                src={`${selectedVideo.videoUrl}?autoplay=1&rel=0`} 
-                title={selectedVideo.title}
-                className="w-full h-full" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowFullScreen
-              ></iframe>
+              {selectedVideo.videoUrl.includes('youtube.com') ? (
+                <iframe 
+                  src={`${selectedVideo.videoUrl}?autoplay=1&rel=0`} 
+                  title={selectedVideo.title}
+                  className="w-full h-full" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <video 
+                  src={selectedVideo.videoUrl}
+                  controls
+                  autoPlay
+                  className="w-full h-full" 
+                ></video>
+              )}
             </div>
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
