@@ -156,8 +156,8 @@ export function RecentWorkSection() {
                       </div>
                     </div>
                     <CardContent className="p-6">
-                      <h3 className="text-xl font-bold mb-1">{video.title}</h3>
-                      <p className="text-primary/80 text-sm mb-3">Client: {video.client}</p>
+                      <h3 className="text-xl font-bold mb-1">{video.client}</h3>
+                      <p className="text-primary/80 text-sm mb-3">{video.title}</p>
                       <p className="text-muted-foreground text-sm line-clamp-2">{video.description}</p>
                     </CardContent>
                   </Card>
@@ -194,8 +194,8 @@ export function RecentWorkSection() {
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-2xl font-bold">{selectedVideo.title}</h3>
-                  <p className="text-primary/80">Client: {selectedVideo.client}</p>
+                  <h3 className="text-2xl font-bold">{selectedVideo.client}</h3>
+                  <p className="text-primary/80">{selectedVideo.title}</p>
                 </div>
                 <Button 
                   onClick={handleCloseVideo}
