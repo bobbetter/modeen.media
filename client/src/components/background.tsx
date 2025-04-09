@@ -8,14 +8,15 @@ export function AnimatedBackground() {
       {/* Dark gradient base background with warmer dark tones */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A0805] via-[#121012] to-[#0D0A08]" />
       
-      {/* Full-screen producer silhouette image */}
+      {/* Full-screen producer silhouette image - upscaled */}
       <div 
-        className="absolute inset-0 opacity-80"
+        className="absolute inset-0 opacity-95"
         style={{
           backgroundImage: `url(${producerSilhouette})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundSize: '140%', /* Upscaled from 'cover' to 140% */
+          backgroundPosition: 'center 40%', /* Adjusted positioning to focus more on upper body */
           backgroundRepeat: 'no-repeat',
+          transform: 'scale(1.15)', /* Additional scaling for larger silhouette */
         }}
       >
         {/* Beige/warm lighting effects on the silhouette */}
