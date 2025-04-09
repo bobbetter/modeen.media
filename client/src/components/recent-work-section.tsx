@@ -132,41 +132,16 @@ export function RecentWorkSection() {
             <ChevronRight className="h-6 w-6 text-gray-700 dark:text-gray-300" />
           </Button>
           
-          {/* Video Slider - Circular Motion Effect */}
+          {/* Video Slider */}
           <div className="overflow-hidden px-6 md:px-12">
-            <motion.div 
-              className="flex gap-6 py-8"
-              initial={false}
-              animate={{ 
-                rotateY: currentIndex * -15,
-                scale: 1 
-              }}
-              transition={{ duration: 0.7, ease: "easeInOut" }}
-              style={{ 
-                transformStyle: "preserve-3d", 
-                perspective: "1000px",
-                transformOrigin: "center center"
-              }}
-            >
+            <div className="flex gap-6 py-8">
               {visibleVideos.map((video, index) => (
                 <motion.div
                   key={`${video.id}-${index}`}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ 
-                    opacity: 1, 
-                    y: 0,
-                    rotateY: (index - 1) * 5,
-                    z: index === 1 ? 30 : 0
-                  }}
-                  transition={{ 
-                    duration: 0.5,
-                    delay: index * 0.1 
-                  }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="w-full md:w-1/3 flex-shrink-0"
-                  style={{ 
-                    transformStyle: "preserve-3d",
-                    backfaceVisibility: "hidden"
-                  }}
                 >
                   <Card className="h-full overflow-hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-gray-200/20 dark:border-gray-800/20 rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_25px_40px_rgba(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-2">
                     <div className="aspect-video relative overflow-hidden rounded-t-2xl">
@@ -192,7 +167,7 @@ export function RecentWorkSection() {
                   </Card>
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
