@@ -4,6 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import DeenAthleticThumbnail from "../assets/deen-athletic.png";
+import Abu53Thumbnail from "../assets/thumbnails/abu53.jpg";
+import SunnahshopThumbnail from "../assets/thumbnails/sunnahshop.svg";
+import SafwaCentreThumbnail from "../assets/thumbnails/safwa-centre.svg";
 
 type Video = {
   id: number;
@@ -17,33 +20,33 @@ type Video = {
 const videoData: Video[] = [
   {
     id: 1,
-    title: "Signature Tracksuit",
-    client: "Deen Athletic",
+    title: "Deen Athletic",
+    client: "Sports Brand",
     thumbnailUrl: DeenAthleticThumbnail,
     videoUrl: "https://www.youtube.com/embed/2HEhWPJPfZY", // Placeholder until actual video is available
     description: "Custom audio design for sports brand promotional material featuring dynamic sound effects and voiceover."
   },
   {
     id: 2,
-    title: "Nasheed Production",
-    client: "Abu53",
-    thumbnailUrl: "https://img.youtube.com/vi/qX9IHIyyn9I/maxresdefault.jpg",
+    title: "Abu53",
+    client: "German Nasheed Artist",
+    thumbnailUrl: Abu53Thumbnail,
     videoUrl: "https://www.youtube.com/embed/qX9IHIyyn9I",
     description: "Professional audio production for German nasheed artist with carefully crafted sound design."
   },
   {
     id: 3,
-    title: "Product Showcase",
-    client: "Sunnahshop",
-    thumbnailUrl: "https://images.unsplash.com/photo-1638303339971-2d3bbec59d1c?q=80&w=600&auto=format&fit=crop",
+    title: "Sunnahshop",
+    client: "Islamic Online Shop",
+    thumbnailUrl: SunnahshopThumbnail,
     videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho", // Placeholder until actual video is available
     description: "Professional voiceovers for Islamic online shop featuring dates, black seed oil, and other specialty products."
   },
   {
     id: 4,
-    title: "Educational Content",
-    client: "Safwa Centre",
-    thumbnailUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600&auto=format&fit=crop",
+    title: "Safwa Centre",
+    client: "Educational Channel",
+    thumbnailUrl: SafwaCentreThumbnail,
     videoUrl: "https://www.youtube.com/embed/U_Yp5KI4Q0E", // Placeholder until actual video is available
     description: "Audio production for educational channel from Paris with clear voiceovers and balanced background elements."
   }

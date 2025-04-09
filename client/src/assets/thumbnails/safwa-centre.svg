@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#0D0A08"/>
+  <rect x="440" y="260" width="400" height="200" rx="10" fill="#C2A278" fill-opacity="0.2"/>
+  <text x="640" y="340" font-family="Arial" font-size="42" fill="#C2A278" text-anchor="middle">Safwa Centre</text>
+  <text x="640" y="400" font-family="Arial" font-size="24" fill="#A89078" text-anchor="middle">Educational Channel</text>
+</svg>
