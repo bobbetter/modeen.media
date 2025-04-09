@@ -117,8 +117,9 @@ export function ProductsSection() {
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
               
               <CardContent className="p-10">
-                <div className="flex flex-col md:flex-row md:items-center gap-8 relative z-10">
-                  <div className="flex-shrink-0 w-full md:w-48 h-48 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5">
+                <div className="flex flex-col items-center relative z-10">
+                  {/* Cover at the top center */}
+                  <div className="mb-8 w-64 h-64 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5 transform-gpu">
                     <motion.img 
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.5 }}
@@ -128,7 +129,8 @@ export function ProductsSection() {
                     />
                   </div>
                   
-                  <div className="flex-grow">
+                  {/* Content below */}
+                  <div className="w-full text-left">
                     <span className="text-primary text-sm font-light tracking-widest uppercase">Premium Collection</span>
                     <h3 className="text-2xl font-bold text-foreground mt-2 mb-3 tracking-tight">Signature Soundpack</h3>
                     <div className="flex items-center mb-4">
