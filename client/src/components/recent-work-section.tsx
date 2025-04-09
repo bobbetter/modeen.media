@@ -20,35 +20,35 @@ type Video = {
 const videoData: Video[] = [
   {
     id: 1,
-    title: "Sports Brand",
-    client: "Deen Athletic",
+    title: "Deen Athletic",
+    client: "Sports Brand",
     thumbnailUrl: DeenAthleticThumbnail,
     videoUrl: "https://www.youtube.com/embed/2HEhWPJPfZY", // Placeholder until actual video is available
     description: "Custom audio design for sports brand promotional material featuring dynamic sound effects and voiceover."
   },
   {
     id: 2,
-    title: "Nasheed Artist",
-    client: "Abu53",
+    title: "Abu53",
+    client: "German Nasheed Artist",
     thumbnailUrl: Abu53Thumbnail,
     videoUrl: "https://www.youtube.com/embed/qX9IHIyyn9I",
-    description: "Professional audio production for German nasheed artist with unique crafted sound design."
+    description: "Professional audio production for German nasheed artist with carefully crafted sound design."
   },
   {
     id: 3,
-    title: "Islamic Online Shop",
-    client: "Sunnahshop",
+    title: "Sunnahshop",
+    client: "Islamic Online Shop",
     thumbnailUrl: SunnahshopThumbnail,
     videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho", // Placeholder until actual video is available
     description: "Professional voiceovers for Islamic online shop featuring dates, black seed oil, and other specialty products."
   },
   {
     id: 4,
-    title: "Educational Channel",
-    client: "Safwa Centre",
+    title: "Safwa Centre",
+    client: "Educational Channel",
     thumbnailUrl: SafwaCentreThumbnail,
     videoUrl: "https://www.youtube.com/embed/U_Yp5KI4Q0E", // Placeholder until actual video is available
-    description: "Audio production for educational channel from French with cinematic backgrounds and balanced sound fx elements."
+    description: "Audio production for educational channel from Paris with clear voiceovers and balanced background elements."
   }
 ];
 
