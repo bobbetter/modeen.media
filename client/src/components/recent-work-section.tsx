@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { useIsMobile } from "../hooks/use-mobile";
 import DeenAthleticThumbnail from "../assets/deen-athletic-new.png";
 import Abu53Thumbnail from "../assets/thumbnails/abu53-thumb.jpg";
 import SunnahshopThumbnail from "../assets/thumbnails/sunnah-shop-product.jpg";
@@ -46,7 +47,8 @@ const videoData: Video[] = [
 export function RecentWorkSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const maxVisibleItems = 3; // We display all three videos since we only have three
+  const isMobile = useIsMobile();
+  const maxVisibleItems = isMobile ? 1 : 3; // Show only 1 video at a time on mobile
   const videoSliderRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
@@ -128,7 +130,7 @@ export function RecentWorkSection() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="w-full md:w-1/3 flex-shrink-0"
+                  className={`w-full ${isMobile ? '' : 'md:w-1/3'} flex-shrink-0`}
                 >
                   <Card className="h-full overflow-hidden bg-gray-950/50 backdrop-blur-xl border-gray-800/30 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.4),0_10px_20px_rgba(0,0,0,0.3),inset_0_0_20px_rgba(194,162,120,0.3)] hover:shadow-[0_35px_60px_rgba(0,0,0,0.6),0_10px_30px_rgba(194,162,120,0.3)] transition-all duration-300 transform hover:-translate-y-2">
                     <div className="aspect-video relative overflow-hidden rounded-t-2xl">
@@ -146,7 +148,7 @@ export function RecentWorkSection() {
                         </Button>
                       </div>
                     </div>
-                    <CardContent className="p-6">
+                    <CardContent className={`${isMobile ? 'p-4' : 'p-6'}`}>
                       <h3 className="text-xl font-bold mb-1">{video.client}</h3>
                       <p className="text-primary/80 text-sm mb-3">{video.title}</p>
                       <p className="text-muted-foreground text-sm line-clamp-2">{video.description}</p>

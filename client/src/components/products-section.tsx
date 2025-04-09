@@ -11,6 +11,7 @@ import { ArrowRight, Star, Send, ChevronLeft, ChevronRight } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { contactFormSchema, type ContactFormData, submitContactForm } from "@/lib/contact-api";
 import { useMutation } from "@tanstack/react-query";
+import { useIsMobile } from "../hooks/use-mobile";
 import SignatureSoundpack from "../assets/signature-soundpack-cover.png";
 import CreatorsMostwanted from "../assets/creators-mostwanted-cover.png";
 
@@ -57,6 +58,7 @@ export function ProductsSection() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPackIndex, setCurrentPackIndex] = useState(0);
+  const isMobile = useIsMobile();
   
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -170,7 +172,7 @@ export function ProductsSection() {
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
               
-              <CardContent className="p-10">
+              <CardContent className={`${isMobile ? 'p-5' : 'p-10'}`}>
                 <div className="flex flex-col items-center relative z-10">
                   {/* Cover at the top center with navigation arrows */}
                   <div className="mb-8 w-full flex items-center justify-center gap-4">
@@ -183,7 +185,7 @@ export function ProductsSection() {
                     </div>
                     
                     {/* Album Cover */}
-                    <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5 transform-gpu relative">
+                    <div className={`${isMobile ? 'w-48 h-48' : 'w-64 h-64'} rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5 transform-gpu relative`}>
                       <AnimatePresence mode="wait">
                         <motion.div
                           key={currentPackIndex}
@@ -291,7 +293,7 @@ export function ProductsSection() {
               <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
               
-              <CardContent className="p-10 relative z-10">
+              <CardContent className={`${isMobile ? 'p-5' : 'p-10'} relative z-10`}>
                 <span className="text-primary text-sm font-light tracking-widest uppercase">Tailored Audio</span>
                 <h3 className="text-2xl font-bold text-foreground mt-2 mb-4 tracking-tight">Custom Soundtrack or Voiceover</h3>
                 <p className="text-muted-foreground leading-relaxed mb-6 text-sm">

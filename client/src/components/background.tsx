@@ -1,8 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import producerSilhouette from '../assets/producer-silhouette.png';
+import { useIsMobile } from '../hooks/use-mobile';
 
 export function AnimatedBackground() {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
       {/* Dark gradient base background with warmer dark tones */}
@@ -14,9 +17,9 @@ export function AnimatedBackground() {
         style={{
           backgroundImage: `url(${producerSilhouette})`,
           backgroundSize: 'cover',
-          backgroundPosition: '105% bottom',
+          backgroundPosition: isMobile ? '20% bottom' : '105% bottom',
           backgroundRepeat: 'no-repeat',
-          transform: 'scale(1.05)',
+          transform: isMobile ? 'scale(1.3)' : 'scale(1.05)',
         }}
       >
         {/* Beige/warm lighting effects on the silhouette */}
