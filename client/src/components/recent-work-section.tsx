@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
-import DeenAthleticThumbnail from "../assets/deen-athletic.png";
+import DeenAthleticThumbnail from "../assets/deen-athletic-new.png";
 import Abu53Thumbnail from "../assets/thumbnails/abu53.jpg";
 import SunnahshopThumbnail from "../assets/thumbnails/sunnahshop.svg";
 import SafwaCentreThumbnail from "../assets/thumbnails/safwa-centre.svg";
