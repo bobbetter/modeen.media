@@ -1,21 +1,28 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import producerBg from '../assets/producer-bg.svg';
+import producerSilhouette from '../assets/producer-silhouette.png';
 
 export function AnimatedBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
-      {/* Base background with producer image */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-b from-[#040E1C] via-[#0A1A33] to-[#061425]"
-        style={{
-          backgroundImage: `url(${producerBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'right center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.95
-        }}
-      />
+      {/* Dark gradient base background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#040E1C] via-[#0A1A33] to-[#061425]" />
+      
+      {/* Producer silhouette image */}
+      <div className="absolute inset-0 flex items-center justify-end">
+        <div 
+          className="h-[90vh] w-[50vw] relative mr-8 opacity-90"
+          style={{
+            backgroundImage: `url(${producerSilhouette})`,
+            backgroundSize: 'contain',
+            backgroundPosition: 'right center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
+          {/* Blue lighting effects on the silhouette */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/10 via-blue-800/5 to-transparent" />
+        </div>
+      </div>
       
       {/* Animated particle overlay */}
       <div className="absolute inset-0 opacity-20">
@@ -25,8 +32,9 @@ export function AnimatedBackground() {
       {/* Gradient overlays for depth */}
       <div className="absolute inset-0 bg-gradient-to-tr from-[#020916]/40 via-transparent to-[#102038]/30" />
       
-      {/* Blue accent light */}
+      {/* Blue accent lighting */}
       <div className="absolute top-[-10%] left-[30%] w-[600px] h-[600px] rounded-full bg-blue-900/10 blur-[150px]" />
+      <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] rounded-full bg-blue-700/5 blur-[100px]" />
       
       {/* Subtle vignette effect */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_#000_120%)] opacity-60" />
