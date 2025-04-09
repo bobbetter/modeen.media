@@ -107,22 +107,22 @@ export function RecentWorkSection() {
           {/* Navigation Buttons */}
           <Button 
             onClick={handlePrev} 
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -ml-6 md:ml-0"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -ml-2 sm:-ml-4 md:ml-0"
             variant="ghost"
           >
-            <ChevronLeft className="h-6 w-6 text-white/80" />
+            <ChevronLeft className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} text-white/80`} />
           </Button>
           
           <Button 
             onClick={handleNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -mr-6 md:mr-0"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-primary/90 hover:text-white hover:scale-105 transition-all duration-300 border border-gray-700/50 -mr-2 sm:-mr-4 md:mr-0"
             variant="ghost"
           >
-            <ChevronRight className="h-6 w-6 text-white/80" />
+            <ChevronRight className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} text-white/80`} />
           </Button>
           
           {/* Video Slider */}
-          <div className="overflow-hidden px-6 md:px-12">
+          <div className="overflow-hidden px-8 sm:px-10 md:px-12">
             <div className="flex gap-6 py-8">
               {visibleVideos.map((video, index) => (
                 <motion.div
@@ -142,9 +142,9 @@ export function RecentWorkSection() {
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                         <Button 
                           onClick={() => handleSelectVideo(video)}
-                          className="h-16 w-16 rounded-full bg-[#C2A278]/90 hover:bg-[#C2A278] text-black hover:scale-110 transition-all duration-300 flex items-center justify-center"
+                          className={`${isMobile ? 'h-12 w-12 sm:h-14 sm:w-14' : 'h-16 w-16'} rounded-full bg-[#C2A278]/90 hover:bg-[#C2A278] text-black hover:scale-110 transition-all duration-300 flex items-center justify-center`}
                         >
-                          <Play className="h-8 w-8 fill-current" />
+                          <Play className={`${isMobile ? 'h-6 w-6 sm:h-7 sm:w-7' : 'h-8 w-8'} fill-current`} />
                         </Button>
                       </div>
                     </div>
@@ -193,7 +193,7 @@ export function RecentWorkSection() {
                 ></video>
               )}
             </div>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-2xl font-bold">{selectedVideo.client}</h3>
