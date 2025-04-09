@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { ArrowRight, Star, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { contactFormSchema, type ContactFormData, submitContactForm } from "@/lib/contact-api";
@@ -15,6 +17,7 @@ import { useMutation } from "@tanstack/react-query";
 export function ProductsSection() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
   
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -50,6 +53,20 @@ export function ProductsSection() {
   function onSubmit(data: ContactFormData) {
     setIsSubmitting(true);
     contactMutation.mutate(data);
+  }
+  
+  function handlePurchase() {
+    setIsPurchasing(true);
+    
+    // Simulate API call with a timeout
+    setTimeout(() => {
+      toast({
+        title: "Purchase successful!",
+        description: "Thank you for your purchase. You'll receive a download link via email shortly.",
+        duration: 5000,
+      });
+      setIsPurchasing(false);
+    }, 2000);
   }
 
   const cardVariants = {
@@ -143,9 +160,26 @@ export function ProductsSection() {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-foreground text-xl font-bold">$149.99</span>
-                      <Button className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" size="sm">
-                        <span className="relative z-10">Buy Now</span>
-                        <ArrowRight className="relative z-10 ml-1 h-4 w-4" />
+                      <Button 
+                        className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" 
+                        size="sm"
+                        onClick={handlePurchase}
+                        disabled={isPurchasing}
+                      >
+                        <span className="relative z-10 flex items-center gap-1">
+                          {isPurchasing ? (
+                            <>
+                              <LoadingSpinner size="sm" thickness="thin" className="mr-1" />
+                              Processing
+                            </>
+                          ) : (
+                            <>
+                              Buy Now
+                              <ArrowRight className="h-4 w-4" />
+                            </>
+                          )}
+                        </span>
+                        {/* Button animation on hover */}
                         <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
                       </Button>
                     </div>
@@ -190,81 +224,101 @@ export function ProductsSection() {
                   Need something unique? Let us craft a custom audio experience specifically for your project. Our team specializes in bespoke soundtracks and professional voiceovers.
                 </p>
                 
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-muted-foreground/90 font-light">Name</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="Your name" 
-                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light" 
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-muted-foreground/90 font-light">Email</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="email" 
-                              placeholder="your@email.com" 
-                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="message"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-muted-foreground/90 font-light">Project Details</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Tell us about your project..." 
-                              className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-4 resize-none placeholder:text-muted-foreground/30 font-light"
-                              rows={4}
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="flex items-center justify-between pt-2">
-                      <Button 
-                        type="submit" 
-                        className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300"
-                        disabled={isSubmitting}
-                      >
-                        <span className="relative z-10">{isSubmitting ? "Sending..." : "Send Request"}</span>
-                        <Send className="relative z-10 ml-2 h-4 w-4" />
-                        <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
-                      </Button>
+                <div className="relative">
+                  {/* Loading overlay */}
+                  <LoadingOverlay 
+                    isLoading={isSubmitting} 
+                    text="Sending your request..."
+                    spinnerType="fancy"
+                  />
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-muted-foreground/90 font-light">Name</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Your name" 
+                                className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       
-                      <div className="text-muted-foreground/70 text-sm font-light">
-                        Response within 24h
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-muted-foreground/90 font-light">Email</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="email" 
+                                placeholder="your@email.com" 
+                                className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-6 h-10 placeholder:text-muted-foreground/30 font-light"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="message"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-muted-foreground/90 font-light">Project Details</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Tell us about your project..." 
+                                className="bg-white/70 border border-gray-200/50 focus:border-primary rounded-xl shadow-inner backdrop-blur-sm p-4 resize-none placeholder:text-muted-foreground/30 font-light"
+                                rows={4}
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="flex items-center justify-between pt-2">
+                        <Button 
+                          type="submit" 
+                          className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300"
+                          disabled={isSubmitting}
+                        >
+                          <span className="relative z-10 flex items-center gap-1">
+                            {isSubmitting ? (
+                              <>
+                                <LoadingSpinner size="sm" thickness="thin" className="mr-1" />
+                                Sending
+                              </>
+                            ) : (
+                              <>
+                                Send Request
+                                <Send className="h-4 w-4" />
+                              </>
+                            )}
+                          </span>
+                          <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
+                        </Button>
+                        
+                        <div className="text-muted-foreground/70 text-sm font-light">
+                          Response within 24h
+                        </div>
                       </div>
-                    </div>
-                  </form>
-                </Form>
+                    </form>
+                  </Form>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
