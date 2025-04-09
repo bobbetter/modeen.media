@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -86,14 +86,7 @@ export function RecentWorkSection() {
     setSelectedVideo(null);
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!selectedVideo) {
-        handleNext();
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [currentIndex, selectedVideo]);
+  // Auto-changing effect removed as requested
 
   // Get visible videos with proper wrapping
   const visibleVideos = [];
