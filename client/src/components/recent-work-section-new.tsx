@@ -119,7 +119,7 @@ export function RecentWorkSection() {
           
           {/* Video Cards */}
           <div className="overflow-hidden px-6 md:px-12">
-            <div className="flex gap-6 py-8">
+            <div className="flex justify-center gap-6 py-8">
               {visibleVideos.map((video, index) => (
                 <motion.div
                   key={`${video.id}-${index}`}
