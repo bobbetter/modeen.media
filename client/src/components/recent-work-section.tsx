@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import DeenAthleticThumbnail from "../assets/deen-athletic.png";
 
 type Video = {
   id: number;
@@ -16,43 +17,35 @@ type Video = {
 const videoData: Video[] = [
   {
     id: 1,
-    title: "Mountain Retreat",
-    client: "Alpine Resorts",
-    thumbnailUrl: "https://images.unsplash.com/photo-1518021964703-4b2030f03085?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/2HEhWPJPfZY",
-    description: "Cinematic soundscape featuring custom mountain ambience and ethereal textures."
+    title: "Signature Tracksuit",
+    client: "Deen Athletic",
+    thumbnailUrl: DeenAthleticThumbnail,
+    videoUrl: "https://www.youtube.com/embed/2HEhWPJPfZY", // Placeholder until actual video is available
+    description: "Custom audio design for sports brand promotional material featuring dynamic sound effects and voiceover."
   },
   {
     id: 2,
-    title: "Ocean Depths",
-    client: "Blue Marine Foundation",
-    thumbnailUrl: "https://images.unsplash.com/photo-1551244072-5d12893278ab?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/v1yYm7zRjpQ",
-    description: "Deep underwater atmosphere with whale songs and custom submarine sounds."
+    title: "Nasheed Production",
+    client: "Abu53",
+    thumbnailUrl: "https://img.youtube.com/vi/qX9IHIyyn9I/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/qX9IHIyyn9I",
+    description: "Professional audio production for German nasheed artist with carefully crafted sound design."
   },
   {
     id: 3,
-    title: "Urban Motion",
-    client: "City Ventures",
-    thumbnailUrl: "https://images.unsplash.com/photo-1444723121867-7a241cacace9?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho",
-    description: "Modern city ambience with sleek transitions and minimalist sound design."
+    title: "Product Showcase",
+    client: "Sunnahshop",
+    thumbnailUrl: "https://images.unsplash.com/photo-1638303339971-2d3bbec59d1c?q=80&w=600&auto=format&fit=crop",
+    videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho", // Placeholder until actual video is available
+    description: "Professional voiceovers for Islamic online shop featuring dates, black seed oil, and other specialty products."
   },
   {
     id: 4,
-    title: "Product Launch",
-    client: "TechVision Inc.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/U_Yp5KI4Q0E",
-    description: "Futuristic product reveal soundtrack with premium UI sounds and transitions."
-  },
-  {
-    id: 5,
-    title: "Nature Documentary",
-    client: "EarthView Productions",
-    thumbnailUrl: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/5HwdSMSxln0",
-    description: "Expansive natural soundscapes with custom foley and atmospheric design."
+    title: "Educational Content",
+    client: "Safwa Centre",
+    thumbnailUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600&auto=format&fit=crop",
+    videoUrl: "https://www.youtube.com/embed/U_Yp5KI4Q0E", // Placeholder until actual video is available
+    description: "Audio production for educational channel from Paris with clear voiceovers and balanced background elements."
   }
 ];
 
@@ -96,11 +89,11 @@ export function RecentWorkSection() {
   }
 
   return (
-    <section id="recent-work" className="py-24 relative overflow-hidden bg-gradient-to-b from-transparent to-blue-900/10">
+    <section id="recent-work" className="py-24 relative overflow-hidden bg-gradient-to-b from-transparent to-[#C2A278]/10">
       {/* Background Effects */}
       <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-primary/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 right-1/4 w-64 h-64 bg-primary/15 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#C2A278]/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 right-1/4 w-64 h-64 bg-[#A89078]/15 rounded-full blur-3xl"></div>
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
@@ -143,7 +136,7 @@ export function RecentWorkSection() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="w-full md:w-1/3 flex-shrink-0"
                 >
-                  <Card className="h-full overflow-hidden bg-gray-950/50 backdrop-blur-xl border-gray-800/30 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.4),0_10px_20px_rgba(0,0,0,0.3),inset_0_0_20px_rgba(30,58,138,0.3)] hover:shadow-[0_35px_60px_rgba(0,0,0,0.6),0_10px_30px_rgba(30,58,138,0.3)] transition-all duration-300 transform hover:-translate-y-2">
+                  <Card className="h-full overflow-hidden bg-gray-950/50 backdrop-blur-xl border-gray-800/30 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.4),0_10px_20px_rgba(0,0,0,0.3),inset_0_0_20px_rgba(194,162,120,0.3)] hover:shadow-[0_35px_60px_rgba(0,0,0,0.6),0_10px_30px_rgba(194,162,120,0.3)] transition-all duration-300 transform hover:-translate-y-2">
                     <div className="aspect-video relative overflow-hidden rounded-t-2xl">
                       <img 
                         src={video.thumbnailUrl} 
@@ -153,7 +146,7 @@ export function RecentWorkSection() {
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                         <Button 
                           onClick={() => handleSelectVideo(video)}
-                          className="h-16 w-16 rounded-full bg-primary/90 hover:bg-primary text-white hover:scale-110 transition-all duration-300 flex items-center justify-center"
+                          className="h-16 w-16 rounded-full bg-[#C2A278]/90 hover:bg-[#C2A278] text-black hover:scale-110 transition-all duration-300 flex items-center justify-center"
                         >
                           <Play className="h-8 w-8 fill-current" />
                         </Button>
