@@ -97,7 +97,7 @@ export function ProductsSection() {
               transition={{ duration: 1, delay: 0.2 }}
               className="mb-1 text-muted-foreground/70 font-light tracking-widest uppercase text-sm"
             ></motion.div>
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-4 relative z-10 font-sans">
+            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-4 relative z-10 font-sans">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary/90 to-primary/60">modeen</span>
               <span className="font-light">.media</span>
             </h1>
