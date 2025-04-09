@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import DeenAthleticThumbnail from "../assets/deen-athletic-new.png";
-import Abu53Thumbnail from "../assets/thumbnails/abu53.jpg";
+import Abu53Thumbnail from "../assets/thumbnails/abu53-thumb.jpg";
 import SunnahshopThumbnail from "../assets/thumbnails/sunnahshop.svg";
 import SafwaCentreThumbnail from "../assets/thumbnails/safwa-centre.svg";
 
@@ -23,7 +23,7 @@ const videoData: Video[] = [
     title: "Deen Athletic",
     client: "Sports Brand",
     thumbnailUrl: DeenAthleticThumbnail,
-    videoUrl: "/videos/deen-athletic.mp4", // Local video file
+    videoUrl: "/videos/signature-tracksuit.mp4", // Updated to use the signature tracksuit video
     description: "Custom audio design for sports brand promotional material featuring dynamic sound effects and voiceover."
   },
   {
