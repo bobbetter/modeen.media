@@ -14,9 +14,9 @@ export function AnimatedBackground() {
         style={{
           backgroundImage: `url(${producerSilhouette})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center bottom',
+          backgroundPosition: '60% bottom',
           backgroundRepeat: 'no-repeat',
-          transform: 'scale(1.05)',
+          transform: 'scale(1.2)',
         }}
       >
         {/* Beige/warm lighting effects on the silhouette */}
