@@ -11,7 +11,7 @@ import { ArrowRight, Star, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { contactFormSchema, type ContactFormData, submitContactForm } from "@/lib/contact-api";
 import { useMutation } from "@tanstack/react-query";
-import AlbumCover from "../assets/whale-cover.svg";
+import AlbumCover from "../assets/whale-cover.png";
 
 export function ProductsSection() {
   const { toast } = useToast();
@@ -122,7 +122,7 @@ export function ProductsSection() {
                       transition={{ duration: 0.5 }}
                       src={AlbumCover}
                       alt="Signature Soundpack" 
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   
