@@ -1,5 +1,5 @@
 import { ProductsSection } from "@/components/products-section";
-import { RecentWorkSection } from "@/components/recent-work-section";
+import { RecentWorkSection } from "@/components/recent-work-section-fixed";
 import { Footer } from "@/components/footer";
 import { AnimatedBackground } from "@/components/background";
 

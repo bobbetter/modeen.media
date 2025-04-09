@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,46 +13,41 @@ type Video = {
   description: string;
 };
 
+// Static local images instead of imports
+const DeenAthleticImage = "/client/src/assets/deen-athletic.png";
+
 const videoData: Video[] = [
   {
     id: 1,
-    title: "Mountain Retreat",
-    client: "Alpine Resorts",
-    thumbnailUrl: "https://images.unsplash.com/photo-1518021964703-4b2030f03085?q=80&w=600&auto=format&fit=crop",
+    title: "Deen Athletic",
+    client: "Sports Brand",
+    thumbnailUrl: "https://i.imgur.com/8nLFCVP.png", // Fallback URL for demonstration
     videoUrl: "https://www.youtube.com/embed/2HEhWPJPfZY",
-    description: "Cinematic soundscape featuring custom mountain ambience and ethereal textures."
+    description: "Custom audio design for sports brand promotional material featuring dynamic sound effects and voiceover."
   },
   {
     id: 2,
-    title: "Ocean Depths",
-    client: "Blue Marine Foundation",
-    thumbnailUrl: "https://images.unsplash.com/photo-1551244072-5d12893278ab?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/v1yYm7zRjpQ",
-    description: "Deep underwater atmosphere with whale songs and custom submarine sounds."
+    title: "Abu53",
+    client: "German Nasheed Artist",
+    thumbnailUrl: "https://i.imgur.com/kDJSUbK.jpg", // Fallback URL for demonstration
+    videoUrl: "https://www.youtube.com/embed/qX9IHIyyn9I",
+    description: "Professional audio production for German nasheed artist with carefully crafted sound design."
   },
   {
     id: 3,
-    title: "Urban Motion",
-    client: "City Ventures",
-    thumbnailUrl: "https://images.unsplash.com/photo-1444723121867-7a241cacace9?q=80&w=600&auto=format&fit=crop",
+    title: "Sunnahshop",
+    client: "Islamic Online Shop",
+    thumbnailUrl: "https://i.imgur.com/M9JMH2k.png", // Fallback URL for demonstration
     videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho",
-    description: "Modern city ambience with sleek transitions and minimalist sound design."
+    description: "Professional voiceovers for Islamic online shop featuring dates, black seed oil, and other specialty products."
   },
   {
     id: 4,
-    title: "Product Launch",
-    client: "TechVision Inc.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop",
+    title: "Safwa Centre",
+    client: "Educational Channel",
+    thumbnailUrl: "https://i.imgur.com/HMnGMws.png", // Fallback URL for demonstration
     videoUrl: "https://www.youtube.com/embed/U_Yp5KI4Q0E",
-    description: "Futuristic product reveal soundtrack with premium UI sounds and transitions."
-  },
-  {
-    id: 5,
-    title: "Nature Documentary",
-    client: "EarthView Productions",
-    thumbnailUrl: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/5HwdSMSxln0",
-    description: "Expansive natural soundscapes with custom foley and atmospheric design."
+    description: "Audio production for educational channel from Paris with clear voiceovers and balanced background elements."
   }
 ];
 
@@ -86,15 +81,6 @@ export function RecentWorkSection() {
     setSelectedVideo(null);
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!selectedVideo) {
-        handleNext();
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [currentIndex, selectedVideo]);
-
   // Get visible videos with proper wrapping
   const visibleVideos = [];
   for (let i = 0; i < maxVisibleItems; i++) {
@@ -103,11 +89,11 @@ export function RecentWorkSection() {
   }
 
   return (
-    <section id="recent-work" className="py-24 relative overflow-hidden bg-gradient-to-b from-transparent to-gray-100/40 dark:to-gray-900/20">
+    <section id="recent-work" className="py-24 relative overflow-hidden bg-gradient-to-b from-transparent to-[#C2A278]/10">
       {/* Background Effects */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#C2A278]/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 right-1/4 w-64 h-64 bg-[#A89078]/15 rounded-full blur-3xl"></div>
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
@@ -125,18 +111,18 @@ export function RecentWorkSection() {
           {/* Navigation Buttons */}
           <Button 
             onClick={handlePrev} 
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-xl hover:bg-white hover:scale-105 transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 -ml-6 md:ml-0"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-[#C2A278]/90 hover:text-black hover:scale-105 transition-all duration-300 border border-gray-700/50 -ml-6 md:ml-0"
             variant="ghost"
           >
-            <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            <ChevronLeft className="h-6 w-6 text-white/80" />
           </Button>
           
           <Button 
             onClick={handleNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-xl hover:bg-white hover:scale-105 transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 -mr-6 md:mr-0"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-gray-900/80 backdrop-blur-md shadow-xl hover:bg-[#C2A278]/90 hover:text-black hover:scale-105 transition-all duration-300 border border-gray-700/50 -mr-6 md:mr-0"
             variant="ghost"
           >
-            <ChevronRight className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            <ChevronRight className="h-6 w-6 text-white/80" />
           </Button>
           
           {/* Video Slider */}
@@ -150,7 +136,7 @@ export function RecentWorkSection() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="w-full md:w-1/3 flex-shrink-0"
                 >
-                  <Card className="h-full overflow-hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-gray-200/20 dark:border-gray-800/20 rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_25px_40px_rgba(0,0,0,0.2)] transition-all duration-300 transform hover:-translate-y-2">
+                  <Card className="h-full overflow-hidden bg-gray-950/50 backdrop-blur-xl border-gray-800/30 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.4),0_10px_20px_rgba(0,0,0,0.3),inset_0_0_20px_rgba(194,162,120,0.3)] hover:shadow-[0_35px_60px_rgba(0,0,0,0.6),0_10px_30px_rgba(194,162,120,0.3)] transition-all duration-300 transform hover:-translate-y-2">
                     <div className="aspect-video relative overflow-hidden rounded-t-2xl">
                       <img 
                         src={video.thumbnailUrl} 
@@ -160,7 +146,7 @@ export function RecentWorkSection() {
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                         <Button 
                           onClick={() => handleSelectVideo(video)}
-                          className="h-16 w-16 rounded-full bg-primary/90 hover:bg-primary text-white hover:scale-110 transition-all duration-300 flex items-center justify-center"
+                          className="h-16 w-16 rounded-full bg-[#C2A278]/90 hover:bg-[#C2A278] text-black hover:scale-110 transition-all duration-300 flex items-center justify-center"
                         >
                           <Play className="h-8 w-8 fill-current" />
                         </Button>
@@ -168,7 +154,7 @@ export function RecentWorkSection() {
                     </div>
                     <CardContent className="p-6">
                       <h3 className="text-xl font-bold mb-1">{video.title}</h3>
-                      <p className="text-primary/80 text-sm mb-3">Client: {video.client}</p>
+                      <p className="text-[#C2A278]/80 text-sm mb-3">{video.client}</p>
                       <p className="text-muted-foreground text-sm line-clamp-2">{video.description}</p>
                     </CardContent>
                   </Card>
@@ -190,7 +176,7 @@ export function RecentWorkSection() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
-            className="w-full max-w-5xl bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl"
+            className="w-full max-w-5xl bg-gray-900/95 rounded-2xl overflow-hidden shadow-2xl border border-gray-800/50 backdrop-blur-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="aspect-video w-full">
@@ -206,7 +192,7 @@ export function RecentWorkSection() {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-2xl font-bold">{selectedVideo.title}</h3>
-                  <p className="text-primary/80">Client: {selectedVideo.client}</p>
+                  <p className="text-[#C2A278]/80">{selectedVideo.client}</p>
                 </div>
                 <Button 
                   onClick={handleCloseVideo}
