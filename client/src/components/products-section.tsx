@@ -64,11 +64,14 @@ export function ProductsSection() {
   };
 
   return (
-    <section id="products" className="py-24 pt-32 min-h-[90vh] bg-background/95 backdrop-blur-sm">
+    <section id="products" className="py-24 pt-10 min-h-[90vh] bg-background/95 backdrop-blur-sm">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-16">
-          Our Products
-        </h2>
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-foreground">
+            modeen<span className="text-primary">.media</span>
+          </h1>
+          <p className="text-muted-foreground mt-2">Premium audio solutions for creators</p>
+        </div>
         
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           {/* Soundpack Card */}
