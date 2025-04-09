@@ -14,7 +14,7 @@ export function AnimatedBackground() {
         style={{
           backgroundImage: `url(${producerSilhouette})`,
           backgroundSize: 'cover',
-          backgroundPosition: '70% bottom',
+          backgroundPosition: '105% bottom',
           backgroundRepeat: 'no-repeat',
           transform: 'scale(1.05)',
         }}
