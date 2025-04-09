@@ -1,21 +1,62 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowRight, Star, Send } from "lucide-react";
+import { ArrowRight, Star, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { contactFormSchema, type ContactFormData, submitContactForm } from "@/lib/contact-api";
 import { useMutation } from "@tanstack/react-query";
-import AlbumCover from "../assets/signature-soundpack-cover.png";
+import SignatureSoundpack from "../assets/signature-soundpack-cover.png";
+import CreatorsMostwanted from "../assets/creators-mostwanted-cover.png";
+
+// Define the soundpack type
+type Soundpack = {
+  id: number;
+  title: string;
+  coverImage: string;
+  description: string;
+  tags: string[];
+  price: string;
+  collection: string;
+  rating: number;
+  ratingCount: number;
+};
+
+// Define the soundpacks
+const soundpacks: Soundpack[] = [
+  {
+    id: 1,
+    title: "Signature Soundpack",
+    coverImage: SignatureSoundpack,
+    description: "A collection of 200+ handcrafted sounds, designed for professionals. Perfect for filmmakers, game developers, and content creators seeking premium audio elements.",
+    tags: ["Sound Effects", "Vocal Beds", "Transitions", "Ambient", "UI Sounds"],
+    price: "$149.99",
+    collection: "Premium Collection",
+    rating: 4.7,
+    ratingCount: 128
+  },
+  {
+    id: 2,
+    title: "CREATORS MOSTWANTED",
+    coverImage: CreatorsMostwanted,
+    description: "The ultimate creator toolkit featuring 150+ trending sounds and effects. Ideal for social media content, YouTube videos, and podcasts.",
+    tags: ["Trending SFX", "Social Media", "Stingers", "Podcast Elements", "Loops"],
+    price: "$129.99",
+    collection: "Creator Series",
+    rating: 4.9,
+    ratingCount: 93
+  }
+];
 
 export function ProductsSection() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPackIndex, setCurrentPackIndex] = useState(0);
   
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -52,6 +93,22 @@ export function ProductsSection() {
     setIsSubmitting(true);
     contactMutation.mutate(data);
   }
+
+  // Navigate to the previous soundpack
+  const navigatePrev = () => {
+    setCurrentPackIndex((prev) => 
+      prev === 0 ? soundpacks.length - 1 : prev - 1
+    );
+  };
+
+  // Navigate to the next soundpack
+  const navigateNext = () => {
+    setCurrentPackIndex((prev) => 
+      prev === soundpacks.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const currentPack = soundpacks[currentPackIndex];
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -115,52 +172,102 @@ export function ProductsSection() {
               
               <CardContent className="p-10">
                 <div className="flex flex-col items-center relative z-10">
-                  {/* Cover at the top center */}
-                  <div className="mb-8 w-64 h-64 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5 transform-gpu">
-                    <motion.img 
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.5 }}
-                      src={AlbumCover}
-                      alt="Signature Soundpack" 
-                      className="w-full h-full object-cover"
-                    />
+                  {/* Cover at the top center with navigation arrows */}
+                  <div className="mb-8 w-full flex items-center justify-center gap-4">
+                    {/* Left Arrow Navigation */}
+                    <div 
+                      className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800/70 hover:bg-primary/80 cursor-pointer transition-colors shadow-lg transform hover:scale-105 active:scale-95"
+                      onClick={navigatePrev}
+                    >
+                      <ChevronLeft className="h-5 w-5 text-white" />
+                    </div>
+                    
+                    {/* Album Cover */}
+                    <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5 transform-gpu relative">
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={currentPackIndex}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="w-full h-full"
+                        >
+                          <img 
+                            src={currentPack.coverImage}
+                            alt={currentPack.title} 
+                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                          />
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+                    
+                    {/* Right Arrow Navigation */}
+                    <div 
+                      className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800/70 hover:bg-primary/80 cursor-pointer transition-colors shadow-lg transform hover:scale-105 active:scale-95"
+                      onClick={navigateNext}
+                    >
+                      <ChevronRight className="h-5 w-5 text-white" />
+                    </div>
                   </div>
                   
                   {/* Content below */}
                   <div className="w-full text-left">
-                    <span className="text-primary text-sm font-light tracking-widest uppercase">Premium Collection</span>
-                    <h3 className="text-2xl font-bold text-foreground mt-2 mb-3 tracking-tight">Signature Soundpack</h3>
-                    <div className="flex items-center mb-4">
-                      <div className="flex items-center text-yellow-400">
-                        {[1, 2, 3, 4].map((i) => (
-                          <Star key={i} className="h-4 w-4 fill-current" />
-                        ))}
-                        <Star className="h-4 w-4 fill-current opacity-50" />
-                      </div>
-                      <span className="text-muted-foreground text-sm ml-2 font-light">4.7 (128 reviews)</span>
-                    </div>
-                    <p className="text-muted-foreground leading-relaxed mb-5 text-sm">
-                      A collection of 200+ handcrafted sounds, designed for professionals. Perfect for filmmakers, game developers, and content creators seeking premium audio elements.
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground text-xl font-bold">$149.99</span>
-                      <Button className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" size="sm">
-                        <span className="relative z-10">Buy Now</span>
-                        <ArrowRight className="relative z-10 ml-1 h-4 w-4" />
-                        <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
-                      </Button>
-                    </div>
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={currentPackIndex}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <span className="text-primary text-sm font-light tracking-widest uppercase">{currentPack.collection}</span>
+                        <h3 className="text-2xl font-bold text-foreground mt-2 mb-3 tracking-tight">{currentPack.title}</h3>
+                        <div className="flex items-center mb-4">
+                          <div className="flex items-center text-yellow-400">
+                            {[...Array(Math.floor(currentPack.rating))].map((_, i) => (
+                              <Star key={i} className="h-4 w-4 fill-current" />
+                            ))}
+                            {currentPack.rating % 1 > 0 && (
+                              <Star className="h-4 w-4 fill-current opacity-50" />
+                            )}
+                          </div>
+                          <span className="text-muted-foreground text-sm ml-2 font-light">
+                            {currentPack.rating} ({currentPack.ratingCount} reviews)
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground leading-relaxed mb-5 text-sm">
+                          {currentPack.description}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-foreground text-xl font-bold">{currentPack.price}</span>
+                          <Button className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" size="sm">
+                            <span className="relative z-10">Buy Now</span>
+                            <ArrowRight className="relative z-10 ml-1 h-4 w-4" />
+                            <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
+                          </Button>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
                 </div>
                 
                 <div className="mt-6 pt-6 border-t border-white/5 relative z-10">
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Sound Effects</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Vocal Beds</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Transitions</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Ambient</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">UI Sounds</span>
-                  </div>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentPackIndex}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="flex flex-wrap gap-2">
+                        {currentPack.tags.map((tag, index) => (
+                          <span key={index} className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">{tag}</span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
               </CardContent>
             </Card>
