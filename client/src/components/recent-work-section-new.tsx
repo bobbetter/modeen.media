@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import DeenAthleticThumbnail from "../assets/deen-athletic-new.png";
 import Abu53Thumbnail from "../assets/thumbnails/abu53-thumb.jpg";
-import SunnahshopThumbnail from "../assets/thumbnails/sunnah-shop-product.jpg";
+import SunnahshopThumbnail from "../assets/thumbnails/dates-thumbnail.jpg";
 
 type Video = {
   id: number;
@@ -36,10 +36,10 @@ const videoData: Video[] = [
   {
     id: 3,
     title: "Sunnah Shop",
-    client: "Premium Islamic Products",
+    client: "Premium Dates & Islamic Products",
     thumbnailUrl: SunnahshopThumbnail,
     videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho",
-    description: "Professional voiceover production for premium Islamic store offering certified organic dates, black seed products, and high-quality traditional items."
+    description: "Professional audio production for premium Islamic store featuring authentic organic dates, black seed oil, and other high-quality traditional products."
   }
 ];
 
