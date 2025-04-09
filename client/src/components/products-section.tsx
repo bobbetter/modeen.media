@@ -11,7 +11,7 @@ import { ArrowRight, Star, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { contactFormSchema, type ContactFormData, submitContactForm } from "@/lib/contact-api";
 import { useMutation } from "@tanstack/react-query";
-import AlbumCover from "../assets/album-cover.svg";
+import AlbumCover from "../assets/whale-cover.svg";
 
 export function ProductsSection() {
   const { toast } = useToast();
@@ -128,8 +128,8 @@ export function ProductsSection() {
                   
                   {/* Content below */}
                   <div className="w-full text-left">
-                    <span className="text-primary text-sm font-light tracking-widest uppercase">Premium Collection</span>
-                    <h3 className="text-2xl font-bold text-foreground mt-2 mb-3 tracking-tight">Signature Soundpack</h3>
+                    <span className="text-primary text-sm font-light tracking-widest uppercase">PROD. BY MELO DEEN</span>
+                    <h3 className="text-2xl font-bold text-foreground mt-2 mb-3 tracking-tight">THE WHALE</h3>
                     <div className="flex items-center mb-4">
                       <div className="flex items-center text-yellow-400">
                         {[1, 2, 3, 4].map((i) => (
@@ -140,10 +140,13 @@ export function ProductsSection() {
                       <span className="text-muted-foreground text-sm ml-2 font-light">4.7 (128 reviews)</span>
                     </div>
                     <p className="text-muted-foreground leading-relaxed mb-5 text-sm">
-                      A collection of 200+ handcrafted sounds, designed for professionals. Perfect for filmmakers, game developers, and content creators seeking premium audio elements.
+                      Premium signature soundpack from Melo Deen. Features deep ocean-inspired textures, ambient whale calls, and cinematic underwater elements. Ideal for films, games, and immersive media projects.
                     </p>
                     <div className="flex items-center justify-between">
+                      <div className="flex items-center">
                       <span className="text-foreground text-xl font-bold">$149.99</span>
+                      <span className="ml-2 px-1.5 py-0.5 bg-primary/20 text-primary/80 text-xs rounded">2024</span>
+                    </div>
                       <Button className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" size="sm">
                         <span className="relative z-10">Buy Now</span>
                         <ArrowRight className="relative z-10 ml-1 h-4 w-4" />
@@ -155,11 +158,11 @@ export function ProductsSection() {
                 
                 <div className="mt-6 pt-6 border-t border-white/5 relative z-10">
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Sound Effects</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Vocal Beds</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Transitions</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Ambient</span>
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">UI Sounds</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Ocean Ambience</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Whale Calls</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Underwater FX</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">Cinematic</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">DEENSTARS.IO</span>
                   </div>
                 </div>
               </CardContent>
