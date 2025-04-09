@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import DeenAthleticThumbnail from "../assets/deen-athletic-new.png";
 import Abu53Thumbnail from "../assets/thumbnails/abu53-thumb.jpg";
-import SunnahshopThumbnail from "../assets/thumbnails/sunnahshop.svg";
-import SafwaCentreThumbnail from "../assets/thumbnails/safwa-centre.svg";
+import SunnahshopThumbnail from "../assets/thumbnails/sunnah-shop-product.jpg";
 
 type Video = {
   id: number;
@@ -29,33 +28,25 @@ const videoData: Video[] = [
   {
     id: 2,
     title: "Abu53",
-    client: "German Nasheed Artist",
+    client: "Nasheed Artist",
     thumbnailUrl: Abu53Thumbnail,
     videoUrl: "https://www.youtube.com/embed/qX9IHIyyn9I",
     description: "Professional audio production for German nasheed artist with carefully crafted sound design."
   },
   {
     id: 3,
-    title: "Sunnahshop",
-    client: "Islamic Online Shop",
+    title: "Sunnah Shop",
+    client: "Premium Islamic Products",
     thumbnailUrl: SunnahshopThumbnail,
-    videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho", // Placeholder until actual video is available
-    description: "Professional voiceovers for Islamic online shop featuring dates, black seed oil, and other specialty products."
-  },
-  {
-    id: 4,
-    title: "Safwa Centre",
-    client: "Educational Channel",
-    thumbnailUrl: SafwaCentreThumbnail,
-    videoUrl: "https://www.youtube.com/embed/U_Yp5KI4Q0E", // Placeholder until actual video is available
-    description: "Audio production for educational channel from Paris with clear voiceovers and balanced background elements."
+    videoUrl: "https://www.youtube.com/embed/mkR_Qwix4Ho",
+    description: "Professional voiceover production for premium Islamic store offering certified organic dates, black seed products, and high-quality traditional items."
   }
 ];
 
 export function RecentWorkSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const maxVisibleItems = 3;
+  const maxVisibleItems = 3; // We display all three videos since we only have three
   const videoSliderRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
