@@ -9,8 +9,7 @@
 
   body {
     @apply font-sans antialiased text-foreground;
-    background: #3b3b40;
-    background: linear-gradient(135deg, #3b3b40 0%, #4d4d52 50%, #616164 100%);
+    background: linear-gradient(135deg, #3b3b40, #616164);
     min-height: 100vh;
   }
 }

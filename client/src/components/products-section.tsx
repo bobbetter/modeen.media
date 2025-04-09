@@ -64,7 +64,7 @@ export function ProductsSection() {
   };
 
   return (
-    <section id="products" className="py-24 pt-10 min-h-[90vh] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #3b3b40 0%, #4d4d52 50%, #616164 100%)' }}>
+    <section id="products" className="py-24 pt-10 min-h-[90vh] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
