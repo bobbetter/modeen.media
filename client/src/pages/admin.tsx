@@ -138,6 +138,7 @@ export default function Admin() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include" // Include cookies for authentication
       });
       
       return response.json();
@@ -175,6 +176,7 @@ export default function Admin() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include" // Include cookies for authentication
       });
       
       return response.json();
@@ -202,6 +204,7 @@ export default function Admin() {
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/products/${id}`, {
         method: "DELETE",
+        credentials: "include" // Include cookies for authentication
       });
       
       return response.json();
@@ -229,6 +232,7 @@ export default function Admin() {
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
+        credentials: "include" // Include cookies for authentication
       });
       
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
