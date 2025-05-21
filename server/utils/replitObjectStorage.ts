@@ -23,13 +23,14 @@ export async function uploadToObjectStorage(filePath: string, filename: string):
     const key = `products/${filename}`;
     
     // Upload the file to Replit Object Storage
-    await storageClient.putObject(key, fileContent);
+    const result = await storageClient.upload(key, fileContent);
     
-    // This is the bucket ID provided by the user
-    const bucketId = 'replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4';
+    if (!result.ok) {
+      throw new Error(`Failed to upload to Object Storage: ${result.error}`);
+    }
     
     // Return the URL that can be used to access the file
-    return `https://${bucketId}.prod.roplat.com/${key}`;
+    return `/uploads/products/${filename}`;
   } catch (error) {
     console.error('Error uploading to Replit Object Storage:', error);
     throw error;
@@ -44,13 +45,19 @@ export async function deleteFromObjectStorage(fileUrl: string): Promise<void> {
   if (!fileUrl) return;
   
   try {
-    // Extract the key from the URL - assuming format like https://{bucket-id}.prod.roplat.com/products/filename
+    // Extract the key from the URL - assuming format like /uploads/products/filename
     const urlParts = fileUrl.split('/');
-    const key = urlParts.slice(-2).join('/'); // This should give us "products/filename"
+    const filename = urlParts[urlParts.length - 1];
+    const key = `products/${filename}`;
     
-    // Delete the file from Replit Object Storage
-    await storageClient.deleteObject(key);
-    console.log(`Deleted file ${key} from Replit Object Storage`);
+    // Delete the file from Replit Object Storage using delete
+    const result = await storageClient.delete(key);
+    
+    if (!result.ok) {
+      console.warn(`Warning: Object Storage delete failed: ${result.error}`);
+    } else {
+      console.log(`Deleted file ${key} from Replit Object Storage`);
+    }
   } catch (error) {
     console.error('Error deleting from Replit Object Storage:', error);
     throw error;
