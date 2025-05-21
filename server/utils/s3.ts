@@ -28,11 +28,11 @@ const s3Client = new S3Client({
 export async function uploadFileToS3(filePath: string, key: string): Promise<string> {
   const fileContent = await readFile(filePath);
   
+  // Specify the correct type for ACL
   const uploadParams = {
     Bucket: S3_BUCKET,
     Key: key,
-    Body: fileContent,
-    ACL: "public-read" as const // Make the file publicly accessible
+    Body: fileContent
   };
 
   await s3Client.send(new PutObjectCommand(uploadParams));

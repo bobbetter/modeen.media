@@ -1,9 +1,14 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertContactSchema, insertUserSchema, insertProductSchema } from "@shared/schema";
 import { z } from "zod";
 import { authMiddleware, adminMiddleware, AuthRequest } from "./middleware/auth";
+import { upload } from "./middleware/upload";
+import { uploadFileToS3, deleteFileFromS3, getKeyFromUrl } from "./utils/s3";
+import path from "path";
+import fs from "fs";
+import { promisify } from "util";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
@@ -166,6 +171,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // File upload endpoint
+  app.post("/api/upload", authMiddleware, adminMiddleware, upload.single("file"), async (req: AuthRequest & { file?: Express.Multer.File }, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No file uploaded"
+        });
+      }
+
+      // Generate S3 key - use unique file name
+      const fileName = path.basename(req.file.path);
+      const s3Key = `products/${fileName}`;
+      
+      // Upload to S3
+      const fileUrl = await uploadFileToS3(req.file.path, s3Key);
+      
+      // Delete local file after upload
+      await promisify(fs.unlink)(req.file.path);
+      
+      return res.status(200).json({
+        success: true,
+        data: {
+          fileUrl
+        }
+      });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred during file upload"
+      });
+    }
+  });
+
   // Protected admin routes for product management
   app.post("/api/products", authMiddleware, adminMiddleware, async (req: AuthRequest, res) => {
     try {
@@ -176,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         // Ensure tags is an array
         tags: Array.isArray(req.body.tags) ? req.body.tags : 
-              (typeof req.body.tags === 'string' ? req.body.tags.split(',').map(t => t.trim()) : [])
+              (typeof req.body.tags === 'string' ? req.body.tags.split(',').map((t: string) => t.trim()) : [])
       };
       
       console.log("Processed product data:", JSON.stringify(productData));
@@ -218,6 +258,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Get existing product before update (to check if file needs to be deleted)
+      const existingProduct = await storage.getProduct(productId);
+      if (!existingProduct) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found"
+        });
+      }
+      
       const validation = insertProductSchema.safeParse(req.body);
       
       if (!validation.success) {
@@ -226,6 +275,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Invalid product data",
           errors: validation.error.format()
         });
+      }
+      
+      // Check if the file URL has changed
+      if (existingProduct.fileUrl && existingProduct.fileUrl !== validation.data.fileUrl) {
+        // Delete old file from S3 if it exists and has changed
+        const oldFileKey = getKeyFromUrl(existingProduct.fileUrl);
+        if (oldFileKey) {
+          try {
+            await deleteFileFromS3(oldFileKey);
+          } catch (error) {
+            console.error("Error deleting old file from S3:", error);
+            // Continue with update even if file deletion fails
+          }
+        }
       }
       
       const updatedProduct = await storage.updateProduct(productId, validation.data);
@@ -262,6 +325,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Get product before deletion to access file URL
+      const product = await storage.getProduct(productId);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found"
+        });
+      }
+      
+      // Delete the product from the database
       const success = await storage.deleteProduct(productId);
       
       if (!success) {
@@ -269,6 +342,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: false,
           message: "Product not found"
         });
+      }
+      
+      // Delete associated file from S3 if it exists
+      if (product.fileUrl) {
+        const fileKey = getKeyFromUrl(product.fileUrl);
+        if (fileKey) {
+          try {
+            await deleteFileFromS3(fileKey);
+          } catch (error) {
+            console.error("Error deleting file from S3:", error);
+            // Continue even if file deletion fails
+          }
+        }
       }
       
       return res.status(200).json({
