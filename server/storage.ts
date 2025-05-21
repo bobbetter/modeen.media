@@ -71,6 +71,36 @@ export class MemStorage implements IStorage {
     return Array.from(this.contacts.values());
   }
   
+  // Initialize with some sample products
+  constructor() {
+    // Initialize maps
+    this.users = new Map();
+    this.contacts = new Map();
+    this.products = new Map();
+    
+    // Set initial IDs
+    this.currentUserId = 1;
+    this.currentContactId = 1;
+    this.currentProductId = 1;
+    
+    // Create admin user
+    this.users.set(1, {
+      id: 1,
+      username: "admin",
+      password: "admin",
+      isAdmin: true
+    });
+    
+    // Initialize products with sample data if empty
+    if (this.products.size === 0) {
+      this.createProduct({
+        name: "Sample Product",
+        description: "This is a sample product",
+        price: 99.99
+      });
+    }
+  }
+  
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
     const id = this.currentProductId++;
     const created_at = new Date().toISOString();
