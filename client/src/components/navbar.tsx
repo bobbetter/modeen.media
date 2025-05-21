@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, User, Shield } from "lucide-react";
+import { Link } from "wouter";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -57,7 +58,24 @@ export function Navbar() {
           >
             Contact
           </button>
+          <Link href="/login" className="flex items-center text-foreground hover:text-primary transition duration-300 text-sm font-medium">
+            <User className="h-4 w-4 mr-1" />
+            Login
+          </Link>
+          <Link href="/admin" className="flex items-center text-foreground hover:text-primary transition duration-300 text-sm font-medium">
+            <Shield className="h-4 w-4 mr-1" />
+            Admin
+          </Link>
         </nav>
+        
+        <div className="hidden md:flex space-x-2">
+          <Link href="/login">
+            <Button variant="outline" size="sm">
+              <User className="h-4 w-4 mr-2" />
+              Login
+            </Button>
+          </Link>
+        </div>
         
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild className="md:hidden">
@@ -80,6 +98,14 @@ export function Navbar() {
               >
                 Contact
               </button>
+              <Link href="/login" className="flex items-center text-foreground hover:text-primary transition duration-300 text-lg font-medium">
+                <User className="h-5 w-5 mr-2" />
+                Login
+              </Link>
+              <Link href="/admin" className="flex items-center text-foreground hover:text-primary transition duration-300 text-lg font-medium">
+                <Shield className="h-5 w-5 mr-2" />
+                Admin
+              </Link>
             </div>
           </SheetContent>
         </Sheet>
