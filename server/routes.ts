@@ -1,4 +1,4 @@
-import type { Express, Request, Response, NextFunction } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertContactSchema, insertUserSchema, insertProductSchema } from "@shared/schema";
@@ -11,6 +11,8 @@ import fs from "fs";
 import { promisify } from "util";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve files from the file-storage directory
+  app.use('/file-storage', express.static(path.join(process.cwd(), 'file-storage')));
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
