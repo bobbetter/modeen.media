@@ -1,4 +1,6 @@
 import { users, type User, type InsertUser, contacts, type Contact, type InsertContact, products, type Product, type InsertProduct } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -13,99 +15,87 @@ export interface IStorage {
   deleteProduct(id: number): Promise<boolean>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private contacts: Map<number, Contact>;
-  private products: Map<number, Product>;
-  currentUserId: number;
-  currentContactId: number;
-  currentProductId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.contacts = new Map();
-    this.products = new Map();
-    this.currentUserId = 1;
-    this.currentContactId = 1;
-    this.currentProductId = 1;
-    
-    // Create a default admin user
-    this.createUser({
-      username: "admin",
-      password: "admin123",
-      isAdmin: true
-    });
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    // Ensure isAdmin is properly set with a default value if not provided
-    const user: User = { 
-      ...insertUser, 
-      id,
+    const [user] = await db.insert(users).values({
+      ...insertUser,
       isAdmin: insertUser.isAdmin === true
-    };
-    this.users.set(id, user);
+    }).returning();
     return user;
   }
 
   async createContact(insertContact: InsertContact): Promise<Contact> {
-    const id = this.currentContactId++;
     const created_at = new Date().toISOString();
-    const contact: Contact = { ...insertContact, id, created_at };
-    this.contacts.set(id, contact);
+    const [contact] = await db.insert(contacts).values({
+      ...insertContact,
+      created_at
+    }).returning();
     return contact;
   }
 
   async getContacts(): Promise<Contact[]> {
-    return Array.from(this.contacts.values());
+    return await db.select().from(contacts);
   }
   
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
-    const id = this.currentProductId++;
     const created_at = new Date().toISOString();
-    const product: Product = { ...insertProduct, id, created_at };
-    this.products.set(id, product);
+    const [product] = await db.insert(products).values({
+      ...insertProduct,
+      created_at
+    }).returning();
     return product;
   }
   
   async getProducts(): Promise<Product[]> {
-    return Array.from(this.products.values());
+    return await db.select().from(products);
   }
   
   async getProduct(id: number): Promise<Product | undefined> {
-    return this.products.get(id);
+    const [product] = await db.select().from(products).where(eq(products.id, id));
+    return product || undefined;
   }
   
   async updateProduct(id: number, insertProduct: InsertProduct): Promise<Product | undefined> {
-    const existingProduct = this.products.get(id);
+    const [updated] = await db.update(products)
+      .set(insertProduct)
+      .where(eq(products.id, id))
+      .returning();
     
-    if (!existingProduct) {
-      return undefined;
-    }
-    
-    const updated: Product = { 
-      ...existingProduct, 
-      ...insertProduct,
-    };
-    
-    this.products.set(id, updated);
-    return updated;
+    return updated || undefined;
   }
   
   async deleteProduct(id: number): Promise<boolean> {
-    return this.products.delete(id);
+    const result = await db.delete(products).where(eq(products.id, id));
+    return !!result;
   }
 }
 
-export const storage = new MemStorage();
+// Initialize the storage
+export const storage = new DatabaseStorage();
+
+// Create a default admin user if it doesn't exist
+(async () => {
+  try {
+    const adminUser = await storage.getUserByUsername("admin");
+    if (!adminUser) {
+      await storage.createUser({
+        username: "admin",
+        password: "admin123",
+        isAdmin: true
+      });
+      console.log("Default admin user created");
+    }
+  } catch (error) {
+    console.error("Error creating default admin user:", error);
+  }
+})();
