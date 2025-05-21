@@ -344,7 +344,7 @@ export default function Admin() {
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
             <p className="mt-2">Loading products...</p>
           </div>
-        ) : productsData?.data?.length === 0 ? (
+        ) : productsData.length === 0 ? (
           <div className="text-center p-8 text-muted-foreground">
             No products yet. Click "Add Product" to create one.
           </div>
@@ -362,7 +362,7 @@ export default function Admin() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {productsData?.data?.map((product: Product) => (
+                {productsData.map((product: Product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.id}</TableCell>
                     <TableCell>{product.name}</TableCell>
