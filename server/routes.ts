@@ -195,7 +195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Upload file to Replit Object Storage
       console.log("Uploading file to Replit Object Storage...");
-      const fileUrl = await uploadFileToStorage(req.file.path, fileName);
+      const fileUrl = await uploadToObjectStorage(req.file.path, fileName);
       console.log("File uploaded to Object Storage at:", fileUrl);
       
       // Delete temporary file after storage
@@ -293,7 +293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingProduct.fileUrl && existingProduct.fileUrl !== validation.data.fileUrl) {
         // Delete old file if it exists and has changed
         try {
-          await deleteFileFromStorage(existingProduct.fileUrl);
+          await deleteFromObjectStorage(existingProduct.fileUrl);
         } catch (error) {
           console.error("Error deleting old file:", error);
           // Continue with update even if file deletion fails
@@ -356,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Delete associated file if it exists
       if (product.fileUrl) {
         try {
-          await deleteFileFromStorage(product.fileUrl);
+          await deleteFromObjectStorage(product.fileUrl);
         } catch (error) {
           console.error("Error deleting file:", error);
           // Continue even if file deletion fails

@@ -23,7 +23,7 @@ export async function uploadToObjectStorage(filePath: string, filename: string):
     const key = `products/${filename}`;
     
     // Upload the file to Replit Object Storage
-    const result = await storageClient.upload(key, fileContent);
+    const result = await storageClient.uploadFromBytes(key, fileContent);
     
     if (!result.ok) {
       throw new Error(`Failed to upload to Object Storage: ${result.error}`);
