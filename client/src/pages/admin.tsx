@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useNavigate } from "wouter";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
+import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -63,40 +63,65 @@ export default function Admin() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  // Check if user is authenticated and is admin
-  const { data: userData, isLoading: isUserLoading, isError: isUserError } = useQuery({
-    queryKey: ["/api/auth/me"],
-    retry: false,
-    onError: () => {
-      // Redirect to login if not authenticated
-      navigate("/login");
-    }
-  });
+  // Define response types to help with proper typing
+  type ApiResponse<T> = {
+    success: boolean;
+    message?: string;
+    data: T;
+  };
 
-  // If authenticated but not admin, redirect to home
+  type UserData = {
+    id: number;
+    username: string;
+    isAdmin: boolean;
+  };
+
+  // Check if user is authenticated and is admin
+  const { 
+    data: userApiResponse, 
+    isLoading: isUserLoading, 
+    isError: isUserError 
+  } = useQuery<ApiResponse<UserData>>({
+    queryKey: ["/api/auth/me"],
+    retry: false
+  });
+  
+  // Extract user data from API response
+  const userData = userApiResponse?.data;
+  
+  // Redirect if not authenticated or not admin
   useEffect(() => {
-    if (userData && !userData.data.isAdmin) {
+    if (isUserError) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to access the admin panel",
+      });
+      setLocation("/login");
+    } else if (userData && !userData.isAdmin) {
       toast({
         title: "Access denied",
         description: "You don't have permission to access the admin panel",
         variant: "destructive",
       });
-      navigate("/");
+      setLocation("/");
     }
-  }, [userData, navigate, toast]);
+  }, [userData, isUserError, toast, setLocation]);
 
   // Fetch products
   const {
-    data: productsData,
+    data: productsApiResponse,
     isLoading: isProductsLoading,
     isError: isProductsError,
-  } = useQuery({
+  } = useQuery<ApiResponse<Product[]>>({
     queryKey: ["/api/products"],
-    enabled: !!userData?.data?.isAdmin,
+    enabled: !!userData?.isAdmin,
   });
+  
+  // Extract products data from API response
+  const productsData = productsApiResponse?.data || [];
 
   // Create product mutation
   const createProductMutation = useMutation({
@@ -107,7 +132,7 @@ export default function Admin() {
         price: parseFloat(data.price),
       };
       
-      const response = await apiRequest("/api/products", {
+      const response = await fetch("/api/products", {
         method: "POST",
         body: JSON.stringify(productData),
         headers: {
@@ -144,7 +169,7 @@ export default function Admin() {
         price: parseFloat(data.price),
       };
       
-      const response = await apiRequest(`/api/products/${id}`, {
+      const response = await fetch(`/api/products/${id}`, {
         method: "PUT",
         body: JSON.stringify(productData),
         headers: {
@@ -175,7 +200,7 @@ export default function Admin() {
   // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest(`/api/products/${id}`, {
+      const response = await fetch(`/api/products/${id}`, {
         method: "DELETE",
       });
       
@@ -202,7 +227,7 @@ export default function Admin() {
   // Logout function
   const handleLogout = async () => {
     try {
-      await apiRequest("/api/auth/logout", {
+      await fetch("/api/auth/logout", {
         method: "POST",
       });
       
@@ -211,7 +236,7 @@ export default function Admin() {
         title: "Logged out",
         description: "You have been logged out successfully",
       });
-      navigate("/login");
+      setLocation("/login");
     } catch (error) {
       console.error("Logout error:", error);
       toast({
@@ -279,7 +304,7 @@ export default function Admin() {
   }
 
   // If user is not admin, don't render the page (will be redirected)
-  if (!userData?.data?.isAdmin) {
+  if (userData && !userData.isAdmin) {
     return null;
   }
 
@@ -290,7 +315,7 @@ export default function Admin() {
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm">
-              Welcome, {userData?.data?.username || "Admin"}
+              Welcome, {userData?.username || "Admin"}
             </span>
             <Button variant="secondary" size="sm" onClick={handleLogout}>
               Logout
