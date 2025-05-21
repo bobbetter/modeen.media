@@ -1,6 +1,5 @@
 import { users, type User, type InsertUser, contacts, type Contact, type InsertContact, products, type Product, type InsertProduct } from "@shared/schema";
-
-export interface IStorage {
+```export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
@@ -22,19 +21,31 @@ export class MemStorage implements IStorage {
   currentProductId: number;
 
   constructor() {
+    // Initialize maps
     this.users = new Map();
     this.contacts = new Map();
     this.products = new Map();
+
+    // Set initial IDs
     this.currentUserId = 1;
     this.currentContactId = 1;
     this.currentProductId = 1;
-    
-    // Create a default admin user
+
+    // Create admin user
     this.createUser({
       username: "admin",
       password: "admin123",
       isAdmin: true
     });
+
+    // Initialize products with sample data if empty
+    if (this.products.size === 0) {
+      this.createProduct({
+        name: "Sample Product",
+        description: "This is a sample product",
+        price: 99.99
+      });
+    }
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -49,7 +60,6 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    // Ensure isAdmin is properly set with a default value if not provided
     const user: User = { 
       ...insertUser, 
       id,
@@ -70,37 +80,7 @@ export class MemStorage implements IStorage {
   async getContacts(): Promise<Contact[]> {
     return Array.from(this.contacts.values());
   }
-  
-  // Initialize with some sample products
-  constructor() {
-    // Initialize maps
-    this.users = new Map();
-    this.contacts = new Map();
-    this.products = new Map();
-    
-    // Set initial IDs
-    this.currentUserId = 1;
-    this.currentContactId = 1;
-    this.currentProductId = 1;
-    
-    // Create admin user
-    this.users.set(1, {
-      id: 1,
-      username: "admin",
-      password: "admin",
-      isAdmin: true
-    });
-    
-    // Initialize products with sample data if empty
-    if (this.products.size === 0) {
-      this.createProduct({
-        name: "Sample Product",
-        description: "This is a sample product",
-        price: 99.99
-      });
-    }
-  }
-  
+
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
     const id = this.currentProductId++;
     const created_at = new Date().toISOString();
@@ -108,31 +88,31 @@ export class MemStorage implements IStorage {
     this.products.set(id, product);
     return product;
   }
-  
+
   async getProducts(): Promise<Product[]> {
     return Array.from(this.products.values());
   }
-  
+
   async getProduct(id: number): Promise<Product | undefined> {
     return this.products.get(id);
   }
-  
+
   async updateProduct(id: number, insertProduct: InsertProduct): Promise<Product | undefined> {
     const existingProduct = this.products.get(id);
-    
+
     if (!existingProduct) {
       return undefined;
     }
-    
+
     const updated: Product = { 
       ...existingProduct, 
       ...insertProduct,
     };
-    
+
     this.products.set(id, updated);
     return updated;
   }
-  
+
   async deleteProduct(id: number): Promise<boolean> {
     return this.products.delete(id);
   }
