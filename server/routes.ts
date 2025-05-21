@@ -5,7 +5,7 @@ import { insertContactSchema, insertUserSchema, insertProductSchema } from "@sha
 import { z } from "zod";
 import { authMiddleware, adminMiddleware, AuthRequest } from "./middleware/auth";
 import { upload } from "./middleware/upload";
-import { uploadFileToS3, deleteFileFromS3, getKeyFromUrl } from "./utils/s3";
+import { storeFile, deleteFile } from "./utils/fileStorage";
 import path from "path";
 import fs from "fs";
 import { promisify } from "util";
@@ -181,20 +181,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Generate S3 key - use unique file name
+      // Get the original filename and file path
+      const originalName = req.file.originalname;
       const fileName = path.basename(req.file.path);
-      const s3Key = `products/${fileName}`;
       
-      // Upload to S3
-      const fileUrl = await uploadFileToS3(req.file.path, s3Key);
+      // Store the file in Replit's file storage
+      const fileUrl = await storeFile(req.file.path, fileName);
       
-      // Delete local file after upload
+      // Delete temporary file after storage
       await promisify(fs.unlink)(req.file.path);
       
       return res.status(200).json({
         success: true,
         data: {
-          fileUrl
+          fileUrl,
+          originalName
         }
       });
     } catch (error) {
@@ -279,15 +280,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if the file URL has changed
       if (existingProduct.fileUrl && existingProduct.fileUrl !== validation.data.fileUrl) {
-        // Delete old file from S3 if it exists and has changed
-        const oldFileKey = getKeyFromUrl(existingProduct.fileUrl);
-        if (oldFileKey) {
-          try {
-            await deleteFileFromS3(oldFileKey);
-          } catch (error) {
-            console.error("Error deleting old file from S3:", error);
-            // Continue with update even if file deletion fails
-          }
+        // Delete old file if it exists and has changed
+        try {
+          await deleteFile(existingProduct.fileUrl);
+        } catch (error) {
+          console.error("Error deleting old file:", error);
+          // Continue with update even if file deletion fails
         }
       }
       
@@ -344,16 +342,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Delete associated file from S3 if it exists
+      // Delete associated file if it exists
       if (product.fileUrl) {
-        const fileKey = getKeyFromUrl(product.fileUrl);
-        if (fileKey) {
-          try {
-            await deleteFileFromS3(fileKey);
-          } catch (error) {
-            console.error("Error deleting file from S3:", error);
-            // Continue even if file deletion fails
-          }
+        try {
+          await deleteFile(product.fileUrl);
+        } catch (error) {
+          console.error("Error deleting file:", error);
+          // Continue even if file deletion fails
         }
       }
       

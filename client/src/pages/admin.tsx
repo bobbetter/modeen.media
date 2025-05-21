@@ -482,6 +482,21 @@ export default function Admin() {
                     </TableCell>
                     <TableCell>${Number(product.price).toFixed(2)}</TableCell>
                     <TableCell>
+                      {product.fileUrl ? (
+                        <a 
+                          href={product.fileUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center text-sm text-blue-600 hover:underline"
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          View File
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">No file</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       {new Date(product.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
@@ -613,7 +628,8 @@ export default function Admin() {
                         {/* Hidden actual file input */}
                         <input 
                           type="hidden" 
-                          {...field} 
+                          {...field}
+                          value={field.value || ""}
                         />
                         
                         {/* File Upload UI */}
