@@ -170,7 +170,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/products", authMiddleware, adminMiddleware, async (req: AuthRequest, res) => {
     try {
       console.log("Product data received:", JSON.stringify(req.body));
-      const validation = insertProductSchema.safeParse(req.body);
+      
+      // Make sure category and tags are properly formatted
+      const productData = {
+        ...req.body,
+        // Ensure tags is an array
+        tags: Array.isArray(req.body.tags) ? req.body.tags : 
+              (typeof req.body.tags === 'string' ? req.body.tags.split(',').map(t => t.trim()) : [])
+      };
+      
+      console.log("Processed product data:", JSON.stringify(productData));
+      const validation = insertProductSchema.safeParse(productData);
       
       if (!validation.success) {
         console.log("Validation errors:", JSON.stringify(validation.error.format()));
