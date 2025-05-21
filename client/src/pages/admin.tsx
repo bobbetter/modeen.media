@@ -55,6 +55,14 @@ const productFormSchema = insertProductSchema.extend({
       message: "Price must be a positive number",
     }
   ),
+  category: z.string().default(""),
+  tags: z.union([z.string(), z.array(z.string())]).transform(value => {
+    if (typeof value === 'string') {
+      // Convert comma-separated string to array
+      return value.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+    }
+    return value;
+  }).default([]),
 });
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
@@ -256,6 +264,8 @@ export default function Admin() {
       name: "",
       description: "",
       price: "",
+      category: "",
+      tags: [],
     },
   });
 
@@ -265,6 +275,8 @@ export default function Admin() {
       name: "",
       description: "",
       price: "",
+      category: "",
+      tags: [],
     });
     setCurrentProduct(null);
     setIsDialogOpen(true);
@@ -276,6 +288,8 @@ export default function Admin() {
       name: product.name,
       description: product.description,
       price: product.price.toString(),
+      category: product.category || "",
+      tags: product.tags || [],
     });
     setCurrentProduct(product);
     setIsDialogOpen(true);
@@ -358,6 +372,8 @@ export default function Admin() {
                   <TableHead>ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Description</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Tags</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -370,6 +386,16 @@ export default function Admin() {
                     <TableCell>{product.name}</TableCell>
                     <TableCell className="max-w-xs truncate">
                       {product.description}
+                    </TableCell>
+                    <TableCell>{product.category || "-"}</TableCell>
+                    <TableCell>
+                      {product.tags && product.tags.length > 0 
+                        ? product.tags.map((tag, index) => (
+                            <span key={index} className="inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded mr-1 mb-1">
+                              {tag}
+                            </span>
+                          ))
+                        : "-"}
                     </TableCell>
                     <TableCell>${Number(product.price).toFixed(2)}</TableCell>
                     <TableCell>
@@ -455,6 +481,36 @@ export default function Admin() {
                         min="0"
                         placeholder="0.00"
                         {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Category" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Tags (comma separated)" 
+                        value={Array.isArray(field.value) ? field.value.join(', ') : field.value} 
+                        onChange={e => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
