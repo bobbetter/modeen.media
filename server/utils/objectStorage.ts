@@ -8,9 +8,9 @@ const unlink = promisify(fs.unlink);
 
 // Initialize Replit Object Storage with the provided bucket ID
 const storage = createObjectStorageClient({
-  bucketName: 'modeen-media-files',
+  bucketName: 'SpiritedVengefulNaturallanguage',
   // You provided this bucket ID
-  bucketId: 'replit-objstore-61b76130-28b4-4830-83b7-2f90d6e0e13a'
+  bucketId: 'replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4'
 });
 
 /**

@@ -193,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fileName = path.basename(req.file.path);
       console.log("File details:", { originalName, fileName, path: req.file.path });
       
-      // Store the file in our file storage
+      // Store file in local storage
       console.log("Storing file...");
       const fileUrl = await storeFile(req.file.path, fileName);
       console.log("File stored at:", fileUrl);
