@@ -176,7 +176,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // File upload endpoint
   app.post("/api/upload", authMiddleware, adminMiddleware, upload.single("file"), async (req: AuthRequest & { file?: Express.Multer.File }, res) => {
     try {
+      console.log("File upload request received");
+      console.log("Request body:", req.body);
+      console.log("Request file:", req.file);
+      
       if (!req.file) {
+        console.log("No file found in request");
         return res.status(400).json({
           success: false,
           message: "No file uploaded"
@@ -186,12 +191,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the original filename and file path
       const originalName = req.file.originalname;
       const fileName = path.basename(req.file.path);
+      console.log("File details:", { originalName, fileName, path: req.file.path });
       
       // Store the file in our file storage
+      console.log("Storing file...");
       const fileUrl = await storeFile(req.file.path, fileName);
+      console.log("File stored at:", fileUrl);
       
       // Delete temporary file after storage
       await promisify(fs.unlink)(req.file.path);
+      console.log("Temporary file deleted");
       
       return res.status(200).json({
         success: true,

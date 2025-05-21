@@ -310,16 +310,24 @@ export default function Admin() {
   // File upload mutation
   const uploadFileMutation = useMutation({
     mutationFn: async (file: File) => {
+      console.log("Starting file upload for:", file.name);
+      
       const formData = new FormData();
       formData.append("file", file);
+      console.log("FormData created with file");
       
+      console.log("Sending upload request to /api/upload");
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
         credentials: "include" // Include cookies for authentication
       });
       
-      return response.json();
+      console.log("Upload response status:", response.status);
+      const responseData = await response.json();
+      console.log("Upload response data:", responseData);
+      
+      return responseData;
     },
     onSuccess: (response) => {
       if (response.success) {
