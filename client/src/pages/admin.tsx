@@ -492,7 +492,7 @@ export default function Admin() {
                     <TableCell>
                       {product.fileUrl ? (
                         <a 
-                          href={product.fileUrl} 
+                          href={product.fileUrl.startsWith('http') ? product.fileUrl : `${window.location.origin}${product.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="flex items-center text-sm text-blue-600 hover:underline"
@@ -647,7 +647,7 @@ export default function Admin() {
                               <div className="flex items-center">
                                 <FileText className="h-5 w-5 mr-2 text-primary" />
                                 <a 
-                                  href={field.value} 
+                                  href={field.value.startsWith('http') ? field.value : `${window.location.origin}${field.value}`} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="text-sm text-blue-600 hover:underline truncate max-w-[200px]"
