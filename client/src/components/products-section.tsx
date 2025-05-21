@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { contactFormSchema, type ContactFormData, submitContactForm } from "@/lib/contact-api";
 import { useMutation } from "@tanstack/react-query";
 import { useIsMobile } from "../hooks/use-mobile";
+import { useLocation } from "wouter";
 import SignatureSoundpack from "../assets/signature-soundpack-cover.png";
 import CreatorsMostwanted from "../assets/creators-mostwanted-cover.png";
 
@@ -59,6 +60,7 @@ export function ProductsSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPackIndex, setCurrentPackIndex] = useState(0);
   const isMobile = useIsMobile();
+  const [, setLocation] = useLocation();
   
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -108,6 +110,11 @@ export function ProductsSection() {
     setCurrentPackIndex((prev) => 
       prev === soundpacks.length - 1 ? 0 : prev + 1
     );
+  };
+  
+  // Handle clicking the Buy Now button
+  const handleBuyNow = () => {
+    setLocation(`/checkout?product=${currentPack.id}`);
   };
 
   const currentPack = soundpacks[currentPackIndex];
@@ -243,7 +250,11 @@ export function ProductsSection() {
                         </p>
                         <div className="flex items-center justify-between">
                           <span className="text-foreground text-xl font-bold">{currentPack.price}</span>
-                          <Button className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" size="sm">
+                          <Button 
+                            onClick={handleBuyNow}
+                            className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" 
+                            size="sm"
+                          >
                             <span className="relative z-10">Buy Now</span>
                             <ArrowRight className="relative z-10 ml-1 h-4 w-4" />
                             <div className="absolute inset-0 bg-white/30 opacity-0 group-hover/btn:opacity-30 transition-opacity duration-300"></div>
