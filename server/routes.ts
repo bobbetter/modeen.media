@@ -169,9 +169,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Protected admin routes for product management
   app.post("/api/products", authMiddleware, adminMiddleware, async (req: AuthRequest, res) => {
     try {
+      console.log("Product data received:", JSON.stringify(req.body));
       const validation = insertProductSchema.safeParse(req.body);
       
       if (!validation.success) {
+        console.log("Validation errors:", JSON.stringify(validation.error.format()));
         return res.status(400).json({
           success: false,
           message: "Invalid product data",
