@@ -3,6 +3,35 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertContactSchema } from "@shared/schema";
 import { z } from "zod";
+import Stripe from "stripe";
+import path from "path";
+import fs from "fs";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
+
+// Soundpack data - in a real app, this would come from a database
+const soundpacks = [
+  {
+    id: 1,
+    title: "Signature Soundpack",
+    description: "A collection of 200+ handcrafted sounds, designed for professionals.",
+    priceInCents: 14999, // $149.99
+    filename: "signature-soundpack.zip"
+  },
+  {
+    id: 2,
+    title: "CREATORS MOSTWANTED",
+    description: "The ultimate creator toolkit featuring 150+ trending sounds and effects.",
+    priceInCents: 12999, // $129.99
+    filename: "creators-mostwanted.zip"
+  }
+];
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes
