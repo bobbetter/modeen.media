@@ -126,10 +126,9 @@ export default function Admin() {
   // Create product mutation
   const createProductMutation = useMutation({
     mutationFn: async (data: ProductFormValues) => {
-      // Convert price to a number
+      // Keep price as a string as expected by the server
       const productData = {
-        ...data,
-        price: parseFloat(data.price),
+        ...data
       };
       
       const response = await fetch("/api/products", {
@@ -164,10 +163,9 @@ export default function Admin() {
   // Update product mutation
   const updateProductMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: ProductFormValues }) => {
-      // Convert price to a number
+      // Keep price as a string as expected by the server
       const productData = {
-        ...data,
-        price: parseFloat(data.price),
+        ...data
       };
       
       const response = await fetch(`/api/products/${id}`, {
