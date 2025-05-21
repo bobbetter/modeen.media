@@ -5,7 +5,7 @@ import { insertContactSchema, insertUserSchema, insertProductSchema } from "@sha
 import { z } from "zod";
 import { authMiddleware, adminMiddleware, AuthRequest } from "./middleware/auth";
 import { upload } from "./middleware/upload";
-import { storeFile, deleteFile } from "./utils/fileUpload";
+import { uploadFileToStorage, deleteFileFromStorage } from "./utils/replitStorage";
 import path from "path";
 import fs from "fs";
 import { promisify } from "util";
