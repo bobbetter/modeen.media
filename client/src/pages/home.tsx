@@ -9,10 +9,10 @@ export default function Home() {
     <div className="min-h-screen text-foreground relative">
       {/* Interactive animated background */}
       <AnimatedBackground />
-      
+
       {/* Navigation */}
-      <Navbar />
-      
+      {/* <Navbar /> */}
+
       {/* Content layers */}
       <div className="flex flex-col relative z-10">
         <ProductsSection />

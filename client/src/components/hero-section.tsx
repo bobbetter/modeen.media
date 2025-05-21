@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { SoundWave } from "./ui/sound-wave";
 import { ChevronDown } from "lucide-react";
 
+
 export function HeroSection() {
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');

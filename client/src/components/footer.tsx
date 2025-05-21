@@ -1,4 +1,7 @@
 import { Facebook, Twitter, Instagram } from "lucide-react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Shield } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -39,6 +42,12 @@ export function Footer() {
               <a href="#" className="text-white/40 hover:text-primary transition-all duration-500">
                 <Instagram className="h-5 w-5 hover:scale-110 transition-transform duration-300" />
               </a>
+              <Link href="/admin">
+                <Button variant="outline" size="sm" className="border-primary/50 hover:bg-primary hover:text-background">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Admin
+                </Button>
+              </Link>
             </div>
           </div>
           
