@@ -5,14 +5,14 @@ import { insertContactSchema, insertUserSchema, insertProductSchema } from "@sha
 import { z } from "zod";
 import { authMiddleware, adminMiddleware, AuthRequest } from "./middleware/auth";
 import { upload } from "./middleware/upload";
-import { uploadFileToStorage, deleteFileFromStorage } from "./utils/replitStorage";
+import { storeFile, deleteFile } from "./utils/fileUpload";
 import path from "path";
 import fs from "fs";
 import { promisify } from "util";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Serve files from the file-storage directory
-  app.use('/file-storage', express.static(path.join(process.cwd(), 'file-storage')));
+  // Serve files from the public directory
+  app.use(express.static(path.join(process.cwd(), 'public')));
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -187,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const originalName = req.file.originalname;
       const fileName = path.basename(req.file.path);
       
-      // Store the file in Replit's file storage
+      // Store the file in our file storage
       const fileUrl = await storeFile(req.file.path, fileName);
       
       // Delete temporary file after storage

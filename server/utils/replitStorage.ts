@@ -1,4 +1,4 @@
-import * as objectStorage from '@replit/object-storage';
+import { Client } from '@replit/object-storage';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
@@ -11,7 +11,7 @@ const BUCKET_ID = 'replit-objstore-61b76130-28b4-4830-83b7-2f90d6e0e13a';
 const BUCKET_NAME = 'modeen-media-files';
 
 // Access the Replit Object Storage bucket
-const storage = objectStorage.default;
+const storage = new Client();
 
 /**
  * Upload a file to Replit Object Storage
@@ -28,7 +28,9 @@ export async function uploadFileToStorage(filePath: string, filename: string): P
     const key = `products/${filename}`;
     
     // Upload to object storage
-    await storage.put(key, fileContent);
+    await storage.put(key, fileContent, {
+      bucketId: BUCKET_ID
+    });
     
     // Build URL to access the file
     const fileUrl = `https://${BUCKET_ID}.${BUCKET_NAME}.replit.dev/${key}`;
