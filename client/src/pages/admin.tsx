@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
@@ -44,7 +44,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Plus, Pencil, Trash } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash, Upload, FileText, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 // Form schema for product
@@ -73,6 +73,9 @@ export default function Admin() {
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Define response types to help with proper typing
   type ApiResponse<T> = {
@@ -266,6 +269,7 @@ export default function Admin() {
       price: "",
       category: "",
       tags: [],
+      fileUrl: "",
     },
   });
 
@@ -277,6 +281,7 @@ export default function Admin() {
       price: "",
       category: "",
       tags: [],
+      fileUrl: "",
     });
     setCurrentProduct(null);
     setIsDialogOpen(true);
@@ -290,6 +295,7 @@ export default function Admin() {
       price: product.price.toString(),
       category: product.category || "",
       tags: product.tags || [],
+      fileUrl: product.fileUrl || "",
     });
     setCurrentProduct(product);
     setIsDialogOpen(true);
@@ -300,6 +306,82 @@ export default function Admin() {
     setCurrentProduct(product);
     setIsDeleteDialogOpen(true);
   };
+
+  // File upload mutation
+  const uploadFileMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+        credentials: "include" // Include cookies for authentication
+      });
+      
+      return response.json();
+    },
+    onSuccess: (response) => {
+      if (response.success) {
+        // Set the file URL in the form
+        form.setValue("fileUrl", response.data.fileUrl);
+        setUploadingFile(false);
+        toast({
+          title: "File uploaded",
+          description: "File has been uploaded successfully",
+        });
+      } else {
+        setUploadingFile(false);
+        toast({
+          title: "Error",
+          description: response.message || "Failed to upload file",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error) => {
+      console.error("File upload error:", error);
+      setUploadingFile(false);
+      toast({
+        title: "Error",
+        description: "Failed to upload file",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+  
+  // Handle file upload
+  const handleFileUpload = () => {
+    if (selectedFile) {
+      setUploadingFile(true);
+      uploadFileMutation.mutate(selectedFile);
+    }
+  };
+  
+  // Remove the selected file
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+  
+  // Clear file selection when dialog closes
+  useEffect(() => {
+    if (!isDialogOpen) {
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }, [isDialogOpen]);
 
   // Submit form handler
   const onSubmit = (data: ProductFormValues) => {
@@ -375,6 +457,7 @@ export default function Admin() {
                   <TableHead>Category</TableHead>
                   <TableHead>Tags</TableHead>
                   <TableHead>Price</TableHead>
+                  <TableHead>File</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -517,6 +600,112 @@ export default function Admin() {
                   </FormItem>
                 )}
               />
+              
+              {/* File Upload Field */}
+              <FormField
+                control={form.control}
+                name="fileUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Upload File</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        {/* Hidden actual file input */}
+                        <input 
+                          type="hidden" 
+                          {...field} 
+                        />
+                        
+                        {/* File Upload UI */}
+                        <div className="border rounded-md p-4">
+                          {field.value ? (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <FileText className="h-5 w-5 mr-2 text-primary" />
+                                <a 
+                                  href={field.value} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-blue-600 hover:underline truncate max-w-[200px]"
+                                >
+                                  {field.value.split('/').pop()}
+                                </a>
+                              </div>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => form.setValue("fileUrl", "")}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <input
+                                  type="file"
+                                  className="hidden"
+                                  ref={fileInputRef}
+                                  onChange={handleFileChange}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  onClick={() => fileInputRef.current?.click()}
+                                  disabled={uploadingFile}
+                                >
+                                  <Upload className="h-4 w-4 mr-2" />
+                                  Choose File
+                                </Button>
+                                {selectedFile && (
+                                  <>
+                                    <span className="text-sm truncate max-w-[150px]">
+                                      {selectedFile.name}
+                                    </span>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={handleRemoveFile}
+                                      className="ml-auto"
+                                      disabled={uploadingFile}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                              {selectedFile && (
+                                <Button
+                                  type="button"
+                                  className="w-full"
+                                  onClick={handleFileUpload}
+                                  disabled={uploadingFile}
+                                >
+                                  {uploadingFile ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                      Uploading...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="h-4 w-4 mr-2" />
+                                      Upload
+                                    </>
+                                  )}
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
               <DialogFooter>
                 <Button
                   type="button"
