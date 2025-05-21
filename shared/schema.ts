@@ -36,6 +36,7 @@ export const products = pgTable("products", {
   price: numeric("price").notNull(),
   category: text("category").default("").notNull(),
   tags: text("tags").array().default([]).notNull(),
+  fileUrl: text("file_url"),
   created_at: text("created_at").notNull(),
 });
 
@@ -45,6 +46,7 @@ export const insertProductSchema = createInsertSchema(products).pick({
   price: true,
   category: true,
   tags: true,
+  fileUrl: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
