@@ -606,15 +606,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get the file from object storage
-      const { stream, filename, contentType, contentLength } = await getFileFromObjectStorage(product.fileUrl);
+      const { buffer, filename, contentType } = await getFileFromObjectStorage(product.fileUrl);
 
       // Set appropriate headers for file download
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Length', contentLength);
+      res.setHeader('Content-Length', buffer.length);
       
-      // Stream the file to the response
-      stream.pipe(res);
+      // Send the file as a buffer
+      res.send(buffer);
     } catch (error) {
       console.error('Error serving download:', error);
       return res.status(500).json({ error: 'Failed to download file' });

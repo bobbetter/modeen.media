@@ -42,9 +42,9 @@ export async function uploadToObjectStorage(filePath: string, filename: string):
 /**
  * Get a file from Replit Object Storage
  * @param fileUrl URL of the file to retrieve
- * @returns A stream of the file content and filename
+ * @returns File content as Buffer, filename, and content type
  */
-export async function getFileFromObjectStorage(fileUrl: string): Promise<{ stream: Readable, filename: string, contentType: string, contentLength: number }> {
+export async function getFileFromObjectStorage(fileUrl: string): Promise<{ buffer: any, filename: string, contentType: string }> {
   try {
     // Normalize the fileUrl to get the proper object storage key
     let key = fileUrl;
@@ -58,17 +58,12 @@ export async function getFileFromObjectStorage(fileUrl: string): Promise<{ strea
     
     console.log(`Getting file from Object Storage with key: ${key}`);
 
-    // Check if file exists
-    const existsResult = await storageClient.exists(key);
-    if (!existsResult.ok || !existsResult.exists) {
-      throw new Error(`File does not exist in Object Storage: ${key}`);
-    }
-
-    // Get the file data as bytes
+    // No need to check if file exists, just try to download it
+    // Get the file as bytes (buffer)
     const result = await storageClient.downloadAsBytes(key);
     
     if (!result.ok) {
-      throw new Error(`Failed to get file from Object Storage: ${result.error}`);
+      throw new Error(`Failed to get file from Object Storage: ${result.error?.message || 'Unknown error'}`);
     }
     
     // Extract the filename from the key
@@ -96,14 +91,11 @@ export async function getFileFromObjectStorage(fileUrl: string): Promise<{ strea
       contentType = contentTypeMap[ext];
     }
     
-    // Create a readable stream from the buffer data
-    const stream = Readable.from(result.data);
-    
+    // The result.value is an array with the buffer as the first element
     return {
-      stream,
+      buffer: result.value[0],
       filename,
-      contentType,
-      contentLength: result.data.length
+      contentType
     };
   } catch (error) {
     console.error('Error getting file from Object Storage:', error);
