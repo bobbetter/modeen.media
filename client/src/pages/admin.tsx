@@ -70,7 +70,7 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 // Form schema for download links
 const downloadLinkFormSchema = insertDownloadLinkSchema.extend({
   product_id: z.number(),
-  download_link: z.string().min(1, "Download link is required"),
+  // download_link: z.string().min(1, "Download link is required"),
   max_download_count: z.number().int().min(0, "Max download count must be a non-negative integer"),
   expire_after_seconds: z.number().int().min(0, "Expiration time must be a non-negative integer"),
 });
@@ -365,7 +365,6 @@ export default function Admin() {
     resolver: zodResolver(downloadLinkFormSchema),
     defaultValues: {
       product_id: 0,
-      download_link: "",
       max_download_count: 0,
       expire_after_seconds: 0,
       created_by: {},
@@ -410,7 +409,6 @@ export default function Admin() {
   const handleAddDownloadLink = (productId: number) => {
     downloadLinkForm.reset({
       product_id: productId,
-      download_link: "",
       max_download_count: 0,
       expire_after_seconds: 0,
       created_by: {},
@@ -714,9 +712,6 @@ export default function Admin() {
                         <TableCell className="font-medium">{downloadLink.id}</TableCell>
                         <TableCell>{downloadLink.product_id}</TableCell>
                         <TableCell>{product ? product.name : 'Unknown'}</TableCell>
-                        <TableCell className="max-w-xs truncate">
-                          {downloadLink.download_link}
-                        </TableCell>
                         <TableCell>{downloadLink.download_count}</TableCell>
                         <TableCell>
                           {downloadLink.max_download_count > 0 
@@ -1029,19 +1024,6 @@ export default function Admin() {
           </DialogHeader>
           <Form {...downloadLinkForm}>
             <form onSubmit={downloadLinkForm.handleSubmit(onSubmitDownloadLink)} className="space-y-4">
-              <FormField
-                control={downloadLinkForm.control}
-                name="download_link"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Download Link</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter the download link" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={downloadLinkForm.control}
                 name="max_download_count"
