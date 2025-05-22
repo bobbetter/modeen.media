@@ -18,6 +18,7 @@ import {
   uploadToObjectStorage,
   deleteFromObjectStorage,
   getFileFromObjectStorage,
+  getImageFromObjectStorage,
 } from "./utils/replitObjectStorage";
 import path from "path";
 import fs from "fs";
@@ -641,8 +642,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Serving image with key: ${key}`);
       
-      // Get the file from object storage
-      const { buffer, contentType } = await getFileFromObjectStorage(key);
+      // Get the image from object storage
+      const { buffer, contentType } = await getImageFromObjectStorage(key);
       
       console.log(`Image found - Content-Type: ${contentType}, Buffer length: ${buffer.length}`);
       

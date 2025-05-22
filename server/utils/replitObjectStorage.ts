@@ -40,6 +40,50 @@ export async function uploadToObjectStorage(filePath: string, filename: string):
 }
 
 /**
+ * Get an image from Replit Object Storage for display
+ * @param key The storage key of the image
+ * @returns Image buffer and content type
+ */
+export async function getImageFromObjectStorage(key: string): Promise<{ buffer: Buffer, contentType: string }> {
+  try {
+    console.log(`Getting image from Object Storage with key: ${key}`);
+    
+    const result = await storageClient.downloadAsBytes(key);
+    
+    if (!result.ok) {
+      throw new Error(`Failed to download from Object Storage: ${result.error}`);
+    }
+    
+    // Determine content type from file extension
+    const ext = key.split('.').pop()?.toLowerCase();
+    let contentType = 'application/octet-stream';
+    
+    const contentTypeMap: { [key: string]: string } = {
+      'png': 'image/png',
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'gif': 'image/gif',
+      'webp': 'image/webp',
+      'svg': 'image/svg+xml'
+    };
+    
+    if (ext && contentTypeMap[ext]) {
+      contentType = contentTypeMap[ext];
+    }
+    
+    console.log(`Image downloaded: ${key} - Size: ${result.value.length} bytes`);
+    
+    return {
+      buffer: result.value,
+      contentType
+    };
+  } catch (error) {
+    console.error('Error downloading image from Object Storage:', error);
+    throw error;
+  }
+}
+
+/**
  * Get a file from Replit Object Storage
  * @param fileUrl URL of the file to retrieve
  * @returns File content as Buffer, filename, and content type
