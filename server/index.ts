@@ -13,7 +13,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: { 
-    secure: process.env.NODE_ENV === "production",
+    secure: false, // Allow cookies over non-HTTPS connections for remote deployment
+    sameSite: 'lax', // Helps with CSRF protection while still allowing redirects
     maxAge: 1000 * 60 * 60 * 24 // 1 day
   }
 }));
