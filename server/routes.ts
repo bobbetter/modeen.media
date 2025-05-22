@@ -23,7 +23,12 @@ import path from "path";
 import fs from "fs";
 import { promisify } from "util";
 
-import { create_jwt_token, make_download_url, decode_jwt_token, ProductTokenPayload } from "./utils/jwt";
+import {
+  create_jwt_token,
+  make_download_url,
+  decode_jwt_token,
+  ProductTokenPayload,
+} from "./utils/jwt";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve files from the public directory
   app.use(express.static(path.join(process.cwd(), "public")));
@@ -492,11 +497,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Add the current user to the created_by field
         console.log("----Request body:", req.body);
 
-        const jwt_token = create_jwt_token(req.body.product_id.toString());
+        // const jwt_token = create_jwt_token(req.body.product_id.toString());
         // req.body.download_link = make_download_url(jwt_token);
         const linkData = {
           ...req.body,
-          download_link: make_download_url(jwt_token),
+          download_link: "empty",
           created_by: {
             id: req.user?.id,
             username: req.user?.username,
@@ -523,11 +528,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         const downloadLink = await storage.createDownloadLink(validation.data);
+        const jwt_token = create_jwt_token(
+          req.body.product_id,
+          downloadLink.id,
+        );
+        const download_link = make_download_url(jwt_token);
+
+        // Update the download link with the actual URL
+        const updatedDownloadLink = await storage.updateDownloadLink(
+          downloadLink.id,
+          download_link,
+        );
 
         return res.status(201).json({
           success: true,
           message: "Download link created successfully",
-          data: downloadLink,
+          data: updatedDownloadLink,
         });
       } catch (error) {
         console.error("Error creating download link:", error);
@@ -539,87 +555,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
-
   app.get("/api/download", async (req, res) => {
     const token = req.query.token as string;
 
     if (!token) {
-      return res.status(400).json({ error: 'Missing token' });
+      return res.status(400).json({ error: "Missing token" });
     }
 
     let payload: ProductTokenPayload;
     try {
       payload = decode_jwt_token(token);
     } catch (error) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
-    const product_id = parseInt(payload.product_id);
+    const product_id = payload.product_id;
     if (isNaN(product_id)) {
-      return res.status(400).json({ error: 'Invalid product ID in token' });
+      return res.status(400).json({ error: "Invalid product ID in token" });
     }
 
     try {
       // Get the product information
       const product = await storage.getProduct(product_id);
       if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
+        return res.status(404).json({ error: "Product not found" });
       }
 
       if (!product.fileUrl) {
-        return res.status(404).json({ error: 'No file associated with this product' });
+        return res
+          .status(404)
+          .json({ error: "No file associated with this product" });
       }
 
       // Find the download link that uses this token
       // This is needed to check expiry and increment download count
-      const downloadLinks = await storage.getDownloadLinksByProductId(product_id);
-      const downloadLink = downloadLinks.find(link => 
-        link.download_link.includes(token)
+      const downloadLink = await storage.getDownloadLink(
+        payload.download_link_id,
       );
 
       if (downloadLink) {
-        // Check if the link has expired
-        const now = new Date();
-        const created = new Date(downloadLink.created_at);
-        const expirationTime = 
-          created.getTime() + downloadLink.expire_after_seconds * 1000;
-
-        if (
-          downloadLink.expire_after_seconds > 0 &&
-          now.getTime() > expirationTime
-        ) {
-          return res.status(410).json({ error: 'This download link has expired' });
-        }
-
         // Check if max downloads reached
         if (
           downloadLink.max_download_count > 0 &&
           downloadLink.download_count >= downloadLink.max_download_count
         ) {
-          return res.status(410).json({ 
-            error: 'This download link has reached its maximum number of downloads' 
+          return res.status(410).json({
+            error:
+              "This download link has reached its maximum number of downloads",
           });
         }
-
+        console.log("Increasing download count for link: ", downloadLink.id);
         // Increment the download count
         await storage.incrementDownloadCount(downloadLink.id);
       }
 
       // Get the file from object storage
-      const { buffer, filename, contentType } = await getFileFromObjectStorage(product.fileUrl);
+      const { buffer, filename, contentType } = await getFileFromObjectStorage(
+        product.fileUrl,
+      );
 
       // Set appropriate headers for file download
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Length', buffer.length);
-      
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${filename}"`,
+      );
+      res.setHeader("Content-Type", contentType);
+      res.setHeader("Content-Length", buffer.length);
+
       // Send the file as a buffer
       res.send(buffer);
     } catch (error) {
-      console.error('Error serving download:', error);
-      return res.status(500).json({ error: 'Failed to download file' });
+      console.error("Error serving download:", error);
+      return res.status(500).json({ error: "Failed to download file" });
     }
-  })
+  });
   // Get a specific download link
   app.get("/api/download-links/:id", async (req, res) => {
     try {

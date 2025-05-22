@@ -139,6 +139,25 @@ export class DatabaseStorage implements IStorage {
     return downloadLink;
   }
 
+  // Update Download Link with actual URL
+  async updateDownloadLink(
+    id: number,
+    download_link: string,
+  ): Promise<DownloadLink | undefined> {
+    console.log(
+      "-----Updating download link with id:",
+      id,
+      "and URL:",
+      download_link,
+    );
+    const [updated] = await db
+      .update(download_links)
+      .set({ download_link: download_link })
+      .where(eq(download_links.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
   async getDownloadLinks(): Promise<DownloadLink[]> {
     return await db.select().from(download_links);
   }
