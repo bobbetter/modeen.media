@@ -357,6 +357,7 @@ export default function Admin() {
       category: "",
       tags: [],
       fileUrl: "",
+      display_image_url: "",
     },
   });
   
@@ -381,6 +382,7 @@ export default function Admin() {
       category: "",
       tags: [],
       fileUrl: "",
+      display_image_url: "",
     });
     setCurrentProduct(null);
     setIsDialogOpen(true);

@@ -37,6 +37,7 @@ export const products = pgTable("products", {
   category: text("category").default("").notNull(),
   tags: text("tags").array().default([]).notNull(),
   fileUrl: text("file_url"),
+  display_image_url: text("display_image_url"),
   created_at: text("created_at").notNull(),
 });
 
@@ -47,6 +48,7 @@ export const insertProductSchema = createInsertSchema(products).pick({
   category: true,
   tags: true,
   fileUrl: true,
+  display_image_url: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
