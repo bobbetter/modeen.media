@@ -1,7 +1,7 @@
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertUserSchema, insertProductSchema } from "@shared/schema";
+import { insertContactSchema, insertUserSchema, insertProductSchema, insertDownloadLinkSchema } from "@shared/schema";
 import { z } from "zod";
 import { authMiddleware, adminMiddleware, AuthRequest } from "./middleware/auth";
 import { upload } from "./middleware/upload";
@@ -372,6 +372,277 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({
         success: false,
         message: "An error occurred while deleting the product"
+      });
+    }
+  });
+
+  // Download Links Routes
+  // Get all download links
+  app.get("/api/download-links", authMiddleware, adminMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const downloadLinks = await storage.getDownloadLinks();
+      return res.status(200).json({
+        success: true,
+        data: downloadLinks
+      });
+    } catch (error) {
+      console.error("Error fetching download links:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while fetching download links"
+      });
+    }
+  });
+
+  // Get download links for a specific product
+  app.get("/api/download-links/product/:productId", authMiddleware, adminMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const productId = parseInt(req.params.productId);
+      
+      if (isNaN(productId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid product ID"
+        });
+      }
+      
+      const downloadLinks = await storage.getDownloadLinksByProductId(productId);
+      return res.status(200).json({
+        success: true,
+        data: downloadLinks
+      });
+    } catch (error) {
+      console.error("Error fetching download links:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while fetching download links"
+      });
+    }
+  });
+
+  // Create a new download link
+  app.post("/api/download-links", authMiddleware, adminMiddleware, async (req: AuthRequest, res) => {
+    try {
+      // Add the current user to the created_by field
+      const linkData = {
+        ...req.body,
+        created_by: {
+          id: req.user?.id,
+          username: req.user?.username,
+        },
+      };
+      
+      const validation = insertDownloadLinkSchema.safeParse(linkData);
+      
+      if (!validation.success) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid download link data",
+          errors: validation.error.format()
+        });
+      }
+      
+      // Verify that the product exists
+      const product = await storage.getProduct(validation.data.product_id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found"
+        });
+      }
+      
+      const downloadLink = await storage.createDownloadLink(validation.data);
+      
+      return res.status(201).json({
+        success: true,
+        message: "Download link created successfully",
+        data: downloadLink
+      });
+    } catch (error) {
+      console.error("Error creating download link:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while creating the download link"
+      });
+    }
+  });
+
+  // Get a specific download link
+  app.get("/api/download-links/:id", async (req, res) => {
+    try {
+      const linkId = parseInt(req.params.id);
+      
+      if (isNaN(linkId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid download link ID"
+        });
+      }
+      
+      const downloadLink = await storage.getDownloadLink(linkId);
+      
+      if (!downloadLink) {
+        return res.status(404).json({
+          success: false,
+          message: "Download link not found"
+        });
+      }
+      
+      // Check if the link has expired
+      const now = new Date();
+      const created = new Date(downloadLink.created_at);
+      const expirationTime = created.getTime() + (downloadLink.expire_after_seconds * 1000);
+      
+      if (downloadLink.expire_after_seconds > 0 && now.getTime() > expirationTime) {
+        return res.status(410).json({
+          success: false,
+          message: "This download link has expired"
+        });
+      }
+      
+      // Check if max downloads reached
+      if (downloadLink.max_download_count > 0 && downloadLink.download_count >= downloadLink.max_download_count) {
+        return res.status(410).json({
+          success: false,
+          message: "This download link has reached its maximum number of downloads"
+        });
+      }
+      
+      // Get the product info
+      const product = await storage.getProduct(downloadLink.product_id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Associated product not found"
+        });
+      }
+      
+      return res.status(200).json({
+        success: true,
+        data: {
+          downloadLink,
+          product
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching download link:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while fetching the download link"
+      });
+    }
+  });
+
+  // Use a download link (increments download count)
+  app.post("/api/download-links/:id/download", async (req, res) => {
+    try {
+      const linkId = parseInt(req.params.id);
+      
+      if (isNaN(linkId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid download link ID"
+        });
+      }
+      
+      const downloadLink = await storage.getDownloadLink(linkId);
+      
+      if (!downloadLink) {
+        return res.status(404).json({
+          success: false,
+          message: "Download link not found"
+        });
+      }
+      
+      // Check if the link has expired
+      const now = new Date();
+      const created = new Date(downloadLink.created_at);
+      const expirationTime = created.getTime() + (downloadLink.expire_after_seconds * 1000);
+      
+      if (downloadLink.expire_after_seconds > 0 && now.getTime() > expirationTime) {
+        return res.status(410).json({
+          success: false,
+          message: "This download link has expired"
+        });
+      }
+      
+      // Check if max downloads reached
+      if (downloadLink.max_download_count > 0 && downloadLink.download_count >= downloadLink.max_download_count) {
+        return res.status(410).json({
+          success: false,
+          message: "This download link has reached its maximum number of downloads"
+        });
+      }
+      
+      // Get the product info
+      const product = await storage.getProduct(downloadLink.product_id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Associated product not found"
+        });
+      }
+      
+      // Increment the download count
+      const updatedLink = await storage.incrementDownloadCount(linkId);
+      
+      return res.status(200).json({
+        success: true,
+        message: "Download successful",
+        data: {
+          downloadLink: updatedLink,
+          fileUrl: product.fileUrl
+        }
+      });
+    } catch (error) {
+      console.error("Error processing download:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while processing the download"
+      });
+    }
+  });
+
+  // Delete a download link
+  app.delete("/api/download-links/:id", authMiddleware, adminMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const linkId = parseInt(req.params.id);
+      
+      if (isNaN(linkId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid download link ID"
+        });
+      }
+      
+      // Check if the download link exists
+      const downloadLink = await storage.getDownloadLink(linkId);
+      if (!downloadLink) {
+        return res.status(404).json({
+          success: false,
+          message: "Download link not found"
+        });
+      }
+      
+      // Delete the download link
+      const success = await storage.deleteDownloadLink(linkId);
+      
+      if (!success) {
+        return res.status(404).json({
+          success: false,
+          message: "Download link not found"
+        });
+      }
+      
+      return res.status(200).json({
+        success: true,
+        message: "Download link deleted successfully"
+      });
+    } catch (error) {
+      console.error("Error deleting download link:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while deleting the download link"
       });
     }
   });

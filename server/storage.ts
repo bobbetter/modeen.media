@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser, contacts, type Contact, type InsertContact, products, type Product, type InsertProduct } from "@shared/schema";
+import { users, type User, type InsertUser, contacts, type Contact, type InsertContact, products, type Product, type InsertProduct, download_links, type DownloadLink, type InsertDownloadLink } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -13,6 +13,14 @@ export interface IStorage {
   getProduct(id: number): Promise<Product | undefined>;
   updateProduct(id: number, product: InsertProduct): Promise<Product | undefined>;
   deleteProduct(id: number): Promise<boolean>;
+  
+  // Download links methods
+  createDownloadLink(downloadLink: InsertDownloadLink): Promise<DownloadLink>;
+  getDownloadLinks(): Promise<DownloadLink[]>;
+  getDownloadLinksByProductId(productId: number): Promise<DownloadLink[]>;
+  getDownloadLink(id: number): Promise<DownloadLink | undefined>;
+  incrementDownloadCount(id: number): Promise<DownloadLink | undefined>;
+  deleteDownloadLink(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -76,6 +84,53 @@ export class DatabaseStorage implements IStorage {
   
   async deleteProduct(id: number): Promise<boolean> {
     const result = await db.delete(products).where(eq(products.id, id));
+    return !!result;
+  }
+  
+  // Download links implementation
+  async createDownloadLink(insertDownloadLink: InsertDownloadLink): Promise<DownloadLink> {
+    const created_at = new Date().toISOString();
+    const [downloadLink] = await db.insert(download_links).values({
+      ...insertDownloadLink,
+      download_count: 0,
+      created_at
+    }).returning();
+    return downloadLink;
+  }
+  
+  async getDownloadLinks(): Promise<DownloadLink[]> {
+    return await db.select().from(download_links);
+  }
+  
+  async getDownloadLinksByProductId(productId: number): Promise<DownloadLink[]> {
+    return await db.select()
+      .from(download_links)
+      .where(eq(download_links.product_id, productId));
+  }
+  
+  async getDownloadLink(id: number): Promise<DownloadLink | undefined> {
+    const [downloadLink] = await db.select()
+      .from(download_links)
+      .where(eq(download_links.id, id));
+    return downloadLink || undefined;
+  }
+  
+  async incrementDownloadCount(id: number): Promise<DownloadLink | undefined> {
+    const downloadLink = await this.getDownloadLink(id);
+    if (!downloadLink) return undefined;
+    
+    const [updated] = await db.update(download_links)
+      .set({ 
+        download_count: downloadLink.download_count + 1 
+      })
+      .where(eq(download_links.id, id))
+      .returning();
+    
+    return updated || undefined;
+  }
+  
+  async deleteDownloadLink(id: number): Promise<boolean> {
+    const result = await db.delete(download_links).where(eq(download_links.id, id));
     return !!result;
   }
 }
