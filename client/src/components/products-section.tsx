@@ -10,55 +10,46 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { ArrowRight, Star, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { contactFormSchema, type ContactFormData, submitContactForm } from "@/lib/contact-api";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useIsMobile } from "../hooks/use-mobile";
-import SignatureSoundpack from "../assets/signature-soundpack-cover.png";
-import CreatorsMostwanted from "../assets/creators-mostwanted-cover.png";
+import { type Product } from "../../../shared/schema";
 
-// Define the soundpack type
-type Soundpack = {
-  id: number;
-  title: string;
-  coverImage: string;
-  description: string;
-  tags: string[];
-  price: string;
-  collection: string;
-  rating: number;
-  ratingCount: number;
+// Helper function to get image URL
+const getImageUrl = (imageUrl: string | null) => {
+  if (!imageUrl) return "";
+  
+  // If it starts with 'products/', convert to API endpoint
+  if (imageUrl.startsWith('products/')) {
+    const filename = imageUrl.replace('products/', '');
+    return `/api/images/${filename}`;
+  }
+  
+  return imageUrl;
 };
 
-// Define the soundpacks
-const soundpacks: Soundpack[] = [
-  {
-    id: 1,
-    title: "Signature Soundpack",
-    coverImage: SignatureSoundpack,
-    description: "A collection of 200+ handcrafted sounds, designed for professionals. Perfect for filmmakers, game developers, and content creators seeking premium audio elements.",
-    tags: ["Sound Effects", "Vocal Beds", "Transitions", "Ambient", "UI Sounds"],
-    price: "$149.99",
-    collection: "Premium Collection",
-    rating: 4.7,
-    ratingCount: 128
-  },
-  {
-    id: 2,
-    title: "CREATORS MOSTWANTED",
-    coverImage: CreatorsMostwanted,
-    description: "The ultimate creator toolkit featuring 150+ trending sounds and effects. Ideal for social media content, YouTube videos, and podcasts.",
-    tags: ["Trending SFX", "Social Media", "Stingers", "Podcast Elements", "Loops"],
-    price: "$129.99",
-    collection: "Creator Series",
-    rating: 4.9,
-    ratingCount: 93
-  }
-];
+// Helper function to format price
+const formatPrice = (price: number) => {
+  return `$${price.toFixed(2)}`;
+};
 
 export function ProductsSection() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPackIndex, setCurrentPackIndex] = useState(0);
   const isMobile = useIsMobile();
+
+  // Fetch products from the API
+  const { data: products = [], isLoading, error } = useQuery<Product[]>({
+    queryKey: ['/api/products'],
+    queryFn: async () => {
+      const response = await fetch('/api/products');
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const result = await response.json();
+      return result.data;
+    }
+  });
   
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -96,21 +87,47 @@ export function ProductsSection() {
     contactMutation.mutate(data);
   }
 
-  // Navigate to the previous soundpack
+  // Navigate to the previous product
   const navigatePrev = () => {
     setCurrentPackIndex((prev) => 
-      prev === 0 ? soundpacks.length - 1 : prev - 1
+      prev === 0 ? products.length - 1 : prev - 1
     );
   };
 
-  // Navigate to the next soundpack
+  // Navigate to the next product
   const navigateNext = () => {
     setCurrentPackIndex((prev) => 
-      prev === soundpacks.length - 1 ? 0 : prev + 1
+      prev === products.length - 1 ? 0 : prev + 1
     );
   };
 
-  const currentPack = soundpacks[currentPackIndex];
+  const currentProduct = products[currentPackIndex];
+
+  // Show loading state if products are still loading
+  if (isLoading) {
+    return (
+      <section id="products" className="py-24 pt-10 min-h-[90vh] relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center">
+            <div className="text-muted-foreground">Loading products...</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show message if no products available
+  if (!products.length) {
+    return (
+      <section id="products" className="py-24 pt-10 min-h-[90vh] relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center">
+            <div className="text-muted-foreground">No products available</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -196,8 +213,8 @@ export function ProductsSection() {
                           className="w-full h-full"
                         >
                           <img 
-                            src={currentPack.coverImage}
-                            alt={currentPack.title} 
+                            src={getImageUrl(currentProduct.display_image_url)}
+                            alt={currentProduct.name} 
                             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                           />
                         </motion.div>
@@ -223,26 +240,23 @@ export function ProductsSection() {
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <span className="text-primary text-sm font-light tracking-widest uppercase">{currentPack.collection}</span>
-                        <h3 className="text-2xl font-bold text-foreground mt-2 mb-3 tracking-tight">{currentPack.title}</h3>
+                        <span className="text-primary text-sm font-light tracking-widest uppercase">{currentProduct.category || 'Product'}</span>
+                        <h3 className="text-2xl font-bold text-foreground mt-2 mb-3 tracking-tight">{currentProduct.name}</h3>
                         <div className="flex items-center mb-4">
                           <div className="flex items-center text-yellow-400">
-                            {[...Array(Math.floor(currentPack.rating))].map((_, i) => (
+                            {[...Array(5)].map((_, i) => (
                               <Star key={i} className="h-4 w-4 fill-current" />
                             ))}
-                            {currentPack.rating % 1 > 0 && (
-                              <Star className="h-4 w-4 fill-current opacity-50" />
-                            )}
                           </div>
                           <span className="text-muted-foreground text-sm ml-2 font-light">
-                            {currentPack.rating} ({currentPack.ratingCount} reviews)
+                            5.0 (Premium Quality)
                           </span>
                         </div>
                         <p className="text-muted-foreground leading-relaxed mb-5 text-sm">
-                          {currentPack.description}
+                          {currentProduct.description}
                         </p>
                         <div className="flex items-center justify-between">
-                          <span className="text-foreground text-xl font-bold">{currentPack.price}</span>
+                          <span className="text-foreground text-xl font-bold">{formatPrice(currentProduct.price)}</span>
                           <Button className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300" size="sm">
                             <span className="relative z-10">Buy Now</span>
                             <ArrowRight className="relative z-10 ml-1 h-4 w-4" />
