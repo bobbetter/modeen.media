@@ -91,9 +91,12 @@ export async function getFileFromObjectStorage(fileUrl: string): Promise<{ buffe
       contentType = contentTypeMap[ext];
     }
     
-    // The result.value is an array with the buffer as the first element
+    // The result.value contains the buffer data
+    const buffer = Buffer.from(result.value);
+    console.log(`Downloaded file ${key} - Size: ${buffer.length} bytes`);
+    
     return {
-      buffer: result.value[0],
+      buffer: buffer,
       filename,
       contentType
     };
