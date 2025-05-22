@@ -519,7 +519,16 @@ export default function Admin() {
   
   // Submit download link form handler
   const onSubmitDownloadLink = (data: DownloadLinkFormValues) => {
-    createDownloadLinkMutation.mutate(data);
+    // Create a UUID or random string for the download link
+    const randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
+    // Add the generated download_link to the data
+    const downloadLinkData = {
+      ...data,
+      download_link: randomString
+    };
+    
+    createDownloadLinkMutation.mutate(downloadLinkData);
   };
 
   // If loading user data, show loading spinner
