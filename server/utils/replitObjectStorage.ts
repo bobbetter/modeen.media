@@ -57,9 +57,15 @@ export async function getFileFromObjectStorage(fileUrl: string): Promise<{ strea
     }
     
     console.log(`Getting file from Object Storage with key: ${key}`);
-    
-    // Get the file from Object Storage
-    const result = await storageClient.getBytes(key);
+
+    // Check if file exists
+    const existsResult = await storageClient.exists(key);
+    if (!existsResult.ok || !existsResult.exists) {
+      throw new Error(`File does not exist in Object Storage: ${key}`);
+    }
+
+    // Get the file data as bytes
+    const result = await storageClient.downloadAsBytes(key);
     
     if (!result.ok) {
       throw new Error(`Failed to get file from Object Storage: ${result.error}`);
@@ -90,7 +96,7 @@ export async function getFileFromObjectStorage(fileUrl: string): Promise<{ strea
       contentType = contentTypeMap[ext];
     }
     
-    // Create a readable stream from the response data
+    // Create a readable stream from the buffer data
     const stream = Readable.from(result.data);
     
     return {

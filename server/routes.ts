@@ -17,6 +17,7 @@ import { upload } from "./middleware/upload";
 import {
   uploadToObjectStorage,
   deleteFromObjectStorage,
+  getFileFromObjectStorage,
 } from "./utils/replitObjectStorage";
 import path from "path";
 import fs from "fs";
