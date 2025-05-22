@@ -92,7 +92,7 @@ export async function getFileFromObjectStorage(fileUrl: string): Promise<{ buffe
     }
     
     // The result.value contains the buffer data
-    const buffer = Buffer.from(result.value);
+    const buffer = result.value;
     console.log(`Downloaded file ${key} - Size: ${buffer.length} bytes`);
     
     return {
