@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Product, insertProductSchema } from "@shared/schema";
+import { Product, insertProductSchema, insertDownloadLinkSchema, DownloadLink } from "@shared/schema";
 
 import {
   Form,
@@ -44,7 +44,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Plus, Pencil, Trash, Upload, FileText, X } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash, Upload, FileText, X, Link, Clock, Download } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 // Form schema for product
@@ -67,10 +67,24 @@ const productFormSchema = insertProductSchema.extend({
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
+// Form schema for download links
+const downloadLinkFormSchema = insertDownloadLinkSchema.extend({
+  product_id: z.number(),
+  download_link: z.string().min(1, "Download link is required"),
+  max_download_count: z.number().int().min(0, "Max download count must be a non-negative integer"),
+  expire_after_seconds: z.number().int().min(0, "Expiration time must be a non-negative integer"),
+});
+
+type DownloadLinkFormValues = z.infer<typeof downloadLinkFormSchema>;
+
 export default function Admin() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDownloadLinkDialogOpen, setIsDownloadLinkDialogOpen] = useState(false);
+  const [isDeleteDownloadLinkDialogOpen, setIsDeleteDownloadLinkDialogOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
+  const [currentDownloadLink, setCurrentDownloadLink] = useState<DownloadLink | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [uploadingFile, setUploadingFile] = useState(false);
@@ -133,6 +147,19 @@ export default function Admin() {
   
   // Extract products data from API response
   const productsData = productsApiResponse?.data || [];
+  
+  // Fetch download links
+  const {
+    data: downloadLinksApiResponse,
+    isLoading: isDownloadLinksLoading,
+    isError: isDownloadLinksError,
+  } = useQuery<ApiResponse<DownloadLink[]>>({
+    queryKey: ["/api/download-links"],
+    enabled: !!userData?.isAdmin,
+  });
+  
+  // Extract download links data from API response
+  const downloadLinksData = downloadLinksApiResponse?.data || [];
 
   // Create product mutation
   const createProductMutation = useMutation({
