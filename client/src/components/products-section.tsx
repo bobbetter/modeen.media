@@ -16,14 +16,22 @@ import { type Product } from "../../../shared/schema";
 
 // Helper function to get image URL
 const getImageUrl = (imageUrl: string | null) => {
-  if (!imageUrl) return "";
+  if (!imageUrl) {
+    console.log("No image URL provided");
+    return "";
+  }
+  
+  console.log("Processing image URL:", imageUrl);
   
   // If it starts with 'products/', convert to API endpoint
   if (imageUrl.startsWith('products/')) {
     const filename = imageUrl.replace('products/', '');
-    return `/api/images/${filename}`;
+    const url = `/api/images/${filename}`;
+    console.log("Generated image URL:", url);
+    return url;
   }
   
+  console.log("Using original image URL:", imageUrl);
   return imageUrl;
 };
 
@@ -222,6 +230,8 @@ export function ProductsSection() {
                             src={getImageUrl(currentProduct.display_image_url)}
                             alt={currentProduct.name} 
                             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                            onLoad={() => console.log("Image loaded successfully:", getImageUrl(currentProduct.display_image_url))}
+                            onError={(e) => console.log("Image failed to load:", getImageUrl(currentProduct.display_image_url), "Error:", e)}
                           />
                         </motion.div>
                       </AnimatePresence>
