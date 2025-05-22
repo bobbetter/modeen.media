@@ -88,8 +88,11 @@ export default function Admin() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadingDisplayImage, setUploadingDisplayImage] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedDisplayImage, setSelectedDisplayImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const displayImageInputRef = useRef<HTMLInputElement>(null);
 
   // Define response types to help with proper typing
   type ApiResponse<T> = {
@@ -397,6 +400,7 @@ export default function Admin() {
       category: product.category || "",
       tags: product.tags || [],
       fileUrl: product.fileUrl || "",
+      display_image_url: product.display_image_url || "",
     });
     setCurrentProduct(product);
     setIsDialogOpen(true);
@@ -479,10 +483,68 @@ export default function Admin() {
     },
   });
   
+  // Display image upload mutation
+  const uploadDisplayImageMutation = useMutation({
+    mutationFn: async (file: File) => {
+      console.log("Starting display image upload for:", file.name);
+      
+      const formData = new FormData();
+      formData.append("file", file);
+      console.log("FormData created with display image file");
+      
+      console.log("Sending upload request to /api/upload");
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+        credentials: "include" // Include cookies for authentication
+      });
+      
+      console.log("Upload response status:", response.status);
+      const responseData = await response.json();
+      console.log("Upload response data:", responseData);
+      
+      return responseData;
+    },
+    onSuccess: (response) => {
+      if (response.success) {
+        // Set the display image URL in the form
+        form.setValue("display_image_url", response.data.fileUrl);
+        setUploadingDisplayImage(false);
+        toast({
+          title: "Image uploaded",
+          description: "Display image has been uploaded successfully",
+        });
+      } else {
+        setUploadingDisplayImage(false);
+        toast({
+          title: "Error",
+          description: response.message || "Failed to upload display image",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error) => {
+      console.error("Display image upload error:", error);
+      setUploadingDisplayImage(false);
+      toast({
+        title: "Error",
+        description: "Failed to upload display image",
+        variant: "destructive",
+      });
+    },
+  });
+  
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
+    }
+  };
+  
+  // Handle display image selection
+  const handleDisplayImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedDisplayImage(e.target.files[0]);
     }
   };
   
@@ -494,6 +556,14 @@ export default function Admin() {
     }
   };
   
+  // Handle display image upload
+  const handleDisplayImageUpload = () => {
+    if (selectedDisplayImage) {
+      setUploadingDisplayImage(true);
+      uploadDisplayImageMutation.mutate(selectedDisplayImage);
+    }
+  };
+  
   // Remove the selected file
   const handleRemoveFile = () => {
     setSelectedFile(null);
@@ -502,12 +572,24 @@ export default function Admin() {
     }
   };
   
+  // Remove the selected display image
+  const handleRemoveDisplayImage = () => {
+    setSelectedDisplayImage(null);
+    if (displayImageInputRef.current) {
+      displayImageInputRef.current.value = "";
+    }
+  };
+  
   // Clear file selection when dialog closes
   useEffect(() => {
     if (!isDialogOpen) {
       setSelectedFile(null);
+      setSelectedDisplayImage(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
+      }
+      if (displayImageInputRef.current) {
+        displayImageInputRef.current.value = "";
       }
     }
   }, [isDialogOpen]);
@@ -939,6 +1021,125 @@ export default function Admin() {
                                   disabled={uploadingFile}
                                 >
                                   {uploadingFile ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                      Uploading...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="h-4 w-4 mr-2" />
+                                      Upload
+                                    </>
+                                  )}
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Display Image Upload Field */}
+              <FormField
+                control={form.control}
+                name="display_image_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Display Image</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        {/* Hidden actual display image input */}
+                        <input 
+                          type="hidden" 
+                          {...field}
+                          value={field.value || ""}
+                        />
+                        
+                        {/* Display Image Upload UI */}
+                        <div className="border rounded-md p-4">
+                          {field.value ? (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <img 
+                                  src={field.value.includes("replit.com/object-storage") 
+                                    ? field.value 
+                                    : field.value.startsWith("products/")
+                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(field.value)}?alt=media`
+                                      : field.value}
+                                  alt="Product display"
+                                  className="h-10 w-10 object-cover rounded mr-2"
+                                />
+                                <a 
+                                  href={field.value.includes("replit.com/object-storage") 
+                                    ? field.value 
+                                    : field.value.startsWith("products/")
+                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(field.value)}?alt=media`
+                                      : field.value}
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-blue-600 hover:underline truncate max-w-[200px]"
+                                >
+                                  {field.value.split('/').pop()}
+                                </a>
+                              </div>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => form.setValue("display_image_url", "")}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <input
+                                  type="file"
+                                  className="hidden"
+                                  ref={displayImageInputRef}
+                                  onChange={handleDisplayImageChange}
+                                  accept="image/*"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  onClick={() => displayImageInputRef.current?.click()}
+                                  disabled={uploadingDisplayImage}
+                                >
+                                  <Upload className="h-4 w-4 mr-2" />
+                                  Choose Image
+                                </Button>
+                                {selectedDisplayImage && (
+                                  <>
+                                    <span className="text-sm truncate max-w-[150px]">
+                                      {selectedDisplayImage.name}
+                                    </span>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={handleRemoveDisplayImage}
+                                      className="ml-auto"
+                                      disabled={uploadingDisplayImage}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                              {selectedDisplayImage && (
+                                <Button
+                                  type="button"
+                                  className="w-full"
+                                  onClick={handleDisplayImageUpload}
+                                  disabled={uploadingDisplayImage}
+                                >
+                                  {uploadingDisplayImage ? (
                                     <>
                                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                                       Uploading...
