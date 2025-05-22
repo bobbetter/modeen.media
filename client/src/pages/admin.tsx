@@ -70,7 +70,7 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 // Form schema for download links
 const downloadLinkFormSchema = insertDownloadLinkSchema.extend({
   product_id: z.number(),
-  // download_link: z.string().min(1, "Download link is required"),
+  download_link: z.string().optional(), // Will be generated on the server
   max_download_count: z.number().int().min(0, "Max download count must be a non-negative integer"),
   expire_after_seconds: z.number().int().min(0, "Expiration time must be a non-negative integer"),
 });
@@ -365,6 +365,7 @@ export default function Admin() {
     resolver: zodResolver(downloadLinkFormSchema),
     defaultValues: {
       product_id: 0,
+      download_link: "", // Add default value for download_link
       max_download_count: 0,
       expire_after_seconds: 0,
       created_by: {},
