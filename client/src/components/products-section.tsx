@@ -28,8 +28,9 @@ const getImageUrl = (imageUrl: string | null) => {
 };
 
 // Helper function to format price
-const formatPrice = (price: number) => {
-  return `$${price.toFixed(2)}`;
+const formatPrice = (price: string) => {
+  const numPrice = parseFloat(price);
+  return `$${numPrice.toFixed(2)}`;
 };
 
 export function ProductsSection() {
@@ -101,8 +102,6 @@ export function ProductsSection() {
     );
   };
 
-  const currentProduct = products[currentPackIndex];
-
   // Show loading state if products are still loading
   if (isLoading) {
     return (
@@ -127,6 +126,13 @@ export function ProductsSection() {
         </div>
       </section>
     );
+  }
+
+  const currentProduct = products[currentPackIndex];
+  
+  // Safety check - if no current product, don't render
+  if (!currentProduct) {
+    return null;
   }
 
   const cardVariants = {
@@ -278,7 +284,7 @@ export function ProductsSection() {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="flex flex-wrap gap-2">
-                        {currentPack.tags.map((tag, index) => (
+                        {currentProduct.tags.map((tag: string, index: number) => (
                           <span key={index} className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">{tag}</span>
                         ))}
                       </div>
