@@ -262,6 +262,66 @@ export default function Admin() {
       });
     },
   });
+  
+  // Create download link mutation
+  const createDownloadLinkMutation = useMutation({
+    mutationFn: async (data: DownloadLinkFormValues) => {
+      const response = await fetch("/api/download-links", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include" // Include cookies for authentication
+      });
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/download-links"] });
+      toast({
+        title: "Success",
+        description: "Download link created successfully",
+      });
+      setIsDownloadLinkDialogOpen(false);
+    },
+    onError: (error) => {
+      console.error("Error creating download link:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create download link",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Delete download link mutation
+  const deleteDownloadLinkMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/download-links/${id}`, {
+        method: "DELETE",
+        credentials: "include" // Include cookies for authentication
+      });
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/download-links"] });
+      toast({
+        title: "Success",
+        description: "Download link deleted successfully",
+      });
+      setIsDeleteDownloadLinkDialogOpen(false);
+    },
+    onError: (error) => {
+      console.error("Error deleting download link:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete download link",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Logout function
   const handleLogout = async () => {
@@ -299,6 +359,18 @@ export default function Admin() {
       fileUrl: "",
     },
   });
+  
+  // Download link form
+  const downloadLinkForm = useForm<DownloadLinkFormValues>({
+    resolver: zodResolver(downloadLinkFormSchema),
+    defaultValues: {
+      product_id: 0,
+      download_link: "",
+      max_download_count: 0,
+      expire_after_seconds: 0,
+      created_by: {},
+    },
+  });
 
   // Open dialog for creating a new product
   const handleAddProduct = () => {
@@ -332,6 +404,26 @@ export default function Admin() {
   const handleDeleteProduct = (product: Product) => {
     setCurrentProduct(product);
     setIsDeleteDialogOpen(true);
+  };
+  
+  // Open dialog for creating a new download link
+  const handleAddDownloadLink = (productId: number) => {
+    downloadLinkForm.reset({
+      product_id: productId,
+      download_link: "",
+      max_download_count: 0,
+      expire_after_seconds: 0,
+      created_by: {},
+    });
+    setSelectedProductId(productId);
+    setCurrentDownloadLink(null);
+    setIsDownloadLinkDialogOpen(true);
+  };
+  
+  // Open dialog for deleting a download link
+  const handleDeleteDownloadLink = (downloadLink: DownloadLink) => {
+    setCurrentDownloadLink(downloadLink);
+    setIsDeleteDownloadLinkDialogOpen(true);
   };
 
   // File upload mutation
@@ -418,13 +510,18 @@ export default function Admin() {
     }
   }, [isDialogOpen]);
 
-  // Submit form handler
+  // Submit product form handler
   const onSubmit = (data: ProductFormValues) => {
     if (currentProduct) {
       updateProductMutation.mutate({ id: currentProduct.id, data });
     } else {
       createProductMutation.mutate(data);
     }
+  };
+  
+  // Submit download link form handler
+  const onSubmitDownloadLink = (data: DownloadLinkFormValues) => {
+    createDownloadLinkMutation.mutate(data);
   };
 
   // If loading user data, show loading spinner
@@ -474,6 +571,87 @@ export default function Admin() {
         </div>
 
         <Separator className="my-4" />
+        
+        {/* Download Links Management */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold mb-4">Download Links</h3>
+          {isDownloadLinksError ? (
+            <div className="text-center p-4 text-red-500">
+              Failed to load download links. Please try again.
+            </div>
+          ) : isDownloadLinksLoading ? (
+            <div className="text-center p-4">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+              <p className="mt-2">Loading download links...</p>
+            </div>
+          ) : downloadLinksData.length === 0 ? (
+            <div className="text-center p-4 text-muted-foreground">
+              No download links yet. Use the link button on a product to create one.
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Product ID</TableHead>
+                    <TableHead>Product Name</TableHead>
+                    <TableHead>Download Link</TableHead>
+                    <TableHead>Download Count</TableHead>
+                    <TableHead>Max Downloads</TableHead>
+                    <TableHead>Expires After</TableHead>
+                    <TableHead>Created At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {downloadLinksData.map((downloadLink) => {
+                    // Find the associated product
+                    const product = productsData.find(p => p.id === downloadLink.product_id);
+                    return (
+                      <TableRow key={downloadLink.id}>
+                        <TableCell className="font-medium">{downloadLink.id}</TableCell>
+                        <TableCell>{downloadLink.product_id}</TableCell>
+                        <TableCell>{product ? product.name : 'Unknown'}</TableCell>
+                        <TableCell className="max-w-xs truncate">
+                          {downloadLink.download_link}
+                        </TableCell>
+                        <TableCell>{downloadLink.download_count}</TableCell>
+                        <TableCell>
+                          {downloadLink.max_download_count > 0 
+                            ? downloadLink.max_download_count 
+                            : 'Unlimited'}
+                        </TableCell>
+                        <TableCell>
+                          {downloadLink.expire_after_seconds > 0 
+                            ? `${Math.floor(downloadLink.expire_after_seconds / 86400)} days` 
+                            : 'No expiration'}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(downloadLink.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="text-destructive"
+                              onClick={() => handleDeleteDownloadLink(downloadLink)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
+        
+        <Separator className="my-6" />
 
         {isProductsError ? (
           <div className="text-center p-8 text-red-500">
@@ -557,6 +735,13 @@ export default function Admin() {
                           onClick={() => handleDeleteProduct(product)}
                         >
                           <Trash className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleAddDownloadLink(product.id)}
+                        >
+                          <Link className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -831,6 +1016,103 @@ export default function Admin() {
               ) : (
                 "Delete"
               )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Download Link Dialog */}
+      <Dialog open={isDownloadLinkDialogOpen} onOpenChange={setIsDownloadLinkDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create Download Link</DialogTitle>
+          </DialogHeader>
+          <Form {...downloadLinkForm}>
+            <form onSubmit={downloadLinkForm.handleSubmit(onSubmitDownloadLink)} className="space-y-4">
+              <FormField
+                control={downloadLinkForm.control}
+                name="download_link"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Download Link</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter the download link" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={downloadLinkForm.control}
+                name="max_download_count"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max Download Count (0 for unlimited)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min="0" 
+                        placeholder="Enter max download count" 
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={downloadLinkForm.control}
+                name="expire_after_seconds"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Expiration Time in Seconds (0 for no expiration)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min="0" 
+                        placeholder="Enter expiration time in seconds" 
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter className="mt-6">
+                <Button type="submit" disabled={createDownloadLinkMutation.isPending}>
+                  {createDownloadLinkMutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Create Download Link
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Download Link Dialog */}
+      <AlertDialog open={isDeleteDownloadLinkDialogOpen} onOpenChange={setIsDeleteDownloadLinkDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the download link.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => currentDownloadLink && deleteDownloadLinkMutation.mutate(currentDownloadLink.id)}
+              disabled={deleteDownloadLinkMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteDownloadLinkMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
