@@ -607,6 +607,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Increasing download count for link: ", downloadLink.id);
         // Increment the download count
         await storage.incrementDownloadCount(downloadLink.id);
+      } else {
+        return res
+          .status(404)
+          .json({ error: "Download link has been removed" });
       }
 
       // Get the file from object storage
