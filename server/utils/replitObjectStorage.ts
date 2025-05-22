@@ -1,6 +1,8 @@
 import { Client } from '@replit/object-storage';
 import fs from 'fs';
 import { promisify } from 'util';
+import path from 'path';
+import { Readable } from 'stream';
 
 const readFile = promisify(fs.readFile);
 
@@ -33,6 +35,72 @@ export async function uploadToObjectStorage(filePath: string, filename: string):
     return key;
   } catch (error) {
     console.error('Error uploading to Replit Object Storage:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get a file from Replit Object Storage
+ * @param fileUrl URL of the file to retrieve
+ * @returns A stream of the file content and filename
+ */
+export async function getFileFromObjectStorage(fileUrl: string): Promise<{ stream: Readable, filename: string, contentType: string, contentLength: number }> {
+  try {
+    // Normalize the fileUrl to get the proper object storage key
+    let key = fileUrl;
+    
+    // If the URL doesn't start with 'products/', prepend it
+    if (!key.startsWith('products/')) {
+      // Extract the filename from the URL path
+      const filename = path.basename(key);
+      key = `products/${filename}`;
+    }
+    
+    console.log(`Getting file from Object Storage with key: ${key}`);
+    
+    // Get the file from Object Storage
+    const result = await storageClient.getBytes(key);
+    
+    if (!result.ok) {
+      throw new Error(`Failed to get file from Object Storage: ${result.error}`);
+    }
+    
+    // Extract the filename from the key
+    const filename = path.basename(key);
+    
+    // Determine content type based on file extension
+    const ext = path.extname(filename).toLowerCase();
+    let contentType = 'application/octet-stream'; // default content type
+    
+    // Map common extensions to content types
+    const contentTypeMap: Record<string, string> = {
+      '.pdf': 'application/pdf',
+      '.zip': 'application/zip',
+      '.rar': 'application/x-rar-compressed',
+      '.mp3': 'audio/mpeg',
+      '.wav': 'audio/wav',
+      '.mp4': 'video/mp4',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.png': 'image/png',
+      '.txt': 'text/plain',
+    };
+    
+    if (contentTypeMap[ext]) {
+      contentType = contentTypeMap[ext];
+    }
+    
+    // Create a readable stream from the response data
+    const stream = Readable.from(result.data);
+    
+    return {
+      stream,
+      filename,
+      contentType,
+      contentLength: result.data.length
+    };
+  } catch (error) {
+    console.error('Error getting file from Object Storage:', error);
     throw error;
   }
 }

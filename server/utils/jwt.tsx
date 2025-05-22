@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
 const BASE_APP_URL = "https://your-app-url.com"
 
-interface ProductTokenPayload {
+export interface ProductTokenPayload {
   product_id: string;
   iat?: number;
   exp?: number;

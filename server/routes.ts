@@ -539,7 +539,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
 
-  app.get("/api/download",async (req, res) => {
+  app.get("/api/download", async (req, res) => {
     const token = req.query.token as string;
 
     if (!token) {
@@ -553,12 +553,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ error: 'Invalid token' });
     }
 
-    const product_id = payload.product_id;
-    const product = await storage.getProduct(product_id);
+    const product_id = parseInt(payload.product_id);
+    if (isNaN(product_id)) {
+      return res.status(400).json({ error: 'Invalid product ID in token' });
+    }
 
-    // Implement the logic to serve the file, streaming it from the bucket
-    // For example, using a library like @replit/object-storage
+    try {
+      // Get the product information
+      const product = await storage.getProduct(product_id);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
 
+      if (!product.fileUrl) {
+        return res.status(404).json({ error: 'No file associated with this product' });
+      }
+
+      // Find the download link that uses this token
+      // This is needed to check expiry and increment download count
+      const downloadLinks = await storage.getDownloadLinksByProductId(product_id);
+      const downloadLink = downloadLinks.find(link => 
+        link.download_link.includes(token)
+      );
+
+      if (downloadLink) {
+        // Check if the link has expired
+        const now = new Date();
+        const created = new Date(downloadLink.created_at);
+        const expirationTime = 
+          created.getTime() + downloadLink.expire_after_seconds * 1000;
+
+        if (
+          downloadLink.expire_after_seconds > 0 &&
+          now.getTime() > expirationTime
+        ) {
+          return res.status(410).json({ error: 'This download link has expired' });
+        }
+
+        // Check if max downloads reached
+        if (
+          downloadLink.max_download_count > 0 &&
+          downloadLink.download_count >= downloadLink.max_download_count
+        ) {
+          return res.status(410).json({ 
+            error: 'This download link has reached its maximum number of downloads' 
+          });
+        }
+
+        // Increment the download count
+        await storage.incrementDownloadCount(downloadLink.id);
+      }
+
+      // Get the file from object storage
+      const { stream, filename, contentType, contentLength } = await getFileFromObjectStorage(product.fileUrl);
+
+      // Set appropriate headers for file download
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Length', contentLength);
+      
+      // Stream the file to the response
+      stream.pipe(res);
+    } catch (error) {
+      console.error('Error serving download:', error);
+      return res.status(500).json({ error: 'Failed to download file' });
+    }
   })
   // Get a specific download link
   app.get("/api/download-links/:id", async (req, res) => {
