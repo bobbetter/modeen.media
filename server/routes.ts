@@ -1,6 +1,4 @@
-import express, {
-  type Express,
-} from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import {
@@ -24,7 +22,7 @@ import path from "path";
 import fs from "fs";
 import { promisify } from "util";
 
-import {create_jwt_token, make_download_url} from "./utils/jwt";
+import { create_jwt_token, make_download_url, decode_jwt_token, ProductTokenPayload } from "./utils/jwt";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve files from the public directory
   app.use(express.static(path.join(process.cwd(), "public")));
@@ -504,9 +502,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         };
         console.log("----Link data:", linkData);
-        console.log("----JWT token:", jwt_token);
         const validation = insertDownloadLinkSchema.safeParse(linkData);
-
+        console.log("----Validation:", validation);
         if (!validation.success) {
           return res.status(400).json({
             success: false,
@@ -541,6 +538,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
+
+  app.get("/api/download",async (req, res) => {
+    const token = req.query.token as string;
+
+    if (!token) {
+      return res.status(400).json({ error: 'Missing token' });
+    }
+
+    let payload: ProductTokenPayload;
+    try {
+      payload = decode_jwt_token(token);
+    } catch (error) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const product_id = payload.product_id;
+    const product = await storage.getProduct(product_id);
+
+    // Implement the logic to serve the file, streaming it from the bucket
+    // For example, using a library like @replit/object-storage
+
+  })
   // Get a specific download link
   app.get("/api/download-links/:id", async (req, res) => {
     try {

@@ -722,6 +722,7 @@ export default function Admin() {
                         <TableCell className="font-medium">{downloadLink.id}</TableCell>
                         <TableCell>{downloadLink.product_id}</TableCell>
                         <TableCell>{product ? product.name : 'Unknown'}</TableCell>
+                        <TableCell>{downloadLink.download_link}</TableCell>
                         <TableCell>{downloadLink.download_count}</TableCell>
                         <TableCell>
                           {downloadLink.max_download_count > 0 

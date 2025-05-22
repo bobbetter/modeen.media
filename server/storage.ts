@@ -1,4 +1,17 @@
-import { users, type User, type InsertUser, contacts, type Contact, type InsertContact, products, type Product, type InsertProduct, download_links, type DownloadLink, type InsertDownloadLink } from "@shared/schema";
+import {
+  users,
+  type User,
+  type InsertUser,
+  contacts,
+  type Contact,
+  type InsertContact,
+  products,
+  type Product,
+  type InsertProduct,
+  download_links,
+  type DownloadLink,
+  type InsertDownloadLink,
+} from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -11,9 +24,12 @@ export interface IStorage {
   createProduct(product: InsertProduct): Promise<Product>;
   getProducts(): Promise<Product[]>;
   getProduct(id: number): Promise<Product | undefined>;
-  updateProduct(id: number, product: InsertProduct): Promise<Product | undefined>;
+  updateProduct(
+    id: number,
+    product: InsertProduct,
+  ): Promise<Product | undefined>;
   deleteProduct(id: number): Promise<boolean>;
-  
+
   // Download links methods
   createDownloadLink(downloadLink: InsertDownloadLink): Promise<DownloadLink>;
   getDownloadLinks(): Promise<DownloadLink[]>;
@@ -30,107 +46,139 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
     return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values({
-      ...insertUser,
-      isAdmin: insertUser.isAdmin === true
-    }).returning();
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...insertUser,
+        isAdmin: insertUser.isAdmin === true,
+      })
+      .returning();
     return user;
   }
 
   async createContact(insertContact: InsertContact): Promise<Contact> {
     const created_at = new Date().toISOString();
-    const [contact] = await db.insert(contacts).values({
-      ...insertContact,
-      created_at
-    }).returning();
+    const [contact] = await db
+      .insert(contacts)
+      .values({
+        ...insertContact,
+        created_at,
+      })
+      .returning();
     return contact;
   }
 
   async getContacts(): Promise<Contact[]> {
     return await db.select().from(contacts);
   }
-  
+
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
     const created_at = new Date().toISOString();
-    const [product] = await db.insert(products).values({
-      ...insertProduct,
-      created_at
-    }).returning();
+    const [product] = await db
+      .insert(products)
+      .values({
+        ...insertProduct,
+        created_at,
+      })
+      .returning();
     return product;
   }
-  
+
   async getProducts(): Promise<Product[]> {
     return await db.select().from(products);
   }
-  
+
   async getProduct(id: number): Promise<Product | undefined> {
-    const [product] = await db.select().from(products).where(eq(products.id, id));
+    const [product] = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, id));
     return product || undefined;
   }
-  
-  async updateProduct(id: number, insertProduct: InsertProduct): Promise<Product | undefined> {
-    const [updated] = await db.update(products)
+
+  async updateProduct(
+    id: number,
+    insertProduct: InsertProduct,
+  ): Promise<Product | undefined> {
+    const [updated] = await db
+      .update(products)
       .set(insertProduct)
       .where(eq(products.id, id))
       .returning();
-    
+
     return updated || undefined;
   }
-  
+
   async deleteProduct(id: number): Promise<boolean> {
     const result = await db.delete(products).where(eq(products.id, id));
     return !!result;
   }
-  
+
   // Download links implementation
-  async createDownloadLink(insertDownloadLink: InsertDownloadLink): Promise<DownloadLink> {
+  async createDownloadLink(
+    insertDownloadLink: InsertDownloadLink,
+  ): Promise<DownloadLink> {
     const created_at = new Date().toISOString();
-    const [downloadLink] = await db.insert(download_links).values({
-      ...insertDownloadLink,
-      download_count: 0,
-      created_at
-    }).returning();
+    console.log("++++Creating download link with data:", insertDownloadLink);
+    const [downloadLink] = await db
+      .insert(download_links)
+      .values({
+        ...insertDownloadLink,
+        download_count: 0,
+        created_at,
+      })
+      .returning();
     return downloadLink;
   }
-  
+
   async getDownloadLinks(): Promise<DownloadLink[]> {
     return await db.select().from(download_links);
   }
-  
-  async getDownloadLinksByProductId(productId: number): Promise<DownloadLink[]> {
-    return await db.select()
+
+  async getDownloadLinksByProductId(
+    productId: number,
+  ): Promise<DownloadLink[]> {
+    return await db
+      .select()
       .from(download_links)
       .where(eq(download_links.product_id, productId));
   }
-  
+
   async getDownloadLink(id: number): Promise<DownloadLink | undefined> {
-    const [downloadLink] = await db.select()
+    const [downloadLink] = await db
+      .select()
       .from(download_links)
       .where(eq(download_links.id, id));
     return downloadLink || undefined;
   }
-  
+
   async incrementDownloadCount(id: number): Promise<DownloadLink | undefined> {
     const downloadLink = await this.getDownloadLink(id);
     if (!downloadLink) return undefined;
-    
-    const [updated] = await db.update(download_links)
-      .set({ 
-        download_count: downloadLink.download_count + 1 
+
+    const [updated] = await db
+      .update(download_links)
+      .set({
+        download_count: downloadLink.download_count + 1,
       })
       .where(eq(download_links.id, id))
       .returning();
-    
+
     return updated || undefined;
   }
-  
+
   async deleteDownloadLink(id: number): Promise<boolean> {
-    const result = await db.delete(download_links).where(eq(download_links.id, id));
+    const result = await db
+      .delete(download_links)
+      .where(eq(download_links.id, id));
     return !!result;
   }
 }
@@ -146,7 +194,7 @@ export const storage = new DatabaseStorage();
       await storage.createUser({
         username: "admin",
         password: "admin123",
-        isAdmin: true
+        isAdmin: true,
       });
       console.log("Default admin user created");
     }
