@@ -700,13 +700,26 @@ export default function Admin() {
                     <TableCell className="font-medium">{product.id}</TableCell>
                     <TableCell>
                       {product.display_image_url ? (
-                        <img 
-                          src={product.display_image_url.startsWith("products/")
-                            ? `/api/images/${product.display_image_url.split('/').pop()}`
-                            : product.display_image_url}
-                          alt={product.name}
-                          className="h-8 w-8 object-cover rounded border"
-                        />
+                        (() => {
+                          const imageUrl = product.display_image_url.startsWith("products/")
+                            ? `/api/images/${product.display_image_url.replace('products/', '')}`
+                            : product.display_image_url;
+                          console.log("Loading image for product", product.id, "URL:", imageUrl, "Original:", product.display_image_url);
+                          return (
+                            <img 
+                              src={imageUrl}
+                              alt={product.name}
+                              className="h-8 w-8 object-cover rounded border"
+                              onError={(e) => {
+                                console.log("Image failed to load:", product.display_image_url, "Generated URL:", imageUrl);
+                                e.currentTarget.style.display = 'none';
+                              }}
+                              onLoad={() => {
+                                console.log("Image loaded successfully:", imageUrl);
+                              }}
+                            />
+                          );
+                        })()
                       ) : (
                         <div className="h-8 w-8 bg-muted rounded border flex items-center justify-center">
                           <span className="text-xs text-muted-foreground">No img</span>
