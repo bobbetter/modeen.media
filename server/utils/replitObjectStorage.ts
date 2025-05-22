@@ -30,7 +30,7 @@ export async function uploadToObjectStorage(filePath: string, filename: string):
     }
     
     // Return the URL that can be used to access the file
-    return `/uploads/products/${filename}`;
+    return key;
   } catch (error) {
     console.error('Error uploading to Replit Object Storage:', error);
     throw error;

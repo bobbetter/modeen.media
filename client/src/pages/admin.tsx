@@ -414,6 +414,13 @@ export default function Admin() {
     return null;
   }
 
+
+  function make_download_url(fileUrl: string): string {
+    const baseUrl = 'https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4';
+    return `${baseUrl}/o/${encodeURIComponent(fileUrl)}?alt=media`;
+  }
+
+    
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-primary text-primary-foreground shadow-md">
@@ -492,11 +499,7 @@ export default function Admin() {
                     <TableCell>
                       {product.fileUrl ? (
                         <a 
-                          href={product.fileUrl.includes("replit.com/object-storage") 
-                            ? product.fileUrl 
-                            : product.fileUrl.startsWith("/uploads")
-                              ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/products%2F${product.fileUrl.split('/').pop()}?alt=media`
-                              : product.fileUrl} 
+                          href={make_download_url(product.fileUrl)} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="flex items-center text-sm text-blue-600 hover:underline"
