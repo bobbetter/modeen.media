@@ -410,6 +410,7 @@ export default function Admin() {
   const handleAddDownloadLink = (productId: number) => {
     downloadLinkForm.reset({
       product_id: productId,
+      download_link: "", // Include download_link field
       max_download_count: 0,
       expire_after_seconds: 0,
       created_by: {},
@@ -520,15 +521,14 @@ export default function Admin() {
   
   // Submit download link form handler
   const onSubmitDownloadLink = (data: DownloadLinkFormValues) => {
-    // Create a UUID or random string for the download link
-    const randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    
-    // Add the generated download_link to the data
+    // Generate a simple placeholder for the download_link field
+    // The actual link will be generated on the server
     const downloadLinkData = {
       ...data,
-      download_link: randomString
+      download_link: "placeholder" // Server will replace this with the actual JWT token-based link
     };
     
+    console.log("Submitting download link data:", downloadLinkData);
     createDownloadLinkMutation.mutate(downloadLinkData);
   };
 
