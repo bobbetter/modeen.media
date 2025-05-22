@@ -48,10 +48,14 @@ export async function getImageFromObjectStorage(key: string): Promise<{ buffer: 
   try {
     console.log(`Getting image from Object Storage with key: ${key}`);
     
+    // Use the correct method to download as bytes
     const result = await storageClient.downloadAsBytes(key);
     
-    if (!result.ok) {
-      throw new Error(`Failed to download from Object Storage: ${result.error}`);
+    console.log(`Download result:`, result);
+    
+    // Check if the download was successful
+    if (!result || !result.length) {
+      throw new Error(`No data returned from Object Storage for key: ${key}`);
     }
     
     // Determine content type from file extension
@@ -71,13 +75,8 @@ export async function getImageFromObjectStorage(key: string): Promise<{ buffer: 
       contentType = contentTypeMap[ext];
     }
     
-    // result.value is the actual buffer data - convert to Buffer if it's an array
-    let buffer = result.value;
-    if (Array.isArray(buffer)) {
-      buffer = Buffer.from(buffer);
-    } else if (!Buffer.isBuffer(buffer)) {
-      buffer = Buffer.from(buffer);
-    }
+    // Convert to Buffer if needed
+    const buffer = Buffer.isBuffer(result) ? result : Buffer.from(result);
     
     console.log(`Image downloaded: ${key} - Size: ${buffer.length} bytes`);
     
