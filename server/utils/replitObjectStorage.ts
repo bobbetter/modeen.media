@@ -71,8 +71,14 @@ export async function getImageFromObjectStorage(key: string): Promise<{ buffer: 
       contentType = contentTypeMap[ext];
     }
     
-    // result.value is the actual buffer data
-    const buffer = result.value;
+    // result.value is the actual buffer data - convert to Buffer if it's an array
+    let buffer = result.value;
+    if (Array.isArray(buffer)) {
+      buffer = Buffer.from(buffer);
+    } else if (!Buffer.isBuffer(buffer)) {
+      buffer = Buffer.from(buffer);
+    }
+    
     console.log(`Image downloaded: ${key} - Size: ${buffer.length} bytes`);
     
     return {
