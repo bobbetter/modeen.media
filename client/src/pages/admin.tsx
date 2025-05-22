@@ -701,11 +701,9 @@ export default function Admin() {
                     <TableCell>
                       {product.display_image_url ? (
                         <img 
-                          src={product.display_image_url.includes("replit.com/object-storage") 
-                            ? product.display_image_url 
-                            : product.display_image_url.startsWith("products/")
-                              ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(product.display_image_url)}?alt=media`
-                              : product.display_image_url}
+                          src={product.display_image_url.startsWith("products/")
+                            ? `/api/images/${product.display_image_url.split('/').pop()}`
+                            : product.display_image_url}
                           alt={product.name}
                           className="h-8 w-8 object-cover rounded border"
                         />
@@ -1083,20 +1081,16 @@ export default function Admin() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center">
                                 <img 
-                                  src={field.value.includes("replit.com/object-storage") 
-                                    ? field.value 
-                                    : field.value.startsWith("products/")
-                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(field.value)}?alt=media`
-                                      : field.value}
+                                  src={field.value.startsWith("products/")
+                                    ? `/api/images/${field.value.split('/').pop()}`
+                                    : field.value}
                                   alt="Product display"
                                   className="h-10 w-10 object-cover rounded mr-2"
                                 />
                                 <a 
-                                  href={field.value.includes("replit.com/object-storage") 
-                                    ? field.value 
-                                    : field.value.startsWith("products/")
-                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(field.value)}?alt=media`
-                                      : field.value}
+                                  href={field.value.startsWith("products/")
+                                    ? `/api/images/${field.value.split('/').pop()}`
+                                    : field.value}
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="text-sm text-blue-600 hover:underline truncate max-w-[200px]"

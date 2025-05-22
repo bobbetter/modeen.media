@@ -633,6 +633,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ error: "Failed to download file" });
     }
   });
+  // Serve images from Object Storage
+  app.get("/api/images/:filename", async (req, res) => {
+    try {
+      const filename = req.params.filename;
+      const key = `products/${filename}`;
+      
+      console.log(`Serving image with key: ${key}`);
+      
+      // Get the file from object storage
+      const { buffer, contentType } = await getFileFromObjectStorage(key);
+      
+      // Set appropriate headers for image display
+      res.setHeader("Content-Type", contentType);
+      res.setHeader("Cache-Control", "public, max-age=86400"); // Cache for 24 hours
+      res.setHeader("Content-Length", buffer.length);
+      
+      // Send the image buffer
+      res.send(buffer);
+    } catch (error) {
+      console.error("Error serving image:", error);
+      return res.status(404).json({ error: "Image not found" });
+    }
+  });
+
   // Get a specific download link
   app.get("/api/download-links/:id", async (req, res) => {
     try {
