@@ -698,6 +698,23 @@ export default function Admin() {
                 {productsData.map((product: Product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.id}</TableCell>
+                    <TableCell>
+                      {product.display_image_url ? (
+                        <img 
+                          src={product.display_image_url.includes("replit.com/object-storage") 
+                            ? product.display_image_url 
+                            : product.display_image_url.startsWith("products/")
+                              ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(product.display_image_url)}?alt=media`
+                              : product.display_image_url}
+                          alt={product.name}
+                          className="h-8 w-8 object-cover rounded border"
+                        />
+                      ) : (
+                        <div className="h-8 w-8 bg-muted rounded border flex items-center justify-center">
+                          <span className="text-xs text-muted-foreground">No img</span>
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell className="max-w-xs truncate">
                       {product.description}
