@@ -71,10 +71,12 @@ export async function getImageFromObjectStorage(key: string): Promise<{ buffer: 
       contentType = contentTypeMap[ext];
     }
     
-    console.log(`Image downloaded: ${key} - Size: ${result.value.length} bytes`);
+    // result.value is the actual buffer data
+    const buffer = result.value;
+    console.log(`Image downloaded: ${key} - Size: ${buffer.length} bytes`);
     
     return {
-      buffer: result.value,
+      buffer,
       contentType
     };
   } catch (error) {
