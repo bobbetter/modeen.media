@@ -261,7 +261,7 @@ export function ProductsSection() {
                           className="w-full h-full"
                         >
                           <img
-                            src={getImageUrl(currentProduct.display_image_url)}
+                            src="src/assets/signature-soundpack-cover.png"
                             alt={currentProduct.name}
                             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                             onLoad={() =>
