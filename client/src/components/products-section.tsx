@@ -95,6 +95,37 @@ export function ProductsSection() {
     }
   };
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <section id="products" className="py-24 pt-10 min-h-[90vh] relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 rounded w-48 mx-auto mb-4"></div>
+              <div className="h-4 bg-gray-300 rounded w-32 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show message when no products available
+  if (products.length === 0) {
+    return (
+      <section id="products" className="py-24 pt-10 min-h-[90vh] relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center">
+            <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">No Products Available</h3>
+            <p className="text-muted-foreground">Products will appear here once they're added to the system.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="products" className="py-24 pt-10 min-h-[90vh] relative overflow-hidden">
       {/* Background Effects */}
@@ -167,11 +198,20 @@ export function ProductsSection() {
                           transition={{ duration: 0.3 }}
                           className="w-full h-full"
                         >
-                          <img 
-                            src={currentPack.coverImage}
-                            alt={currentPack.title} 
-                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                          />
+                          {currentProduct?.display_image_url ? (
+                            <img 
+                              src={currentProduct.display_image_url}
+                              alt={currentProduct.name} 
+                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          <div className={`w-full h-full flex items-center justify-center bg-gray-800/50 ${currentProduct?.display_image_url ? 'hidden' : ''}`}>
+                            <Package className="h-16 w-16 text-gray-400" />
+                          </div>
                         </motion.div>
                       </AnimatePresence>
                     </div>
@@ -223,7 +263,7 @@ export function ProductsSection() {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="flex flex-wrap gap-2">
-                        {currentPack.tags.map((tag, index) => (
+                        {currentProduct?.tags?.map((tag: string, index: number) => (
                           <span key={index} className="px-3 py-1 rounded-full bg-primary/10 text-primary/90 text-xs font-light tracking-wide">{tag}</span>
                         ))}
                       </div>
