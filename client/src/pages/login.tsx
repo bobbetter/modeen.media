@@ -134,11 +134,6 @@ export default function Login() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
-            Default admin: username: admin, password: admin123
-          </p>
-        </CardFooter>
       </Card>
     </div>
   );
