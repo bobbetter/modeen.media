@@ -38,9 +38,15 @@ export function ProductsSection() {
   const isMobile = useIsMobile();
 
   // Fetch products from database
-  const { data: products = [], isLoading: isLoadingProducts } = useQuery<Product[]>({
+  const { data: productsResponse, isLoading: isLoadingProducts } = useQuery({
     queryKey: ['/api/products'],
   });
+
+  // Extract products from API response
+  const products = productsResponse?.data || [];
+  
+  // Reset index if it's out of bounds when products load
+  const validProductIndex = products.length > 0 ? Math.min(currentPackIndex, products.length - 1) : 0;
   
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -93,7 +99,7 @@ export function ProductsSection() {
   };
 
   // Get current product or null if loading/no products
-  const currentProduct = products.length > 0 ? products[currentPackIndex] : null;
+  const currentProduct = products.length > 0 ? products[validProductIndex] : null;
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
