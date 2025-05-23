@@ -18,7 +18,6 @@ import {
   uploadToObjectStorage,
   deleteFromObjectStorage,
   getFileFromObjectStorage,
-  getImageFromObjectStorage,
 } from "./utils/replitObjectStorage";
 import path from "path";
 import fs from "fs";
@@ -634,36 +633,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ error: "Failed to download file" });
     }
   });
-  // Serve images from Object Storage
-  app.get("/api/images/:filename", async (req, res) => {
-    try {
-      const filename = req.params.filename;
-      const key = `products/${filename}`;
-      
-      console.log(`🖼️ Image request: ${filename}`);
-      console.log(`🗝️ Storage key: ${key}`);
-      
-      // Get the image from object storage
-      const { buffer, contentType } = await getImageFromObjectStorage(key);
-      
-      console.log(`✅ Image retrieved - Content-Type: ${contentType}, Buffer length: ${buffer.length}`);
-      console.log(`📊 Buffer type: ${typeof buffer}, isBuffer: ${Buffer.isBuffer(buffer)}`);
-      
-      // Set appropriate headers for image display
-      res.setHeader("Content-Type", contentType);
-      res.setHeader("Cache-Control", "public, max-age=86400"); // Cache for 24 hours
-      res.setHeader("Content-Length", buffer.length);
-      
-      console.log(`📤 Sending image response with ${buffer.length} bytes`);
-      
-      // Send the image buffer
-      res.end(buffer);
-    } catch (error) {
-      console.error("❌ Error serving image:", error);
-      return res.status(404).json({ error: "Image not found" });
-    }
-  });
-
   // Get a specific download link
   app.get("/api/download-links/:id", async (req, res) => {
     try {

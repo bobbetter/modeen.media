@@ -683,7 +683,6 @@ export default function Admin() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>Image</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Category</TableHead>
@@ -698,34 +697,6 @@ export default function Admin() {
                 {productsData.map((product: Product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.id}</TableCell>
-                    <TableCell>
-                      {product.display_image_url ? (
-                        (() => {
-                          const imageUrl = product.display_image_url.startsWith("products/")
-                            ? `/api/images/${product.display_image_url.replace('products/', '')}`
-                            : product.display_image_url;
-                          console.log("Loading image for product", product.id, "URL:", imageUrl, "Original:", product.display_image_url);
-                          return (
-                            <img 
-                              src={imageUrl}
-                              alt={product.name}
-                              className="h-8 w-8 object-cover rounded border"
-                              onError={(e) => {
-                                console.log("Image failed to load:", product.display_image_url, "Generated URL:", imageUrl);
-                                e.currentTarget.style.display = 'none';
-                              }}
-                              onLoad={() => {
-                                console.log("Image loaded successfully:", imageUrl);
-                              }}
-                            />
-                          );
-                        })()
-                      ) : (
-                        <div className="h-8 w-8 bg-muted rounded border flex items-center justify-center">
-                          <span className="text-xs text-muted-foreground">No img</span>
-                        </div>
-                      )}
-                    </TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell className="max-w-xs truncate">
                       {product.description}
@@ -1094,16 +1065,20 @@ export default function Admin() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center">
                                 <img 
-                                  src={field.value.startsWith("products/")
-                                    ? `/api/images/${field.value.split('/').pop()}`
-                                    : field.value}
+                                  src={field.value.includes("replit.com/object-storage") 
+                                    ? field.value 
+                                    : field.value.startsWith("products/")
+                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(field.value)}?alt=media`
+                                      : field.value}
                                   alt="Product display"
                                   className="h-10 w-10 object-cover rounded mr-2"
                                 />
                                 <a 
-                                  href={field.value.startsWith("products/")
-                                    ? `/api/images/${field.value.split('/').pop()}`
-                                    : field.value}
+                                  href={field.value.includes("replit.com/object-storage") 
+                                    ? field.value 
+                                    : field.value.startsWith("products/")
+                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(field.value)}?alt=media`
+                                      : field.value}
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="text-sm text-blue-600 hover:underline truncate max-w-[200px]"
