@@ -40,11 +40,16 @@ function formatPrice(price: string): string {
   return `$${numPrice.toFixed(2)}`;
 }
 
+const image_mapper = {
+  SignatureSoundpack: SignatureSoundpack,
+  CreatorsMostwanted: CreatorsMostwanted,
+};
+
 // Helper function to get a placeholder image if none exists
 function getProductImage(product: Product): string {
   if (product.display_image_url) {
     console.log("Product image URL:", product.display_image_url);
-    return product.display_image_url;
+    return image_mapper[product.display_image_url];
   }
   // Use one of the existing images as fallback
   return product.id % 2 === 0 ? CreatorsMostwanted : SignatureSoundpack;
