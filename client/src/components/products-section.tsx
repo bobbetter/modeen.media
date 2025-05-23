@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ function getProductImage(product: Product): string {
 
 export function ProductsSection() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPackIndex, setCurrentPackIndex] = useState(0);
   const isMobile = useIsMobile();
@@ -279,6 +281,7 @@ export function ProductsSection() {
                               {formatPrice(currentProduct.price)}
                             </span>
                             <Button
+                              onClick={() => setLocation(`/checkout?product=${currentProduct.id}`)}
                               className="relative overflow-hidden group/btn bg-gradient-to-b from-primary/90 to-primary/80 border-0 text-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-all duration-300"
                               size="sm"
                             >
