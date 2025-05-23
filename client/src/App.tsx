@@ -6,6 +6,8 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Admin from "@/pages/admin";
+import Checkout from "@/pages/checkout";
+import PaymentSuccess from "@/pages/payment-success";
 
 function Router() {
   return (

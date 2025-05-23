@@ -29,6 +29,13 @@ import {
   decode_jwt_token,
   ProductTokenPayload,
 } from "./utils/jwt";
+import Stripe from "stripe";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve files from the public directory
   app.use(express.static(path.join(process.cwd(), "public")));
@@ -431,6 +438,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     },
   );
+
+  // Stripe Payment Routes
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { productId } = req.body;
+
+      if (!productId) {
+        return res.status(400).json({
+          success: false,
+          message: "Product ID is required",
+        });
+      }
+
+      // Get product details to determine the amount
+      const product = await storage.getProduct(productId);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
+      // Create payment intent with the product price
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(parseFloat(product.price) * 100), // Convert to cents
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          productId: product.id.toString(),
+          productName: product.name,
+        },
+      });
+
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        product: product
+      });
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Error creating payment intent: " + error.message 
+      });
+    }
+  });
 
   // Download Links Routes
   // Get all download links
