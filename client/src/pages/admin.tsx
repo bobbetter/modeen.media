@@ -6,7 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Product, insertProductSchema, insertDownloadLinkSchema, DownloadLink } from "@shared/schema";
+import {
+  Product,
+  insertProductSchema,
+  insertDownloadLinkSchema,
+  DownloadLink,
+} from "@shared/schema";
 
 import {
   Form,
@@ -44,25 +49,42 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Plus, Pencil, Trash, Upload, FileText, X, Link, Clock, Download } from "lucide-react";
+import {
+  Loader2,
+  Plus,
+  Pencil,
+  Trash,
+  Upload,
+  FileText,
+  X,
+  Link,
+  Clock,
+  Download,
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 // Form schema for product
 const productFormSchema = insertProductSchema.extend({
-  price: z.string().min(1, "Price is required").refine(
-    (value) => !isNaN(parseFloat(value)) && parseFloat(value) > 0,
-    {
+  price: z
+    .string()
+    .min(1, "Price is required")
+    .refine((value) => !isNaN(parseFloat(value)) && parseFloat(value) > 0, {
       message: "Price must be a positive number",
-    }
-  ),
+    }),
   category: z.string().default(""),
-  tags: z.union([z.string(), z.array(z.string())]).transform(value => {
-    if (typeof value === 'string') {
-      // Convert comma-separated string to array
-      return value.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
-    }
-    return value;
-  }).default([]),
+  tags: z
+    .union([z.string(), z.array(z.string())])
+    .transform((value) => {
+      if (typeof value === "string") {
+        // Convert comma-separated string to array
+        return value
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== "");
+      }
+      return value;
+    })
+    .default([]),
 });
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
@@ -71,8 +93,14 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 const downloadLinkFormSchema = insertDownloadLinkSchema.extend({
   product_id: z.number(),
   download_link: z.string().optional(), // Will be generated on the server
-  max_download_count: z.number().int().min(0, "Max download count must be a non-negative integer"),
-  expire_after_seconds: z.number().int().min(0, "Expiration time must be a non-negative integer"),
+  max_download_count: z
+    .number()
+    .int()
+    .min(0, "Max download count must be a non-negative integer"),
+  expire_after_seconds: z
+    .number()
+    .int()
+    .min(0, "Expiration time must be a non-negative integer"),
 });
 
 type DownloadLinkFormValues = z.infer<typeof downloadLinkFormSchema>;
@@ -80,17 +108,24 @@ type DownloadLinkFormValues = z.infer<typeof downloadLinkFormSchema>;
 export default function Admin() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDownloadLinkDialogOpen, setIsDownloadLinkDialogOpen] = useState(false);
-  const [isDeleteDownloadLinkDialogOpen, setIsDeleteDownloadLinkDialogOpen] = useState(false);
+  const [isDownloadLinkDialogOpen, setIsDownloadLinkDialogOpen] =
+    useState(false);
+  const [isDeleteDownloadLinkDialogOpen, setIsDeleteDownloadLinkDialogOpen] =
+    useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
-  const [currentDownloadLink, setCurrentDownloadLink] = useState<DownloadLink | null>(null);
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [currentDownloadLink, setCurrentDownloadLink] =
+    useState<DownloadLink | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+    null,
+  );
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadingDisplayImage, setUploadingDisplayImage] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedDisplayImage, setSelectedDisplayImage] = useState<File | null>(null);
+  const [selectedDisplayImage, setSelectedDisplayImage] = useState<File | null>(
+    null,
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const displayImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -108,18 +143,18 @@ export default function Admin() {
   };
 
   // Check if user is authenticated and is admin
-  const { 
-    data: userApiResponse, 
-    isLoading: isUserLoading, 
-    isError: isUserError 
+  const {
+    data: userApiResponse,
+    isLoading: isUserLoading,
+    isError: isUserError,
   } = useQuery<ApiResponse<UserData>>({
     queryKey: ["/api/auth/me"],
-    retry: false
+    retry: false,
   });
-  
+
   // Extract user data from API response
   const userData = userApiResponse?.data;
-  
+
   // Redirect if not authenticated or not admin
   useEffect(() => {
     if (isUserError) {
@@ -147,10 +182,10 @@ export default function Admin() {
     queryKey: ["/api/products"],
     enabled: !!userData?.isAdmin,
   });
-  
+
   // Extract products data from API response
   const productsData = productsApiResponse?.data || [];
-  
+
   // Fetch download links
   const {
     data: downloadLinksApiResponse,
@@ -160,7 +195,7 @@ export default function Admin() {
     queryKey: ["/api/download-links"],
     enabled: !!userData?.isAdmin,
   });
-  
+
   // Extract download links data from API response
   const downloadLinksData = downloadLinksApiResponse?.data || [];
 
@@ -169,18 +204,18 @@ export default function Admin() {
     mutationFn: async (data: ProductFormValues) => {
       // Keep price as a string as expected by the server
       const productData = {
-        ...data
+        ...data,
       };
-      
+
       const response = await fetch("/api/products", {
         method: "POST",
         body: JSON.stringify(productData),
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include" // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -203,21 +238,27 @@ export default function Admin() {
 
   // Update product mutation
   const updateProductMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: ProductFormValues }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: ProductFormValues;
+    }) => {
       // Keep price as a string as expected by the server
       const productData = {
-        ...data
+        ...data,
       };
-      
+
       const response = await fetch(`/api/products/${id}`, {
         method: "PUT",
         body: JSON.stringify(productData),
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include" // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -243,9 +284,9 @@ export default function Admin() {
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/products/${id}`, {
         method: "DELETE",
-        credentials: "include" // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -265,7 +306,7 @@ export default function Admin() {
       });
     },
   });
-  
+
   // Create download link mutation
   const createDownloadLinkMutation = useMutation({
     mutationFn: async (data: DownloadLinkFormValues) => {
@@ -275,9 +316,9 @@ export default function Admin() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include" // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -297,15 +338,15 @@ export default function Admin() {
       });
     },
   });
-  
+
   // Delete download link mutation
   const deleteDownloadLinkMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/download-links/${id}`, {
         method: "DELETE",
-        credentials: "include" // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -331,9 +372,9 @@ export default function Admin() {
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
-        credentials: "include" // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
-      
+
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Logged out",
@@ -363,7 +404,7 @@ export default function Admin() {
       display_image_url: "",
     },
   });
-  
+
   // Download link form
   const downloadLinkForm = useForm<DownloadLinkFormValues>({
     resolver: zodResolver(downloadLinkFormSchema),
@@ -411,7 +452,7 @@ export default function Admin() {
     setCurrentProduct(product);
     setIsDeleteDialogOpen(true);
   };
-  
+
   // Open dialog for creating a new download link
   const handleAddDownloadLink = (productId: number) => {
     downloadLinkForm.reset({
@@ -425,7 +466,7 @@ export default function Admin() {
     setCurrentDownloadLink(null);
     setIsDownloadLinkDialogOpen(true);
   };
-  
+
   // Open dialog for deleting a download link
   const handleDeleteDownloadLink = (downloadLink: DownloadLink) => {
     setCurrentDownloadLink(downloadLink);
@@ -436,22 +477,22 @@ export default function Admin() {
   const uploadFileMutation = useMutation({
     mutationFn: async (file: File) => {
       console.log("Starting file upload for:", file.name);
-      
+
       const formData = new FormData();
       formData.append("file", file);
       console.log("FormData created with file");
-      
+
       console.log("Sending upload request to /api/upload");
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
-        credentials: "include" // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
-      
+
       console.log("Upload response status:", response.status);
       const responseData = await response.json();
       console.log("Upload response data:", responseData);
-      
+
       return responseData;
     },
     onSuccess: (response) => {
@@ -482,27 +523,27 @@ export default function Admin() {
       });
     },
   });
-  
+
   // Display image upload mutation
   const uploadDisplayImageMutation = useMutation({
     mutationFn: async (file: File) => {
       console.log("Starting display image upload for:", file.name);
-      
+
       const formData = new FormData();
       formData.append("file", file);
       console.log("FormData created with display image file");
-      
+
       console.log("Sending upload request to /api/upload");
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
-        credentials: "include" // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
-      
+
       console.log("Upload response status:", response.status);
       const responseData = await response.json();
       console.log("Upload response data:", responseData);
-      
+
       return responseData;
     },
     onSuccess: (response) => {
@@ -533,21 +574,21 @@ export default function Admin() {
       });
     },
   });
-  
+
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
     }
   };
-  
+
   // Handle display image selection
   const handleDisplayImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedDisplayImage(e.target.files[0]);
     }
   };
-  
+
   // Handle file upload
   const handleFileUpload = () => {
     if (selectedFile) {
@@ -555,7 +596,7 @@ export default function Admin() {
       uploadFileMutation.mutate(selectedFile);
     }
   };
-  
+
   // Handle display image upload
   const handleDisplayImageUpload = () => {
     if (selectedDisplayImage) {
@@ -563,7 +604,7 @@ export default function Admin() {
       uploadDisplayImageMutation.mutate(selectedDisplayImage);
     }
   };
-  
+
   // Remove the selected file
   const handleRemoveFile = () => {
     setSelectedFile(null);
@@ -571,7 +612,7 @@ export default function Admin() {
       fileInputRef.current.value = "";
     }
   };
-  
+
   // Remove the selected display image
   const handleRemoveDisplayImage = () => {
     setSelectedDisplayImage(null);
@@ -579,7 +620,7 @@ export default function Admin() {
       displayImageInputRef.current.value = "";
     }
   };
-  
+
   // Clear file selection when dialog closes
   useEffect(() => {
     if (!isDialogOpen) {
@@ -602,16 +643,16 @@ export default function Admin() {
       createProductMutation.mutate(data);
     }
   };
-  
+
   // Submit download link form handler
   const onSubmitDownloadLink = (data: DownloadLinkFormValues) => {
     // Generate a simple placeholder for the download_link field
     // The actual link will be generated on the server
     const downloadLinkData = {
       ...data,
-      download_link: "placeholder" // Server will replace this with the actual JWT token-based link
+      download_link: "placeholder", // Server will replace this with the actual JWT token-based link
     };
-    
+
     console.log("Submitting download link data:", downloadLinkData);
     createDownloadLinkMutation.mutate(downloadLinkData);
   };
@@ -630,13 +671,12 @@ export default function Admin() {
     return null;
   }
 
-
   function make_download_url(fileUrl: string): string {
-    const baseUrl = 'https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4';
+    const baseUrl =
+      "https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4";
     return `${baseUrl}/o/${encodeURIComponent(fileUrl)}?alt=media`;
   }
 
-    
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-primary text-primary-foreground shadow-md">
@@ -683,12 +723,13 @@ export default function Admin() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead>Name</TableHead>                  
                   <TableHead>Description</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Tags</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>File</TableHead>
+                  <TableHead>Display Image</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -703,9 +744,12 @@ export default function Admin() {
                     </TableCell>
                     <TableCell>{product.category || "-"}</TableCell>
                     <TableCell>
-                      {product.tags && product.tags.length > 0 
+                      {product.tags && product.tags.length > 0
                         ? product.tags.map((tag, index) => (
-                            <span key={index} className="inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded mr-1 mb-1">
+                            <span
+                              key={index}
+                              className="inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded mr-1 mb-1"
+                            >
                               {tag}
                             </span>
                           ))
@@ -714,9 +758,9 @@ export default function Admin() {
                     <TableCell>${Number(product.price).toFixed(2)}</TableCell>
                     <TableCell>
                       {product.fileUrl ? (
-                        <a 
-                          href={make_download_url(product.fileUrl)} 
-                          target="_blank" 
+                        <a
+                          href={make_download_url(product.fileUrl)}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center text-sm text-blue-600 hover:underline"
                         >
@@ -724,9 +768,12 @@ export default function Admin() {
                           View File
                         </a>
                       ) : (
-                        <span className="text-muted-foreground text-sm">No file</span>
+                        <span className="text-muted-foreground text-sm">
+                          No file
+                        </span>
                       )}
                     </TableCell>
+                    <TableCell>{product.display_image_url || "-"}</TableCell>
                     <TableCell>
                       {new Date(product.created_at).toLocaleDateString()}
                     </TableCell>
@@ -762,9 +809,9 @@ export default function Admin() {
             </Table>
           </div>
         )}
-        
+
         <Separator className="my-6" />
-        
+
         {/* Download Links Management */}
         <div className="mb-8">
           <h3 className="text-xl font-bold mb-4">Download Links</h3>
@@ -779,7 +826,8 @@ export default function Admin() {
             </div>
           ) : downloadLinksData.length === 0 ? (
             <div className="text-center p-4 text-muted-foreground">
-              No download links yet. Use the link button on a product to create one.
+              No download links yet. Use the link button on a product to create
+              one.
             </div>
           ) : (
             <div className="rounded-md border">
@@ -800,26 +848,34 @@ export default function Admin() {
                 <TableBody>
                   {downloadLinksData.map((downloadLink) => {
                     // Find the associated product
-                    const product = productsData.find(p => p.id === downloadLink.product_id);
+                    const product = productsData.find(
+                      (p) => p.id === downloadLink.product_id,
+                    );
                     return (
                       <TableRow key={downloadLink.id}>
-                        <TableCell className="font-medium">{downloadLink.id}</TableCell>
+                        <TableCell className="font-medium">
+                          {downloadLink.id}
+                        </TableCell>
                         <TableCell>{downloadLink.product_id}</TableCell>
-                        <TableCell>{product ? product.name : 'Unknown'}</TableCell>
+                        <TableCell>
+                          {product ? product.name : "Unknown"}
+                        </TableCell>
                         <TableCell>{downloadLink.download_link}</TableCell>
                         <TableCell>{downloadLink.download_count}</TableCell>
                         <TableCell>
-                          {downloadLink.max_download_count > 0 
-                            ? downloadLink.max_download_count 
-                            : 'Unlimited'}
+                          {downloadLink.max_download_count > 0
+                            ? downloadLink.max_download_count
+                            : "Unlimited"}
                         </TableCell>
                         <TableCell>
-                          {downloadLink.expire_after_seconds > 0 
-                            ? `${Math.floor(downloadLink.expire_after_seconds / 86400)} days` 
-                            : 'No expiration'}
+                          {downloadLink.expire_after_seconds > 0
+                            ? `${Math.floor(downloadLink.expire_after_seconds / 86400)} days`
+                            : "No expiration"}
                         </TableCell>
                         <TableCell>
-                          {new Date(downloadLink.created_at).toLocaleDateString()}
+                          {new Date(
+                            downloadLink.created_at,
+                          ).toLocaleDateString()}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
@@ -827,7 +883,9 @@ export default function Admin() {
                               variant="outline"
                               size="icon"
                               className="text-destructive"
-                              onClick={() => handleDeleteDownloadLink(downloadLink)}
+                              onClick={() =>
+                                handleDeleteDownloadLink(downloadLink)
+                              }
                             >
                               <Trash className="h-4 w-4" />
                             </Button>
@@ -902,6 +960,7 @@ export default function Admin() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="category"
@@ -915,6 +974,7 @@ export default function Admin() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="tags"
@@ -922,17 +982,21 @@ export default function Admin() {
                   <FormItem>
                     <FormLabel>Tags</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Tags (comma separated)" 
-                        value={Array.isArray(field.value) ? field.value.join(', ') : field.value} 
-                        onChange={e => field.onChange(e.target.value)}
+                      <Input
+                        placeholder="Tags (comma separated)"
+                        value={
+                          Array.isArray(field.value)
+                            ? field.value.join(", ")
+                            : field.value
+                        }
+                        onChange={(e) => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               {/* File Upload Field */}
               <FormField
                 control={form.control}
@@ -943,34 +1007,38 @@ export default function Admin() {
                     <FormControl>
                       <div className="space-y-2">
                         {/* Hidden actual file input */}
-                        <input 
-                          type="hidden" 
+                        <input
+                          type="hidden"
                           {...field}
                           value={field.value || ""}
                         />
-                        
+
                         {/* File Upload UI */}
                         <div className="border rounded-md p-4">
                           {field.value ? (
                             <div className="flex items-center justify-between">
                               <div className="flex items-center">
                                 <FileText className="h-5 w-5 mr-2 text-primary" />
-                                <a 
-                                  href={field.value.includes("replit.com/object-storage") 
-                                    ? field.value 
-                                    : field.value.startsWith("/uploads")
-                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/products%2F${field.value.split('/').pop()}?alt=media`
-                                      : field.value}
-                                  target="_blank" 
+                                <a
+                                  href={
+                                    field.value.includes(
+                                      "replit.com/object-storage",
+                                    )
+                                      ? field.value
+                                      : field.value.startsWith("/uploads")
+                                        ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/products%2F${field.value.split("/").pop()}?alt=media`
+                                        : field.value
+                                  }
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-sm text-blue-600 hover:underline truncate max-w-[200px]"
                                 >
-                                  {field.value.split('/').pop()}
+                                  {field.value.split("/").pop()}
                                 </a>
                               </div>
-                              <Button 
-                                type="button" 
-                                variant="outline" 
+                              <Button
+                                type="button"
+                                variant="outline"
                                 size="sm"
                                 onClick={() => form.setValue("fileUrl", "")}
                               >
@@ -1042,126 +1110,21 @@ export default function Admin() {
                   </FormItem>
                 )}
               />
-              
-              {/* Display Image Upload Field */}
+
               <FormField
                 control={form.control}
                 name="display_image_url"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Display Image</FormLabel>
+                    <FormLabel>Image</FormLabel>
                     <FormControl>
-                      <div className="space-y-2">
-                        {/* Hidden actual display image input */}
-                        <input 
-                          type="hidden" 
-                          {...field}
-                          value={field.value || ""}
-                        />
-                        
-                        {/* Display Image Upload UI */}
-                        <div className="border rounded-md p-4">
-                          {field.value ? (
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <img 
-                                  src={field.value.includes("replit.com/object-storage") 
-                                    ? field.value 
-                                    : field.value.startsWith("products/")
-                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(field.value)}?alt=media`
-                                      : field.value}
-                                  alt="Product display"
-                                  className="h-10 w-10 object-cover rounded mr-2"
-                                />
-                                <a 
-                                  href={field.value.includes("replit.com/object-storage") 
-                                    ? field.value 
-                                    : field.value.startsWith("products/")
-                                      ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/${encodeURIComponent(field.value)}?alt=media`
-                                      : field.value}
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-sm text-blue-600 hover:underline truncate max-w-[200px]"
-                                >
-                                  {field.value.split('/').pop()}
-                                </a>
-                              </div>
-                              <Button 
-                                type="button" 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => form.setValue("display_image_url", "")}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ) : (
-                            <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                <input
-                                  type="file"
-                                  className="hidden"
-                                  ref={displayImageInputRef}
-                                  onChange={handleDisplayImageChange}
-                                  accept="image/*"
-                                />
-                                <Button
-                                  type="button"
-                                  variant="secondary"
-                                  onClick={() => displayImageInputRef.current?.click()}
-                                  disabled={uploadingDisplayImage}
-                                >
-                                  <Upload className="h-4 w-4 mr-2" />
-                                  Choose Image
-                                </Button>
-                                {selectedDisplayImage && (
-                                  <>
-                                    <span className="text-sm truncate max-w-[150px]">
-                                      {selectedDisplayImage.name}
-                                    </span>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={handleRemoveDisplayImage}
-                                      className="ml-auto"
-                                      disabled={uploadingDisplayImage}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
-                              {selectedDisplayImage && (
-                                <Button
-                                  type="button"
-                                  className="w-full"
-                                  onClick={handleDisplayImageUpload}
-                                  disabled={uploadingDisplayImage}
-                                >
-                                  {uploadingDisplayImage ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                      Uploading...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Upload className="h-4 w-4 mr-2" />
-                                      Upload
-                                    </>
-                                  )}
-                                </Button>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      <Input placeholder="Display Image" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <DialogFooter>
                 <Button
                   type="button"
@@ -1173,10 +1136,12 @@ export default function Admin() {
                 <Button
                   type="submit"
                   disabled={
-                    createProductMutation.isPending || updateProductMutation.isPending
+                    createProductMutation.isPending ||
+                    updateProductMutation.isPending
                   }
                 >
-                  {createProductMutation.isPending || updateProductMutation.isPending ? (
+                  {createProductMutation.isPending ||
+                  updateProductMutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Saving...
@@ -1231,13 +1196,19 @@ export default function Admin() {
       </AlertDialog>
 
       {/* Download Link Dialog */}
-      <Dialog open={isDownloadLinkDialogOpen} onOpenChange={setIsDownloadLinkDialogOpen}>
+      <Dialog
+        open={isDownloadLinkDialogOpen}
+        onOpenChange={setIsDownloadLinkDialogOpen}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Create Download Link</DialogTitle>
           </DialogHeader>
           <Form {...downloadLinkForm}>
-            <form onSubmit={downloadLinkForm.handleSubmit(onSubmitDownloadLink)} className="space-y-4">
+            <form
+              onSubmit={downloadLinkForm.handleSubmit(onSubmitDownloadLink)}
+              className="space-y-4"
+            >
               <FormField
                 control={downloadLinkForm.control}
                 name="max_download_count"
@@ -1245,12 +1216,14 @@ export default function Admin() {
                   <FormItem>
                     <FormLabel>Max Download Count (0 for unlimited)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min="0" 
-                        placeholder="Enter max download count" 
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="Enter max download count"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -1262,14 +1235,18 @@ export default function Admin() {
                 name="expire_after_seconds"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Expiration Time in Seconds (0 for no expiration)</FormLabel>
+                    <FormLabel>
+                      Expiration Time in Seconds (0 for no expiration)
+                    </FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min="0" 
-                        placeholder="Enter expiration time in seconds" 
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="Enter expiration time in seconds"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -1277,7 +1254,10 @@ export default function Admin() {
                 )}
               />
               <DialogFooter className="mt-6">
-                <Button type="submit" disabled={createDownloadLinkMutation.isPending}>
+                <Button
+                  type="submit"
+                  disabled={createDownloadLinkMutation.isPending}
+                >
                   {createDownloadLinkMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
@@ -1290,7 +1270,10 @@ export default function Admin() {
       </Dialog>
 
       {/* Delete Download Link Dialog */}
-      <AlertDialog open={isDeleteDownloadLinkDialogOpen} onOpenChange={setIsDeleteDownloadLinkDialogOpen}>
+      <AlertDialog
+        open={isDeleteDownloadLinkDialogOpen}
+        onOpenChange={setIsDeleteDownloadLinkDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -1301,7 +1284,10 @@ export default function Admin() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => currentDownloadLink && deleteDownloadLinkMutation.mutate(currentDownloadLink.id)}
+              onClick={() =>
+                currentDownloadLink &&
+                deleteDownloadLinkMutation.mutate(currentDownloadLink.id)
+              }
               disabled={deleteDownloadLinkMutation.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
