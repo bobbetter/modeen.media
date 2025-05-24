@@ -48,8 +48,12 @@ export default function Checkout() {
     }
 
     // Create PaymentIntent as soon as the page loads
-    apiRequest("POST", "/create-checkout-session", { 
-      productId: parseInt(productId) 
+    fetch("/create-checkout-session", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 'productId': parseInt(productId) })
     })
       .then((res) => res.json())
       .then((data) => {
