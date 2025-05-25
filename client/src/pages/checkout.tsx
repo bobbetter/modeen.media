@@ -3,9 +3,8 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, CreditCard, Shield } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import type { Product } from "@shared/schema";
 
 import SignatureSoundpack from "../assets/signature-soundpack-cover.png";
@@ -27,7 +26,6 @@ import {
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error("Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY");
 }
-
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 // const stripePromise = loadStripe("pk_test_123");
 
@@ -171,7 +169,7 @@ export default function Checkout() {
 
           {/* Payment Form */}
           <div className="space-y-6 h-full">
-            <div id="checkout" className="h-full pb-8">
+            <div id="checkout" className="h-full">
               <EmbeddedCheckoutProvider
                 stripe={stripePromise}
                 options={{ clientSecret: clientSecret }}
