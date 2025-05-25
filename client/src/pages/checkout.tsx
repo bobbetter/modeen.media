@@ -27,8 +27,9 @@ import {
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error("Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY");
 }
-// const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-const stripePromise = loadStripe("pk_test_123");
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// const stripePromise = loadStripe("pk_test_123");
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
@@ -170,7 +171,7 @@ export default function Checkout() {
 
           {/* Payment Form */}
           <div className="space-y-6 h-full">
-            <div id="checkout" className="h-full">
+            <div id="checkout" className="h-full pb-8">
               <EmbeddedCheckoutProvider
                 stripe={stripePromise}
                 options={{ clientSecret: clientSecret }}
