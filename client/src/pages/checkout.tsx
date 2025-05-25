@@ -109,14 +109,14 @@ export default function Checkout() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto lg:items-start">
           {/* Product Details */}
-          <div className="space-y-6">
-            <Card className="border-2 border-muted/50">
+          <div className="space-y-6 h-full">
+            <Card className="border-2 border-muted/50 h-full flex flex-col">
               <CardHeader>
                 <CardTitle className="text-xl">Order Summary</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 flex-1 flex flex-col">
                 {product.display_image_url && (
                   <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
                     <img
@@ -127,7 +127,7 @@ export default function Checkout() {
                   </div>
                 )}
 
-                <div>
+                <div className="flex-1">
                   <h3 className="text-2xl font-bold text-foreground mb-2">
                     {product.name}
                   </h3>
@@ -156,7 +156,7 @@ export default function Checkout() {
                   )}
                 </div>
 
-                <div className="border-t pt-4">
+                <div className="border-t pt-4 mt-auto">
                   <div className="flex justify-between items-center text-lg">
                     <span className="font-semibold">Total:</span>
                     <span className="text-2xl font-bold text-primary">
@@ -169,8 +169,8 @@ export default function Checkout() {
           </div>
 
           {/* Payment Form */}
-          <div className="space-y-6">
-            <div id="checkout">
+          <div className="space-y-6 h-full">
+            <div id="checkout" className="h-full">
               <EmbeddedCheckoutProvider
                 stripe={stripePromise}
                 options={{ clientSecret: clientSecret }}
