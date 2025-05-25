@@ -48,16 +48,19 @@ app.post(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+import { env } from "./config/environment";
+
 // Set up session middleware
+const sessionConfig = env.getSessionConfig();
 app.use(
   session({
-    secret: "modeen-media-admin-secret",
+    secret: sessionConfig.secret,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // Allow cookies over non-HTTPS connections for remote deployment
+      secure: sessionConfig.secure,
       sameSite: "lax", // Helps with CSRF protection while still allowing redirects
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      maxAge: sessionConfig.maxAge,
     },
   }),
 );

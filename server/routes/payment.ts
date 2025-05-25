@@ -2,17 +2,11 @@ import { type Express } from "express";
 import Stripe from "stripe";
 import { storage } from "../storage";
 import bodyParser from "body-parser";
+import { env } from "../config/environment";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
-}
-
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-const stripe = new Stripe(
-  "sk_test_51RR9SdAIn0oICRrzPW2XYyWuaLdBTeoZrz84H7UR9nreCcjOAVyOJRLqJJBclpmxWqpWNvfQcdibqO6gcVv5zmyd00ZdVg2ppA",
-);
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const stripeConfig = env.getStripeConfig();
+const stripe = new Stripe(stripeConfig.secretKey);
+const endpointSecret = stripeConfig.webhookSecret;
 
 async function fulfillCheckout(sessionId: string) {
   // Set your secret key. Remember to switch to your live secret key in production.
