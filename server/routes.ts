@@ -906,7 +906,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               name: product.name,
               description: "test",
             },
-            unit_amount: parseInt(product.price, 10),
+            unit_amount: parseInt(product.price, 10) * 100,
           },
           quantity: 1,
         },
