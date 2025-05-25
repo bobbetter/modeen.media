@@ -2,28 +2,65 @@ import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { registerWebhookRoute } from "./routes/payment";
+import Stripe from "stripe";
+import bodyParser from "body-parser";
+
+const stripe = new Stripe(
+  "sk_test_51RR9SdAIn0oICRrzPW2XYyWuaLdBTeoZrz84H7UR9nreCcjOAVyOJRLqJJBclpmxWqpWNvfQcdibqO6gcVv5zmyd00ZdVg2ppA",
+);
 
 const app = express();
 
 // Register webhook route BEFORE general body parsing middleware
 // This is critical because Stripe webhooks need raw body for signature verification
-registerWebhookRoute(app);
+app.post(
+  "/webhook",
+  bodyParser.raw({ type: "application/json" }), // required for Stripe to verify signature
+  async (request, response) => {
+    const sig = request.headers["stripe-signature"];
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    let event;
+    console.log("Webhook received:", request.body);
+    console.log("Webhook signature:", sig);
+    try {
+      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    } catch (err) {
+      console.error("❌ Webhook signature verification failed:", err.message);
+      return response.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    console.log("✅ Verified webhook event:", event.type);
+
+    // Handle the event
+    if (
+      event.type === "checkout.session.completed" ||
+      event.type === "checkout.session.async_payment_succeeded"
+    ) {
+      const session = event.data.object;
+      await fulfillCheckout(session.id); // Your fulfillment logic
+    }
+
+    response.status(200).end();
+  },
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Set up session middleware
-app.use(session({
-  secret: "modeen-media-admin-secret",
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    secure: false, // Allow cookies over non-HTTPS connections for remote deployment
-    sameSite: 'lax', // Helps with CSRF protection while still allowing redirects
-    maxAge: 1000 * 60 * 60 * 24 // 1 day
-  }
-}));
+app.use(
+  session({
+    secret: "modeen-media-admin-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Allow cookies over non-HTTPS connections for remote deployment
+      sameSite: "lax", // Helps with CSRF protection while still allowing redirects
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
+  }),
+);
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -79,11 +116,14 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  server.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+      log(`serving on port ${port}`);
+    },
+  );
 })();

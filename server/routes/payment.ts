@@ -55,6 +55,22 @@ export function registerWebhookRoute(app: Express): void {
       const sig = request.headers["stripe-signature"];
       const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+      console.log("Webhook received:", request.body);
+      console.log("Webhook signature:", sig);
+      console.log("Endpoint secret exists:", !!endpointSecret);
+      console.log("Endpoint secret starts with:", endpointSecret?.substring(0, 10) + "...");
+
+      // Validate required parameters
+      if (!sig) {
+        console.error("❌ No stripe signature found");
+        return response.status(400).send("No stripe signature found");
+      }
+
+      if (!endpointSecret) {
+        console.error("❌ No webhook endpoint secret configured");
+        return response.status(400).send("No webhook endpoint secret configured");
+      }
+
       let event;
 
       try {
@@ -63,7 +79,7 @@ export function registerWebhookRoute(app: Express): void {
           sig,
           endpointSecret,
         );
-      } catch (err) {
+      } catch (err: any) {
         console.error("❌ Webhook signature verification failed:", err.message);
         return response.status(400).send(`Webhook Error: ${err.message}`);
       }
