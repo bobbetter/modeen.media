@@ -26,8 +26,10 @@ import {
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error("Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY");
 }
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-// const stripePromise = loadStripe("pk_test_123");
+// const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe(
+  "pk_test_51RR9SdAIn0oICRrz5JdVSxLJAWpRS4CBtTPpDjxvJuW0xbHaAJ73ij0yPUks0xFcEurKcoKwkpIKV6TxLR1wYIwg00qIo9jrfi",
+);
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
