@@ -2,8 +2,14 @@ import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { registerWebhookRoute } from "./routes/payment";
 
 const app = express();
+
+// Register webhook route BEFORE general body parsing middleware
+// This is critical because Stripe webhooks need raw body for signature verification
+registerWebhookRoute(app);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

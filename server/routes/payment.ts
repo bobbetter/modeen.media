@@ -46,6 +46,44 @@ async function fulfillCheckout(sessionId: string) {
   }
 }
 
+// Separate webhook registration function that must be called before body parsing middleware
+export function registerWebhookRoute(app: Express): void {
+  app.post(
+    "/webhook",
+    bodyParser.raw({ type: "application/json" }), // required for Stripe to verify signature
+    async (request, response) => {
+      const sig = request.headers["stripe-signature"];
+      const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+      let event;
+
+      try {
+        event = stripe.webhooks.constructEvent(
+          request.body,
+          sig,
+          endpointSecret,
+        );
+      } catch (err) {
+        console.error("❌ Webhook signature verification failed:", err.message);
+        return response.status(400).send(`Webhook Error: ${err.message}`);
+      }
+
+      console.log("✅ Verified webhook event:", event.type);
+
+      // Handle the event
+      if (
+        event.type === "checkout.session.completed" ||
+        event.type === "checkout.session.async_payment_succeeded"
+      ) {
+        const session = event.data.object;
+        await fulfillCheckout(session.id); // Your fulfillment logic
+      }
+
+      response.status(200).end();
+    },
+  );
+}
+
 export function registerPaymentRoutes(app: Express): void {
   app.post("/create-checkout-session", async (req, res) => {
     const productId = req.body.productId;
@@ -81,39 +119,4 @@ export function registerPaymentRoutes(app: Express): void {
       product: product,
     });
   });
-
-  app.post(
-    "/webhook",
-    bodyParser.raw({ type: "application/json" }), // required for Stripe to verify signature
-    async (request, response) => {
-      const sig = request.headers["stripe-signature"];
-      const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-      let event;
-
-      try {
-        event = stripe.webhooks.constructEvent(
-          request.body,
-          sig,
-          endpointSecret,
-        );
-      } catch (err) {
-        console.error("❌ Webhook signature verification failed:", err.message);
-        return response.status(400).send(`Webhook Error: ${err.message}`);
-      }
-
-      console.log("✅ Verified webhook event:", event.type);
-
-      // Handle the event
-      if (
-        event.type === "checkout.session.completed" ||
-        event.type === "checkout.session.async_payment_succeeded"
-      ) {
-        const session = event.data.object;
-        await fulfillCheckout(session.id); // Your fulfillment logic
-      }
-
-      response.status(200).end();
-    },
-  );
 }
