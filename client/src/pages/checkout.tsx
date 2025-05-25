@@ -24,7 +24,15 @@ import { clientEnv } from "@/config/environment";
 
 // Make sure to call loadStripe outside of a component's render to avoid
 // recreating the Stripe object on every render.
-const stripePromise = loadStripe(clientEnv.getStripePublishableKey());
+let stripePromise: Promise<any> | null = null;
+
+const getStripePromise = async () => {
+  if (!stripePromise) {
+    const key = await clientEnv.getStripePublishableKeyAsync();
+    stripePromise = loadStripe(key);
+  }
+  return stripePromise;
+};
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
