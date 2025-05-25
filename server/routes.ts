@@ -30,6 +30,7 @@ import {
   ProductTokenPayload,
 } from "./utils/jwt";
 import Stripe from "stripe";
+import { transporter } from "./utils/email";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
@@ -118,6 +119,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const contact = await storage.createContact(validation.data);
+
+      // Configure the mailoptions object
+      const mailOptions = {
+        from: "yourusername@email.com",
+        to: "modeen.media@gmail.com",
+        subject: "User Contact through website",
+        html: `<p>Name: ${validation.data.name}</p>
+        <p>Email: ${validation.data.email}</p>
+        <p>Message: ${validation.data.message}</p>`,
+      };
+
+      // Send the email
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log("Error:", error);
+        } else {
+          console.log("Email sent: ", info.response);
+        }
+      });
 
       return res.status(201).json({
         success: true,
