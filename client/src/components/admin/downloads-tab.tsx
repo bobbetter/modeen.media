@@ -313,9 +313,11 @@ export function DownloadsTab() {
                   <TableHead>Product ID</TableHead>
                   <TableHead>Product Name</TableHead>
                   <TableHead>Download Link</TableHead>
-                  <TableHead>Download Count</TableHead>
-                  <TableHead>Max Downloads</TableHead>
+                  <TableHead className="w-24">Download Count</TableHead>
+                  <TableHead className="w-28">Max Downloads</TableHead>
                   <TableHead>Expires After</TableHead>
+                  <TableHead>Session ID</TableHead>
+                  <TableHead>Created By</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -376,8 +378,8 @@ export function DownloadsTab() {
                           </TooltipProvider>
                         </div>
                       </TableCell>
-                      <TableCell>{downloadLink.download_count}</TableCell>
-                      <TableCell>
+                      <TableCell className="w-24">{downloadLink.download_count}</TableCell>
+                      <TableCell className="w-28">
                         {downloadLink.max_download_count > 0
                           ? downloadLink.max_download_count
                           : "Unlimited"}
@@ -387,10 +389,28 @@ export function DownloadsTab() {
                           ? `${Math.floor(downloadLink.expire_after_seconds / 86400)} days`
                           : "No expiration"}
                       </TableCell>
+                      <TableCell className="max-w-xs">
+                        <span className="text-sm font-mono">
+                          {downloadLink.session_id || (
+                            <span className="text-muted-foreground">No session</span>
+                          )}
+                        </span>
+                      </TableCell>
+                      <TableCell className="max-w-xs">
+                        <div className="text-sm">
+                          {downloadLink.created_by && typeof downloadLink.created_by === 'object' ? (
+                            <pre className="text-xs bg-muted p-1 rounded overflow-auto max-h-16">
+                              {JSON.stringify(downloadLink.created_by, null, 2)}
+                            </pre>
+                          ) : (
+                            <span className="text-muted-foreground">No data</span>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {new Date(
                           downloadLink.created_at,
-                        ).toLocaleDateString()}
+                        ).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
