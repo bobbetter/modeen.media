@@ -7,14 +7,13 @@ import {
 } from "../middleware/auth";
 import { insertDownloadLinkSchema } from "@shared/schema";
 import {
-  create_jwt_token,
-  make_download_url,
   decode_jwt_token,
   ProductTokenPayload,
 } from "../utils/jwt";
+import { createDownloadLink } from "../utils/downloadLink";
 import { upload } from "../middleware/upload";
 import path from "path";
-import { uploadToObjectStorage } from "../utils/replitObjectStorage";
+import { uploadToObjectStorage, getFileFromObjectStorage } from "../utils/replitObjectStorage";
 import { promisify } from "util";
 import fs from "fs";
 export function registerDownloadRoutes(app: Express): void {
@@ -80,51 +79,39 @@ export function registerDownloadRoutes(app: Express): void {
     adminMiddleware,
     async (req: AuthRequest, res) => {
       try {
-
-
-        const linkData = {
-          ...req.body,
-          download_link: "empty",
-
-        };
-        const validation = insertDownloadLinkSchema.safeParse(linkData);
-        if (!validation.success) {
-          return res.status(400).json({
-            success: false,
-            message: "Invalid download link data",
-            errors: validation.error.format(),
-          });
-        }
-
-        // Verify that the product exists
-        const product = await storage.getProduct(validation.data.product_id);
-        if (!product) {
-          return res.status(404).json({
-            success: false,
-            message: "Product not found",
-          });
-        }
-
-        const downloadLink = await storage.createDownloadLink(validation.data);
-        const jwt_token = create_jwt_token(
-          req.body.product_id,
-          downloadLink.id,
-        );
-        const download_link = make_download_url(jwt_token);
-
-        // Update the download link with the actual URL
-        const updatedDownloadLink = await storage.updateDownloadLink(
-          downloadLink.id,
-          download_link,
-        );
+        // Use the shared utility to create download link
+        const { downloadLink } = await createDownloadLink({
+          product_id: req.body.product_id,
+          max_download_count: req.body.max_download_count,
+          expire_after_seconds: req.body.expire_after_seconds,
+          created_by: req.body.created_by,
+        });
 
         return res.status(201).json({
           success: true,
           message: "Download link created successfully",
-          data: updatedDownloadLink,
+          data: downloadLink,
         });
       } catch (error) {
         console.error("Error creating download link:", error);
+        
+        // Handle specific error types
+        if (error instanceof Error) {
+          if (error.message === "Product not found") {
+            return res.status(404).json({
+              success: false,
+              message: "Product not found",
+            });
+          }
+          if (error.message.includes("Invalid download link data")) {
+            return res.status(400).json({
+              success: false,
+              message: "Invalid download link data",
+              errors: error.message,
+            });
+          }
+        }
+        
         return res.status(500).json({
           success: false,
           message: "An error occurred while creating the download link",

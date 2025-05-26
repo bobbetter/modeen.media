@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import { storage } from "../storage";
 import bodyParser from "body-parser";
 import { env } from "../config/environment";
+import { sendDownloadLinkEmail } from "../utils/email";
+import { createDownloadLink } from "../utils/downloadLink";
 
 const stripeConfig = env.getStripeConfig();
 const stripe = new Stripe(stripeConfig.secretKey);
@@ -31,15 +33,39 @@ async function fulfillCheckout(sessionId: string) {
   // Check the Checkout Session's payment_status property
   // to determine if fulfillment should be performed
   if (checkoutSession.payment_status !== "unpaid") {
-    // TODO: Fulfill the purchase
-    if (checkoutSession.customer_details) {
+    // Fulfill the purchase
+    if (checkoutSession.customer_details && checkoutSession.metadata?.product_id) {
       console.log(
         "Fulfilling order for " + checkoutSession.customer_details.email,
       );
-    }
 
-    // TODO : Create download link for the user
-    // TODO : Send email to the user with the download link
+      try {
+        const productId = parseInt(checkoutSession.metadata.product_id);
+        
+        // Create download link using the shared utility
+        const { downloadLink, product } = await createDownloadLink({
+          product_id: productId,
+          max_download_count: 3, // Allow 3 downloads
+          expire_after_seconds: 7 * 24 * 60 * 60, // 7 days expiration
+          created_by: checkoutSession.customer_details,
+        });
+
+        // Send email with download link
+        const customerName = checkoutSession.customer_details.name || "Valued Customer";
+        await sendDownloadLinkEmail(
+          checkoutSession.customer_details.email!,
+          customerName,
+          product.name,
+          downloadLink.download_link
+        );
+
+        console.log(`✅ Download link created and email sent to ${checkoutSession.customer_details.email}`);
+      } catch (error) {
+        console.error("Error fulfilling checkout:", error);
+      }
+    } else {
+      console.error("Missing customer details or product_id in checkout session");
+    }
   }
 }
 
