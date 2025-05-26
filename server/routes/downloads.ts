@@ -80,22 +80,14 @@ export function registerDownloadRoutes(app: Express): void {
     adminMiddleware,
     async (req: AuthRequest, res) => {
       try {
-        // Add the current user to the created_by field
-        console.log("----Request body:", req.body);
 
-        // const jwt_token = create_jwt_token(req.body.product_id.toString());
-        // req.body.download_link = make_download_url(jwt_token);
+
         const linkData = {
           ...req.body,
           download_link: "empty",
-          created_by: {
-            id: req.user?.id,
-            username: req.user?.username,
-          },
+
         };
-        console.log("----Link data:", linkData);
         const validation = insertDownloadLinkSchema.safeParse(linkData);
-        console.log("----Validation:", validation);
         if (!validation.success) {
           return res.status(400).json({
             success: false,
