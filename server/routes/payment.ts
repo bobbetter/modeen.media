@@ -153,7 +153,7 @@ export function registerPaymentRoutes(app: Express): void {
       mode: "payment",
       ui_mode: "embedded",
       return_url:
-        "https://example.com/checkout/return?session_id={CHECKOUT_SESSION_ID}",
+        `${req.protocol}://${req.get('host')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       metadata: {
         product_id: productId,
       },
@@ -163,5 +163,48 @@ export function registerPaymentRoutes(app: Express): void {
       clientSecret: session.client_secret,
       product: product,
     });
+  });
+
+  app.post("/self-fulfill", async (req, res) => {
+    try {
+      const { session_id } = req.body;
+      
+      if (!session_id) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Session ID is required" 
+        });
+      }
+
+      console.log("Self-fulfilling checkout session:", session_id);
+
+      // Use fulfillCheckout with send_email=false to validate and get download link
+      const result = await fulfillCheckout(session_id, false);
+      
+      if (result && result.downloadLink && result.product) {
+        return res.json({
+          success: true,
+          data: {
+            download_link: result.downloadLink.download_link,
+            product: result.product,
+            created_at: result.downloadLink.created_at,
+            expire_after_seconds: result.downloadLink.expire_after_seconds,
+            download_count: result.downloadLink.download_count,
+            max_download_count: result.downloadLink.max_download_count
+          }
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: "Unable to fulfill checkout session"
+        });
+      }
+    } catch (error: any) {
+      console.error("Error in self-fulfill:", error);
+      return res.status(400).json({
+        success: false,
+        error: error.message || "Failed to process checkout session"
+      });
+    }
   });
 }
