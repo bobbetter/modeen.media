@@ -143,7 +143,6 @@ export function registerPaymentRoutes(app: Express): void {
             currency: "usd",
             product_data: {
               name: product.name,
-              description: "test",
             },
             unit_amount: parseInt(product.price, 10) * 100,
           },
@@ -156,6 +155,14 @@ export function registerPaymentRoutes(app: Express): void {
         `${req.protocol}://${req.get('host')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       metadata: {
         product_id: productId,
+      },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          custom_fields: [
+            { name: 'Internal Product ID', value: productId.toString() },
+          ]
+        }
       },
     });
     console.log("Session created:", session);
