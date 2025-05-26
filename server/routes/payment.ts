@@ -25,6 +25,9 @@ async function fulfillCheckout(sessionId: string) {
     expand: ["line_items"],
   });
 
+  checkoutSession.line_items?.data.forEach((item) => {
+    console.log("Data object for line item:", item);
+  });
   // Check the Checkout Session's payment_status property
   // to determine if fulfillment should be performed
   if (checkoutSession.payment_status !== "unpaid") {
@@ -121,6 +124,9 @@ export function registerPaymentRoutes(app: Express): void {
       ui_mode: "embedded",
       return_url:
         "https://example.com/checkout/return?session_id={CHECKOUT_SESSION_ID}",
+      metadata: {
+        product_id: productId,
+      },
     });
     console.log("Session created:", session);
     res.send({
