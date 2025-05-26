@@ -45,6 +45,7 @@ async function fulfillCheckout(sessionId: string) {
         // Create download link using the shared utility
         const { downloadLink, product } = await createDownloadLink({
           product_id: productId,
+          session_id: sessionId, // Include the Stripe session ID
           max_download_count: 3, // Allow 3 downloads
           expire_after_seconds: 7 * 24 * 60 * 60, // 7 days expiration
           created_by: checkoutSession.customer_details,

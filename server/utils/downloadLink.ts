@@ -4,6 +4,7 @@ import { insertDownloadLinkSchema } from "@shared/schema";
 
 export interface CreateDownloadLinkData {
   product_id: number;
+  session_id?: string;
   max_download_count?: number;
   expire_after_seconds?: number;
   created_by: any;
@@ -16,6 +17,7 @@ export async function createDownloadLink(data: CreateDownloadLinkData) {
     download_link: "empty", // Will be updated after creation
     max_download_count: data.max_download_count || 0,
     expire_after_seconds: data.expire_after_seconds || 0,
+    session_id: data.session_id || null, // Include session_id if provided
   };
 
   // Validate the data
