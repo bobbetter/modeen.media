@@ -88,6 +88,7 @@ export function DownloadsTab() {
   const [isDownloadLinkDialogOpen, setIsDownloadLinkDialogOpen] = useState(false);
   const [isDeleteDownloadLinkDialogOpen, setIsDeleteDownloadLinkDialogOpen] = useState(false);
   const [isViewLinkDialogOpen, setIsViewLinkDialogOpen] = useState(false);
+  const [isViewSessionIdDialogOpen, setIsViewSessionIdDialogOpen] = useState(false);
   const [currentDownloadLink, setCurrentDownloadLink] = useState<DownloadLink | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const { toast } = useToast();
@@ -230,6 +231,12 @@ export function DownloadsTab() {
   const handleViewLink = (downloadLink: DownloadLink) => {
     setCurrentDownloadLink(downloadLink);
     setIsViewLinkDialogOpen(true);
+  };
+
+  // Open dialog to view full session ID
+  const handleViewSessionId = (downloadLink: DownloadLink) => {
+    setCurrentDownloadLink(downloadLink);
+    setIsViewSessionIdDialogOpen(true);
   };
 
   // Submit download link form handler
@@ -390,11 +397,32 @@ export function DownloadsTab() {
                           : "No expiration"}
                       </TableCell>
                       <TableCell className="max-w-xs">
-                        <span className="text-sm font-mono">
-                          {downloadLink.session_id || (
-                            <span className="text-muted-foreground">No session</span>
+                        <div className="flex items-center gap-2">
+                          <span className="truncate flex-1 min-w-0 text-sm font-mono">
+                            {downloadLink.session_id || (
+                              <span className="text-muted-foreground">No session</span>
+                            )}
+                          </span>
+                          {downloadLink.session_id && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 flex-shrink-0"
+                                    onClick={() => handleViewSessionId(downloadLink)}
+                                  >
+                                    <Eye className="h-3 w-3" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>View full session ID</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           )}
-                        </span>
+                        </div>
                       </TableCell>
                       <TableCell className="max-w-xs">
                         <div className="text-sm">
@@ -560,6 +588,35 @@ export function DownloadsTab() {
               <Button
                 variant="outline"
                 onClick={() => currentDownloadLink && handleCopyLink(currentDownloadLink.download_link)}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy to Clipboard
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Full Session ID Dialog */}
+      <Dialog
+        open={isViewSessionIdDialogOpen}
+        onOpenChange={setIsViewSessionIdDialogOpen}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Full Session ID</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">Session ID:</p>
+              <p className="text-sm break-all font-mono bg-background p-2 rounded border">
+                {currentDownloadLink?.session_id}
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => currentDownloadLink?.session_id && navigator.clipboard.writeText(currentDownloadLink.session_id)}
               >
                 <Copy className="h-4 w-4 mr-2" />
                 Copy to Clipboard
