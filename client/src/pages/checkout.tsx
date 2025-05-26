@@ -70,7 +70,7 @@ export default function Checkout() {
     }
 
     // Create PaymentIntent as soon as the page loads
-    fetch("/create-checkout-session", {
+    fetch("/api/create-checkout-session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

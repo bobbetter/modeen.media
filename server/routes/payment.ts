@@ -127,7 +127,7 @@ export function registerWebhookRoute(app: Express): void {
 }
 
 export function registerPaymentRoutes(app: Express): void {
-  app.post("/create-checkout-session", async (req, res) => {
+  app.post("/api/create-checkout-session", async (req, res) => {
     const productId = req.body.productId;
     console.log("Product ID:", productId);
     if (!productId)
@@ -165,7 +165,7 @@ export function registerPaymentRoutes(app: Express): void {
     });
   });
 
-  app.post("/self-fulfill", async (req, res) => {
+  app.post("/api/self-fulfill", async (req, res) => {
     try {
       const { session_id } = req.body;
       
