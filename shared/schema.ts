@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, numeric, jsonb, timestamp, foreignKey } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, numeric, jsonb, timestamp, foreignKey, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -60,16 +60,20 @@ export type Contact = typeof contacts.$inferSelect;
 export const download_links = pgTable("download_links", {
   id: serial("id").primaryKey(),
   product_id: integer("product_id").notNull().references(() => products.id, { onDelete: 'cascade' }),
+  session_id: text("session_id"),
   download_link: text("download_link").notNull(),
   download_count: integer("download_count").default(0).notNull(),
   max_download_count: integer("max_download_count").default(0).notNull(),
   expire_after_seconds: integer("expire_after_seconds").default(0).notNull(),
   created_by: jsonb("created_by").notNull(),
   created_at: text("created_at").notNull(),
-});
+}, (table) => ({
+  sessionIdIdx: index("session_id_idx").on(table.session_id),
+}));
 
 export const insertDownloadLinkSchema = createInsertSchema(download_links).pick({
   product_id: true,
+  session_id: true,
   download_link: true,
   max_download_count: true,
   expire_after_seconds: true,

@@ -35,6 +35,7 @@ export interface IStorage {
   createDownloadLink(downloadLink: InsertDownloadLink): Promise<DownloadLink>;
   getDownloadLinks(): Promise<DownloadLink[]>;
   getDownloadLinksByProductId(productId: number): Promise<DownloadLink[]>;
+  getDownloadLinksBySessionId(sessionId: string): Promise<DownloadLink[]>;
   getDownloadLink(id: number): Promise<DownloadLink | undefined>;
   incrementDownloadCount(id: number): Promise<DownloadLink | undefined>;
   deleteDownloadLink(id: number): Promise<boolean>;
@@ -178,6 +179,15 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(download_links)
       .where(eq(download_links.product_id, productId));
+  }
+
+  async getDownloadLinksBySessionId(
+    sessionId: string,
+  ): Promise<DownloadLink[]> {
+    return await db
+      .select()
+      .from(download_links)
+      .where(eq(download_links.session_id, sessionId));
   }
 
   async getDownloadLink(id: number): Promise<DownloadLink | undefined> {

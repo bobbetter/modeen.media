@@ -72,6 +72,38 @@ export function registerDownloadRoutes(app: Express): void {
     },
   );
 
+  // Get download links for a specific session
+  app.get(
+    "/api/download-links/session/:sessionId",
+    authMiddleware,
+    adminMiddleware,
+    async (req: AuthRequest, res) => {
+      try {
+        const sessionId = req.params.sessionId;
+
+        if (!sessionId) {
+          return res.status(400).json({
+            success: false,
+            message: "Session ID is required",
+          });
+        }
+
+        const downloadLinks =
+          await storage.getDownloadLinksBySessionId(sessionId);
+        return res.status(200).json({
+          success: true,
+          data: downloadLinks,
+        });
+      } catch (error) {
+        console.error("Error fetching download links by session:", error);
+        return res.status(500).json({
+          success: false,
+          message: "An error occurred while fetching download links",
+        });
+      }
+    },
+  );
+
   // Create a new download link
   app.post(
     "/api/download-links",
