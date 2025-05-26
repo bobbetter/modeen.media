@@ -13,7 +13,7 @@ import {
   type InsertDownloadLink,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -36,6 +36,7 @@ export interface IStorage {
   getDownloadLinks(): Promise<DownloadLink[]>;
   getDownloadLinksByProductId(productId: number): Promise<DownloadLink[]>;
   getDownloadLinksBySessionId(sessionId: string): Promise<DownloadLink[]>;
+  getDownloadLinkBySessionAndProduct(sessionId: string, productId: number): Promise<DownloadLink | undefined>;
   getDownloadLink(id: number): Promise<DownloadLink | undefined>;
   incrementDownloadCount(id: number): Promise<DownloadLink | undefined>;
   deleteDownloadLink(id: number): Promise<boolean>;
@@ -188,6 +189,16 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(download_links)
       .where(eq(download_links.session_id, sessionId));
+  }
+
+  async getDownloadLinkBySession(
+    sessionId: string,
+  ): Promise<DownloadLink | undefined> {
+    const [downloadLink] = await db
+      .select()
+      .from(download_links)
+      .where(eq(download_links.session_id, sessionId));
+    return downloadLink || undefined;
   }
 
   async getDownloadLink(id: number): Promise<DownloadLink | undefined> {

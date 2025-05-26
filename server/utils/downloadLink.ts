@@ -32,6 +32,21 @@ export async function createDownloadLink(data: CreateDownloadLinkData) {
     throw new Error("Product not found");
   }
 
+  // Check if a download link already exists for this session_id and product_id
+  if (validation.data.session_id) {
+    const existingDownloadLink = await storage.getDownloadLinkBySession(
+      validation.data.session_id
+    );
+    
+    if (existingDownloadLink) {
+      // Return the existing download link
+      return {
+        downloadLink: existingDownloadLink,
+        product,
+      };
+    }
+  }
+
   // Create the download link
   const downloadLink = await storage.createDownloadLink(validation.data);
   

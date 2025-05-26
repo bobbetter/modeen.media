@@ -19,8 +19,7 @@ async function fulfillCheckout(sessionId: string) {
   // TODO: Make this function safe to run multiple times,
   // even concurrently, with the same session ID
 
-  // TODO: Make sure fulfillment hasn't already been
-  // performed for this Checkout Session
+
 
   // Retrieve the Checkout Session from the API with line_items expanded
   const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId, {
@@ -43,6 +42,7 @@ async function fulfillCheckout(sessionId: string) {
         const productId = parseInt(checkoutSession.metadata.product_id);
         
         // Create download link using the shared utility
+        // Return the existing download link if it already exists for this session
         const { downloadLink, product } = await createDownloadLink({
           product_id: productId,
           session_id: sessionId, // Include the Stripe session ID
