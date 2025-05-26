@@ -10,7 +10,7 @@ import {
   decode_jwt_token,
   ProductTokenPayload,
 } from "../utils/jwt";
-import { createDownloadLink } from "../utils/downloadLink";
+import { createOrGetDownloadLink } from "../utils/downloadLink";
 import { upload } from "../middleware/upload";
 import path from "path";
 import { uploadToObjectStorage, getFileFromObjectStorage } from "../utils/replitObjectStorage";
@@ -112,7 +112,7 @@ export function registerDownloadRoutes(app: Express): void {
     async (req: AuthRequest, res) => {
       try {
         // Use the shared utility to create download link
-        const { downloadLink } = await createDownloadLink({
+        const { downloadLink } = await createOrGetDownloadLink({
           product_id: req.body.product_id,
           max_download_count: req.body.max_download_count,
           expire_after_seconds: req.body.expire_after_seconds,

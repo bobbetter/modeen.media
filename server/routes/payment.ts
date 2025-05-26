@@ -4,22 +4,17 @@ import { storage } from "../storage";
 import bodyParser from "body-parser";
 import { env } from "../config/environment";
 import { sendDownloadLinkEmail } from "../utils/email";
-import { createDownloadLink } from "../utils/downloadLink";
+import { createOrGetDownloadLink } from "../utils/downloadLink";
 
 const stripeConfig = env.getStripeConfig();
 const stripe = new Stripe(stripeConfig.secretKey);
 const endpointSecret = stripeConfig.webhookSecret;
 
-async function fulfillCheckout(sessionId: string) {
+async function fulfillCheckout(sessionId: string, send_email: boolean = true) {
   // Set your secret key. Remember to switch to your live secret key in production.
   // See your keys here: https://dashboard.stripe.com/apikeys
 
   console.log("Fulfilling Checkout Session " + sessionId);
-
-  // TODO: Make this function safe to run multiple times,
-  // even concurrently, with the same session ID
-
-
 
   // Retrieve the Checkout Session from the API with line_items expanded
   const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId, {
@@ -43,7 +38,7 @@ async function fulfillCheckout(sessionId: string) {
         
         // Create download link using the shared utility
         // Return the existing download link if it already exists for this session
-        const { downloadLink, product } = await createDownloadLink({
+        const { downloadLink, product } = await createOrGetDownloadLink({
           product_id: productId,
           session_id: sessionId, // Include the Stripe session ID
           max_download_count: 3, // Allow 3 downloads
@@ -51,23 +46,31 @@ async function fulfillCheckout(sessionId: string) {
           created_by: checkoutSession.customer_details,
         });
 
-        // Send email with download link
-        const customerName = checkoutSession.customer_details.name || "Valued Customer";
-        await sendDownloadLinkEmail(
-          checkoutSession.customer_details.email!,
-          customerName,
-          product.name,
-          downloadLink.download_link
-        );
+        // Only send email if send_email is true
+        if (send_email) {
+          const customerName = checkoutSession.customer_details.name || "Valued Customer";
+          await sendDownloadLinkEmail(
+            checkoutSession.customer_details.email!,
+            customerName,
+            product.name,
+            downloadLink.download_link
+          );
+          console.log(`✅ Download link created and email sent to ${checkoutSession.customer_details.email}`);
+        } else {
+          console.log(`✅ Download link created for ${checkoutSession.customer_details.email}`);
+        }
 
-        console.log(`✅ Download link created and email sent to ${checkoutSession.customer_details.email}`);
+        return { downloadLink, product };
       } catch (error) {
         console.error("Error fulfilling checkout:", error);
+        throw error;
       }
     } else {
       console.error("Missing customer details or product_id in checkout session");
+      throw new Error("Missing customer details or product_id in checkout session");
     }
   }
+  throw new Error("Payment status is unpaid");
 }
 
 // Separate webhook registration function that must be called before body parsing middleware

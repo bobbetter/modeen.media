@@ -10,7 +10,7 @@ export interface CreateDownloadLinkData {
   created_by: any;
 }
 
-export async function createDownloadLink(data: CreateDownloadLinkData) {
+export async function createOrGetDownloadLink(data: CreateDownloadLinkData) {
   // Prepare the data with defaults
   const linkData = {
     ...data,
