@@ -47,10 +47,18 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Loader2,
   Plus,
   Trash,
   Link,
+  Copy,
+  Eye,
 } from "lucide-react";
 
 // Form schema for download links
@@ -79,6 +87,7 @@ type ApiResponse<T> = {
 export function DownloadsTab() {
   const [isDownloadLinkDialogOpen, setIsDownloadLinkDialogOpen] = useState(false);
   const [isDeleteDownloadLinkDialogOpen, setIsDeleteDownloadLinkDialogOpen] = useState(false);
+  const [isViewLinkDialogOpen, setIsViewLinkDialogOpen] = useState(false);
   const [currentDownloadLink, setCurrentDownloadLink] = useState<DownloadLink | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const { toast } = useToast();
@@ -199,6 +208,30 @@ export function DownloadsTab() {
     setIsDeleteDownloadLinkDialogOpen(true);
   };
 
+  // Copy download link to clipboard
+  const handleCopyLink = async (downloadLink: string) => {
+    try {
+      await navigator.clipboard.writeText(downloadLink);
+      toast({
+        title: "Success",
+        description: "Download link copied to clipboard",
+      });
+    } catch (error) {
+      console.error("Failed to copy to clipboard:", error);
+      toast({
+        title: "Error",
+        description: "Failed to copy link to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Open dialog to view full download link
+  const handleViewLink = (downloadLink: DownloadLink) => {
+    setCurrentDownloadLink(downloadLink);
+    setIsViewLinkDialogOpen(true);
+  };
+
   // Submit download link form handler
   const onSubmitDownloadLink = (data: DownloadLinkFormValues) => {
     const downloadLinkData = {
@@ -302,8 +335,46 @@ export function DownloadsTab() {
                       <TableCell>
                         {product ? product.name : "Unknown"}
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">
-                        {downloadLink.download_link}
+                      <TableCell className="max-w-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="truncate flex-1 min-w-0">
+                            {downloadLink.download_link}
+                          </span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 flex-shrink-0"
+                                  onClick={() => handleCopyLink(downloadLink.download_link)}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Copy to clipboard</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 flex-shrink-0"
+                                  onClick={() => handleViewLink(downloadLink)}
+                                >
+                                  <Eye className="h-3 w-3" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>View full link</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                       </TableCell>
                       <TableCell>{downloadLink.download_count}</TableCell>
                       <TableCell>
@@ -448,6 +519,35 @@ export function DownloadsTab() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* View Full Download Link Dialog */}
+      <Dialog
+        open={isViewLinkDialogOpen}
+        onOpenChange={setIsViewLinkDialogOpen}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Full Download Link</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">Download Link:</p>
+              <p className="text-sm break-all font-mono bg-background p-2 rounded border">
+                {currentDownloadLink?.download_link}
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => currentDownloadLink && handleCopyLink(currentDownloadLink.download_link)}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy to Clipboard
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 
