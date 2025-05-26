@@ -11,6 +11,7 @@ import {
   insertProductSchema,
   insertDownloadLinkSchema,
   DownloadLink,
+  Contact,
 } from "@shared/schema";
 
 import {
@@ -112,9 +113,12 @@ export default function Admin() {
     useState(false);
   const [isDeleteDownloadLinkDialogOpen, setIsDeleteDownloadLinkDialogOpen] =
     useState(false);
+  const [isDeleteContactDialogOpen, setIsDeleteContactDialogOpen] =
+    useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [currentDownloadLink, setCurrentDownloadLink] =
     useState<DownloadLink | null>(null);
+  const [currentContact, setCurrentContact] = useState<Contact | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null,
   );
@@ -198,6 +202,19 @@ export default function Admin() {
 
   // Extract download links data from API response
   const downloadLinksData = downloadLinksApiResponse?.data || [];
+
+  // Fetch contacts
+  const {
+    data: contactsApiResponse,
+    isLoading: isContactsLoading,
+    isError: isContactsError,
+  } = useQuery<ApiResponse<Contact[]>>({
+    queryKey: ["/api/contact"],
+    enabled: !!userData?.isAdmin,
+  });
+
+  // Extract contacts data from API response
+  const contactsData = contactsApiResponse?.data || [];
 
   // Create product mutation
   const createProductMutation = useMutation({
@@ -367,6 +384,34 @@ export default function Admin() {
     },
   });
 
+  // Delete contact mutation
+  const deleteContactMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/contact/${id}`, {
+        method: "DELETE",
+        credentials: "include", // Include cookies for authentication
+      });
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/contact"] });
+      toast({
+        title: "Success",
+        description: "Contact deleted successfully",
+      });
+      setIsDeleteContactDialogOpen(false);
+    },
+    onError: (error) => {
+      console.error("Error deleting contact:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete contact",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Logout function
   const handleLogout = async () => {
     try {
@@ -471,6 +516,12 @@ export default function Admin() {
   const handleDeleteDownloadLink = (downloadLink: DownloadLink) => {
     setCurrentDownloadLink(downloadLink);
     setIsDeleteDownloadLinkDialogOpen(true);
+  };
+
+  // Open dialog for deleting a contact
+  const handleDeleteContact = (contact: Contact) => {
+    setCurrentContact(contact);
+    setIsDeleteContactDialogOpen(true);
   };
 
   // File upload mutation
@@ -899,6 +950,67 @@ export default function Admin() {
             </div>
           )}
         </div>
+
+        <Separator className="my-6" />
+
+        {/* Contacts Management */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold mb-4">Contacts</h3>
+          {isContactsError ? (
+            <div className="text-center p-4 text-red-500">
+              Failed to load contacts. Please try again.
+            </div>
+          ) : isContactsLoading ? (
+            <div className="text-center p-4">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+              <p className="mt-2">Loading contacts...</p>
+            </div>
+          ) : contactsData.length === 0 ? (
+            <div className="text-center p-4 text-muted-foreground">
+              No contacts yet.
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Message</TableHead>
+                    <TableHead>Created At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {contactsData.map((contact) => (
+                    <TableRow key={contact.id}>
+                      <TableCell className="font-medium">{contact.id}</TableCell>
+                      <TableCell>{contact.name}</TableCell>
+                      <TableCell>{contact.email}</TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {contact.message}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(contact.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-destructive"
+                          onClick={() => handleDeleteContact(contact)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Product Form Dialog */}
@@ -1295,6 +1407,43 @@ export default function Admin() {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Contact Dialog */}
+      <AlertDialog
+        open={isDeleteContactDialogOpen}
+        onOpenChange={setIsDeleteContactDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the contact from "{currentContact?.name}" ({currentContact?.email}).
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (currentContact) {
+                  deleteContactMutation.mutate(currentContact.id);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteContactMutation.isPending}
+            >
+              {deleteContactMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

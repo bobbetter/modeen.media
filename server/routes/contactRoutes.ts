@@ -29,7 +29,7 @@ app.post("/api/contact", async (req, res) => {
     };
 
     // Send the email
-    transporter.sendMail(mailOptions, function (error, info) {
+    transporter.sendMail(mailOptions, function (error: any, info: any) {
       if (error) {
         console.log("Error:", error);
       } else {
@@ -63,6 +63,40 @@ app.get("/api/contact", async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "An error occurred while fetching contacts",
+    });
+  }
+});
+
+app.delete("/api/contact/:id", async (req, res) => {
+  try {
+    const contactId = parseInt(req.params.id);
+    
+    if (isNaN(contactId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid contact ID",
+      });
+    }
+
+    const deletedContact = await storage.deleteContact(contactId);
+    
+    if (!deletedContact) {
+      return res.status(404).json({
+        success: false,
+        message: "Contact not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Contact deleted successfully",
+      data: deletedContact,
+    });
+  } catch (error) {
+    console.error("Error deleting contact:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting the contact",
     });
   }
 });

@@ -21,6 +21,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createContact(contact: InsertContact): Promise<Contact>;
   getContacts(): Promise<Contact[]>;
+  deleteContact(id: number): Promise<Contact | undefined>;
   createProduct(product: InsertProduct): Promise<Product>;
   getProducts(): Promise<Product[]>;
   getProduct(id: number): Promise<Product | undefined>;
@@ -78,6 +79,14 @@ export class DatabaseStorage implements IStorage {
 
   async getContacts(): Promise<Contact[]> {
     return await db.select().from(contacts);
+  }
+
+  async deleteContact(id: number): Promise<Contact | undefined> {
+    const [deleted] = await db
+      .delete(contacts)
+      .where(eq(contacts.id, id))
+      .returning();
+    return deleted || undefined;
   }
 
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
