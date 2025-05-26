@@ -11,10 +11,11 @@ export interface ClientEnvironmentConfig {
 
 class ClientEnvironmentManager {
   private config: ClientEnvironmentConfig;
+  private serverConfigLoaded = false;
 
   constructor() {
     this.config = this.loadConfig();
-    this.validateConfig();
+    // Don't validate immediately - wait for server config to be loaded
   }
 
   private async loadConfigFromServer(): Promise<string> {
@@ -22,11 +23,13 @@ class ClientEnvironmentManager {
       const response = await fetch('/api/config');
       const result = await response.json();
       if (result.success) {
+        this.serverConfigLoaded = true;
         return result.data.stripePublishableKey;
       }
     } catch (error) {
       console.warn('Could not load config from server:', error);
     }
+    this.serverConfigLoaded = true;
     return '';
   }
 
@@ -34,7 +37,7 @@ class ClientEnvironmentManager {
     // For development, we can use the Vite env var if available
     const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
     const nodeEnv = import.meta.env.MODE || 'development';
-    
+
     return {
       STRIPE_PUBLISHABLE_KEY: stripeKey,
       NODE_ENV: nodeEnv,
@@ -46,7 +49,17 @@ class ClientEnvironmentManager {
     if (this.config.STRIPE_PUBLISHABLE_KEY) {
       return this.config.STRIPE_PUBLISHABLE_KEY;
     }
-    return await this.loadConfigFromServer();
+
+    const serverKey = await this.loadConfigFromServer();
+    if (serverKey) {
+      // Update the config with the server key
+      this.config.STRIPE_PUBLISHABLE_KEY = serverKey;
+    }
+
+    // Now validate after attempting to load from server
+    this.validateConfig();
+
+    return this.config.STRIPE_PUBLISHABLE_KEY;
   }
 
   private validateConfig(): void {
@@ -55,11 +68,11 @@ class ClientEnvironmentManager {
     }
 
     const isProduction = this.config.NODE_ENV === 'production';
-    
+
     if (isProduction && this.config.STRIPE_PUBLISHABLE_KEY.startsWith('pk_test_')) {
       console.warn('⚠️  WARNING: Using test Stripe keys in production environment');
     }
-    
+
     if (!isProduction && this.config.STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_')) {
       console.warn('⚠️  WARNING: Using live Stripe keys in development environment');
     }

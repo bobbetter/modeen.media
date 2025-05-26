@@ -2,48 +2,12 @@ import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import Stripe from "stripe";
-import bodyParser from "body-parser";
-
-const stripe = new Stripe(
-  "sk_test_51RR9SdAIn0oICRrzPW2XYyWuaLdBTeoZrz84H7UR9nreCcjOAVyOJRLqJJBclpmxWqpWNvfQcdibqO6gcVv5zmyd00ZdVg2ppA",
-);
+import { registerWebhookRoute } from "./routes/payment";
 
 const app = express();
 
-// Register webhook route BEFORE general body parsing middleware
-// This is critical because Stripe webhooks need raw body for signature verification
-app.post(
-  "/webhook",
-  bodyParser.raw({ type: "application/json" }), // required for Stripe to verify signature
-  async (request, response) => {
-    const sig = request.headers["stripe-signature"];
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-    let event;
-    console.log("Webhook received:", request.body);
-    console.log("Webhook signature:", sig);
-    try {
-      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-    } catch (err) {
-      console.error("❌ Webhook signature verification failed:", err.message);
-      return response.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    console.log("✅ Verified webhook event:", event.type);
-
-    // Handle the event
-    if (
-      event.type === "checkout.session.completed" ||
-      event.type === "checkout.session.async_payment_succeeded"
-    ) {
-      const session = event.data.object;
-      await fulfillCheckout(session.id); // Your fulfillment logic
-    }
-
-    response.status(200).end();
-  },
-);
+// Register webhook route
+registerWebhookRoute(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

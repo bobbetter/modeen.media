@@ -22,24 +22,37 @@ import {
 } from "@stripe/react-stripe-js";
 import { clientEnv } from "@/config/environment";
 
-// Make sure to call loadStripe outside of a component's render to avoid
-// recreating the Stripe object on every render.
-let stripePromise: Promise<any> | null = null;
-
-const getStripePromise = async () => {
-  if (!stripePromise) {
-    const key = await clientEnv.getStripePublishableKeyAsync();
-    stripePromise = loadStripe(key);
-  }
-  return stripePromise;
-};
-
 export default function Checkout() {
   const [, setLocation] = useLocation();
   const [clientSecret, setClientSecret] = useState("");
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Initialize Stripe with the publishable key from server
+    const initializeStripe = async () => {
+      try {
+        const key = await clientEnv.getStripePublishableKeyAsync();
+        if (key) {
+          setStripePromise(loadStripe(key));
+        } else {
+          throw new Error("No Stripe publishable key available");
+        }
+      } catch (error) {
+        console.error("Error initializing Stripe:", error);
+        toast({
+          title: "Error",
+          description: "Failed to initialize payment system. Please try again.",
+          variant: "destructive",
+        });
+        setLocation("/");
+      }
+    };
+
+    initializeStripe();
+  }, [toast, setLocation]);
 
   useEffect(() => {
     // Get product ID from URL query params
@@ -81,7 +94,7 @@ export default function Checkout() {
       });
   }, [setLocation, toast]);
 
-  if (loading || !clientSecret || !product) {
+  if (loading || !clientSecret || !product || !stripePromise) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -124,7 +137,11 @@ export default function Checkout() {
                 {product.display_image_url && (
                   <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
                     <img
-                      src={image_mapper[product.display_image_url]}
+                      src={
+                        image_mapper[
+                          product.display_image_url as keyof typeof image_mapper
+                        ]
+                      }
                       alt={product.name}
                       className="w-full h-full object-cover"
                     />

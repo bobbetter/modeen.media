@@ -50,9 +50,6 @@ export function registerWebhookRoute(app: Express): void {
       const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
       console.log("Webhook received:", request.body);
-      console.log("Webhook signature:", sig);
-      console.log("Endpoint secret exists:", !!endpointSecret);
-      console.log("Endpoint secret starts with:", endpointSecret?.substring(0, 10) + "...");
 
       // Validate required parameters
       if (!sig) {
@@ -62,7 +59,9 @@ export function registerWebhookRoute(app: Express): void {
 
       if (!endpointSecret) {
         console.error("❌ No webhook endpoint secret configured");
-        return response.status(400).send("No webhook endpoint secret configured");
+        return response
+          .status(400)
+          .send("No webhook endpoint secret configured");
       }
 
       let event;
