@@ -6,6 +6,11 @@ import { registerWebhookRoute } from "./routes/payment";
 
 const app = express();
 
+// Trust proxy for proper HTTPS handling in production
+if (process.env.NODE_ENV === "production") {
+  app.set('trust proxy', 1);
+}
+
 // Register webhook route
 registerWebhookRoute(app);
 
@@ -22,8 +27,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: sessionConfig.secure,
-      sameSite: "lax", // Helps with CSRF protection while still allowing redirects
+      secure: env.isProduction() ? true : false, // Use secure cookies in production
+      sameSite: env.isProduction() ? "lax" : "lax", // Keep lax for both environments
       maxAge: sessionConfig.maxAge,
       domain: sessionConfig.domain,
       httpOnly: true, // Prevent XSS attacks
