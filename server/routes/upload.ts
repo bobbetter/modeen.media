@@ -74,14 +74,14 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
     const validatedData = initiateUploadSchema.parse(req.body);
     const { fileName, fileSize, contentType, partSize = DEFAULT_PART_SIZE } = validatedData;
 
-    console.log("[Upload] Validated data:", {
-      fileName,
-      fileSize,
-      fileSizeInMB: (fileSize / (1024 * 1024)).toFixed(2) + " MB",
-      contentType,
-      partSize,
-      partSizeInMB: (partSize / (1024 * 1024)).toFixed(2) + " MB"
-    });
+    // console.debug("[Upload] Validated data:", {
+    //   fileName,
+    //   fileSize,
+    //   fileSizeInMB: (fileSize / (1024 * 1024)).toFixed(2) + " MB",
+    //   contentType,
+    //   partSize,
+    //   partSizeInMB: (partSize / (1024 * 1024)).toFixed(2) + " MB"
+    // });
 
     // Generate unique S3 key
     const key = generateS3Key(fileName, req.session?.userId?.toString());
@@ -89,12 +89,12 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
 
     // Calculate number of parts
     const totalParts = calculateParts(fileSize, partSize);
-    console.log("[Upload] Calculated parts:", {
-      totalParts,
-      fileSize,
-      partSize,
-      lastPartSize: fileSize - (totalParts - 1) * partSize
-    });
+    // console.log("[Upload] Calculated parts:", {
+    //   totalParts,
+    //   fileSize,
+    //   partSize,
+    //   lastPartSize: fileSize - (totalParts - 1) * partSize
+    // });
 
     // Validate part count (S3 limit is 10,000 parts)
     if (totalParts > 10000) {
@@ -108,9 +108,9 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
     }
 
     // Initiate multipart upload
-    console.log("[Upload] Initiating multipart upload in S3");
+    // console.log("[Upload] Initiating multipart upload in S3");
     const uploadInfo = await initiateMultipartUpload(S3_BUCKET, key, contentType);
-    console.log("[Upload] Multipart upload initiated:", uploadInfo);
+    // console.log("[Upload] Multipart upload initiated:", uploadInfo);
 
     // Generate signed URLs for all parts
     console.log("[Upload] Generating signed URLs for", totalParts, "parts");
@@ -121,7 +121,7 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
       totalParts,
       SIGNED_URL_EXPIRY
     );
-    console.log("[Upload] Generated", signedUrls.length, "signed URLs");
+    // console.log("[Upload] Generated", signedUrls.length, "signed URLs");
 
     const response = {
       uploadId: uploadInfo.uploadId,
@@ -133,12 +133,12 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
       expiresIn: SIGNED_URL_EXPIRY,
     };
 
-    console.log("[Upload] Sending initiate response:", {
-      uploadId: response.uploadId,
-      key: response.key,
-      totalParts: response.totalParts,
-      signedUrlsCount: response.signedUrls.length
-    });
+    // console.log("[Upload] Sending initiate response:", {
+    //   uploadId: response.uploadId,
+    //   key: response.key,
+    //   totalParts: response.totalParts,
+    //   signedUrlsCount: response.signedUrls.length
+    // });
 
     res.json(response);
   } catch (error) {
@@ -174,12 +174,12 @@ async function completeUpload(req: Request, res: Response): Promise<void> {
     const validatedData = completeUploadSchema.parse(req.body);
     const { uploadId, key, parts } = validatedData;
 
-    console.log("[Upload] Completing multipart upload:", {
-      uploadId,
-      key,
-      partsCount: parts.length,
-      parts: parts.map(p => ({ PartNumber: p.PartNumber, ETag: p.ETag }))
-    });
+    // console.log("[Upload] Completing multipart upload:", {
+    //   uploadId,
+    //   key,
+    //   partsCount: parts.length,
+    //   parts: parts.map(p => ({ PartNumber: p.PartNumber, ETag: p.ETag }))
+    // });
 
     // Complete the multipart upload
     const location = await completeMultipartUpload(S3_BUCKET, key, uploadId, parts);

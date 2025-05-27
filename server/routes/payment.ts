@@ -165,7 +165,6 @@ export function registerPaymentRoutes(app: Express): void {
         }
       },
     });
-    console.log("Session created:", session);
     res.send({
       clientSecret: session.client_secret,
       product: product,
