@@ -23,7 +23,6 @@ export default function AGB() {
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-gray-600" />
               <Button
-                variant="ghost"
                 size="sm"
                 onClick={() => setLanguage(language === "de" ? "en" : "de")}
                 className="text-sm"
@@ -46,9 +45,9 @@ export default function AGB() {
         <div className="space-y-12">
           {/* AGB Section */}
           <section className="bg-white rounded-lg shadow-sm p-8 border border-gray-100">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            {/* <h2 className="text-2xl font-semibold text-gray-900 mb-6">
               {t("agb.section")}
-            </h2>
+            </h2> */}
 
             <div className="space-y-6 text-gray-700">
               <div>
@@ -136,4 +135,4 @@ export default function AGB() {
       </main>
     </div>
   );
-} 
+}

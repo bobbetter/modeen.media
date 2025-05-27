@@ -69,25 +69,35 @@ const translations = {
     "agb.title": "Allgemeine Geschäftsbedingungen",
     "agb.section": "AGB",
     "agb.scope.title": "1. Geltungsbereich",
-    "agb.scope.text": "Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen Dustin Hamerla (nachfolgend 'Anbieter') und dem Kunden über den Verkauf digitaler Musikdateien (z. B. MP3-Downloads) auf der Website modeen.media. Die AGB gelten in ihrer zum Zeitpunkt des Vertragsschlusses gültigen Fassung.",
+    "agb.scope.text":
+      "Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen modeen.media (nachfolgend 'Anbieter') und dem Kunden über den Verkauf digitaler Musikdateien (z. B. MP3-Downloads) auf der Website modeen.media. Die AGB gelten in ihrer zum Zeitpunkt des Vertragsschlusses gültigen Fassung.",
     "agb.subject.title": "2. Vertragsgegenstand",
-    "agb.subject.text": "Der Anbieter verkauft digitale Musikinhalte (Songs) ausschließlich in Dateiform zum Download. Der Erwerb erfolgt über die Website modeen.media. Nach erfolgreicher Bezahlung erhält der Kunde Zugang zum Download der erworbenen Dateien.",
+    "agb.subject.text":
+      "Der Anbieter verkauft digitale Musikinhalte (Songs) ausschließlich in Dateiform zum Download. Der Erwerb erfolgt über die Website modeen.media. Nach erfolgreicher Bezahlung erhält der Kunde Zugang zum Download der erworbenen Dateien über einen Download-Link. Dieser steht unmittelbar nach Bezahlung auf der Webseite zur Verfügung und wird an die E-Mail-Addresse des Kunden verschickt.",
     "agb.contract.title": "3. Vertragsabschluss",
-    "agb.contract.text": "Durch das Anklicken des Kaufen-Buttons im Bestellvorgang gibt der Kunde ein verbindliches Angebot zum Abschluss eines Kaufvertrags ab. Der Vertrag kommt zustande, wenn der Anbieter die Bestellung durch Bereitstellung eines Download-Links annimmt.",
+    "agb.contract.text":
+      "Durch das Anklicken des 'Kaufen'-Buttons im Bestellvorgang gibt der Kunde ein verbindliches Angebot zum Abschluss eines Kaufvertrags ab. Der Vertrag kommt zustande, wenn der Anbieter die Bestellung durch Bereitstellung eines Download-Links annimmt.",
     "agb.prices.title": "4. Preise & Kleinunternehmerregelung",
-    "agb.prices.text": "Alle auf der Website angegebenen Preise sind Endpreise gemäß § 19 UStG (Kleinunternehmerregelung). Es wird keine Umsatzsteuer ausgewiesen.",
+    "agb.prices.text":
+      "Alle auf der Website angegebenen Preise sind Endpreise gemäß § 19 UStG (Kleinunternehmerregelung). Es wird keine Umsatzsteuer ausgewiesen.",
     "agb.payment.title": "5. Zahlungsabwicklung",
-    "agb.payment.text": "Die Bezahlung erfolgt ausschließlich über den Zahlungsdienstleister Stripe. Mit Abschluss der Zahlung erhält der Kunde automatisiert Zugriff auf die gekaufte(n) Datei(en) per Download-Link. Der Anbieter behält sich das Recht vor, bestimmte Zahlungsarten im Einzelfall auszuschließen.",
+    "agb.payment.text":
+      "Die Bezahlung erfolgt ausschließlich über den Zahlungsdienstleister Stripe. Mit Abschluss der Zahlung erhält der Kunde automatisiert Zugriff auf die gekaufte(n) Datei(en) per Download-Link. Der Anbieter behält sich das Recht vor, bestimmte Zahlungsarten im Einzelfall auszuschließen.",
     "agb.delivery.title": "6. Lieferung & Download",
-    "agb.delivery.text": "Die Lieferung erfolgt digital durch Bereitstellung eines Download-Links unmittelbar nach erfolgreicher Zahlung. Der Link wird dem Kunden per E-Mail übermittelt oder direkt auf der Website bereitgestellt. Ein physischer Versand erfolgt nicht.",
+    "agb.delivery.text":
+      "Die Lieferung erfolgt digital durch Bereitstellung eines Download-Links unmittelbar nach erfolgreicher Zahlung. Der Link wird dem Kunden per E-Mail übermittelt oder direkt auf der Website bereitgestellt. Ein physischer Versand erfolgt nicht.",
     "agb.rights.title": "7. Nutzungsrechte",
-    "agb.rights.text": "Mit dem Kauf erhält der Kunde ein einfaches, nicht übertragbares Nutzungsrecht zur privaten Nutzung der erworbenen Musikdateien. Eine gewerbliche Nutzung, Weiterverkauf oder öffentliche Aufführung ist ohne ausdrückliche schriftliche Zustimmung des Anbieters nicht gestattet.",
+    "agb.rights.text":
+      "Mit dem Kauf erhält der Kunde ein einfaches, nicht übertragbares Nutzungsrecht zur privaten Nutzung der erworbenen Musikdateien. Eine gewerbliche Nutzung, Weiterverkauf oder öffentliche Aufführung ist ohne ausdrückliche schriftliche Zustimmung des Anbieters nicht gestattet.",
     "agb.withdrawal.title": "8. Widerrufsrecht bei digitalen Inhalten",
-    "agb.withdrawal.text": "Bei digitalen Inhalten erlischt das Widerrufsrecht mit Beginn des Downloads, sofern der Kunde ausdrücklich zugestimmt hat, dass mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist begonnen wird, und bestätigt hat, dass er Kenntnis vom Verlust des Widerrufsrechts hat (§ 356 Abs. 5 BGB). Hinweis: Vor Abschluss des Kaufs wird der Kunde entsprechend um Zustimmung gebeten.",
+    "agb.withdrawal.text":
+      "Bei digitalen Inhalten erlischt das Widerrufsrecht mit Beginn des Downloads, sofern der Kunde ausdrücklich zugestimmt hat, dass mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist begonnen wird, und bestätigt hat, dass er Kenntnis vom Verlust des Widerrufsrechts hat (§ 356 Abs. 5 BGB). Hinweis: Vor Abschluss des Kaufs wird der Kunde entsprechend um Zustimmung gebeten.",
     "agb.liability.title": "9. Haftung",
-    "agb.liability.text": "Der Anbieter haftet nur für Schäden, die auf einer vorsätzlichen oder grob fahrlässigen Pflichtverletzung beruhen. Für Schäden aufgrund fehlerhafter Downloads oder Inkompatibilitäten mit Endgeräten des Kunden wird keine Haftung übernommen.",
+    "agb.liability.text":
+      "Der Anbieter haftet nur für Schäden, die auf einer vorsätzlichen oder grob fahrlässigen Pflichtverletzung beruhen. Für Schäden aufgrund fehlerhafter Downloads oder Inkompatibilitäten mit Endgeräten des Kunden wird keine Haftung übernommen.",
     "agb.final.title": "10. Schlussbestimmungen",
-    "agb.final.text": "Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist, soweit gesetzlich zulässig, der Sitz des Anbieters. Sollten einzelne Bestimmungen dieser AGB unwirksam sein, bleibt die Gültigkeit der übrigen Bestimmungen unberührt.",
+    "agb.final.text":
+      "Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist, soweit gesetzlich zulässig, der Sitz des Anbieters. Sollten einzelne Bestimmungen dieser AGB unwirksam sein, bleibt die Gültigkeit der übrigen Bestimmungen unberührt.",
 
     // Language toggle
     "language.toggle": "Sprache",
@@ -148,25 +158,35 @@ const translations = {
     "agb.title": "Terms and Conditions",
     "agb.section": "Terms and Conditions",
     "agb.scope.title": "1. Scope of Application",
-    "agb.scope.text": "These General Terms and Conditions (GTC) apply to all contracts between Dustin Hamerla (hereinafter 'Provider') and the customer for the sale of digital music files (e.g., MP3 downloads) on the website modeen.media. The GTC apply in the version valid at the time of contract conclusion.",
+    "agb.scope.text":
+      "These General Terms and Conditions (GTC) apply to all contracts between Dustin Hamerla (hereinafter 'Provider') and the customer for the sale of digital music files (e.g., MP3 downloads) on the website modeen.media. The GTC apply in the version valid at the time of contract conclusion.",
     "agb.subject.title": "2. Subject of Contract",
-    "agb.subject.text": "The Provider sells digital music content (songs) exclusively in file format for download. The purchase is made through the website modeen.media. After successful payment, the customer receives access to download the purchased files.",
+    "agb.subject.text":
+      "The Provider sells digital music content (songs) exclusively in file format for download. The purchase is made through the website modeen.media. After successful payment, the customer receives access to download the purchased files.",
     "agb.contract.title": "3. Contract Conclusion",
-    "agb.contract.text": "By clicking the 'Buy' button in the ordering process, the customer makes a binding offer to conclude a purchase contract. The contract is concluded when the Provider accepts the order by providing a download link.",
+    "agb.contract.text":
+      "By clicking the 'Buy' button in the ordering process, the customer makes a binding offer to conclude a purchase contract. The contract is concluded when the Provider accepts the order by providing a download link.",
     "agb.prices.title": "4. Prices & Small Business Regulation",
-    "agb.prices.text": "All prices stated on the website are final prices according to § 19 UStG (small business regulation). No VAT is shown.",
+    "agb.prices.text":
+      "All prices stated on the website are final prices according to § 19 UStG (small business regulation). No VAT is shown.",
     "agb.payment.title": "5. Payment Processing",
-    "agb.payment.text": "Payment is made exclusively through the payment service provider Stripe. Upon completion of payment, the customer automatically receives access to the purchased file(s) via download link. The Provider reserves the right to exclude certain payment methods in individual cases.",
+    "agb.payment.text":
+      "Payment is made exclusively through the payment service provider Stripe. Upon completion of payment, the customer automatically receives access to the purchased file(s) via download link. The Provider reserves the right to exclude certain payment methods in individual cases.",
     "agb.delivery.title": "6. Delivery & Download",
-    "agb.delivery.text": "Delivery is made digitally by providing a download link immediately after successful payment. The link is sent to the customer by email or provided directly on the website. No physical shipping takes place.",
+    "agb.delivery.text":
+      "Delivery is made digitally by providing a download link immediately after successful payment. The link is sent to the customer by email or provided directly on the website. No physical shipping takes place.",
     "agb.rights.title": "7. Usage Rights",
-    "agb.rights.text": "With the purchase, the customer receives a simple, non-transferable right of use for private use of the purchased music files. Commercial use, resale, or public performance is not permitted without the express written consent of the Provider.",
+    "agb.rights.text":
+      "With the purchase, the customer receives a simple, non-transferable right of use for private use of the purchased music files. Commercial use, resale, or public performance is not permitted without the express written consent of the Provider.",
     "agb.withdrawal.title": "8. Right of Withdrawal for Digital Content",
-    "agb.withdrawal.text": "For digital content, the right of withdrawal expires with the start of the download, provided the customer has expressly agreed that the execution of the contract begins before the expiry of the withdrawal period and has confirmed that they are aware of the loss of the right of withdrawal (§ 356 para. 5 BGB). Note: Before completing the purchase, the customer will be asked for appropriate consent.",
+    "agb.withdrawal.text":
+      "For digital content, the right of withdrawal expires with the start of the download, provided the customer has expressly agreed that the execution of the contract begins before the expiry of the withdrawal period and has confirmed that they are aware of the loss of the right of withdrawal (§ 356 para. 5 BGB). Note: Before completing the purchase, the customer will be asked for appropriate consent.",
     "agb.liability.title": "9. Liability",
-    "agb.liability.text": "The Provider is only liable for damages based on intentional or grossly negligent breach of duty. No liability is assumed for damages due to faulty downloads or incompatibilities with the customer's devices.",
+    "agb.liability.text":
+      "The Provider is only liable for damages based on intentional or grossly negligent breach of duty. No liability is assumed for damages due to faulty downloads or incompatibilities with the customer's devices.",
     "agb.final.title": "10. Final Provisions",
-    "agb.final.text": "The law of the Federal Republic of Germany applies. The place of jurisdiction is, insofar as legally permissible, the Provider's place of business. Should individual provisions of these GTC be invalid, the validity of the remaining provisions remains unaffected.",
+    "agb.final.text":
+      "The law of the Federal Republic of Germany applies. The place of jurisdiction is, insofar as legally permissible, the Provider's place of business. Should individual provisions of these GTC be invalid, the validity of the remaining provisions remains unaffected.",
 
     // Language toggle
     "language.toggle": "Language",

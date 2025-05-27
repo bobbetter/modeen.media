@@ -23,7 +23,6 @@ export default function Imprint() {
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-gray-600" />
               <Button
-                variant="ghost"
                 size="sm"
                 onClick={() => setLanguage(language === "de" ? "en" : "de")}
                 className="text-sm"
