@@ -14,20 +14,23 @@ export default function Imprint() {
           <div className="flex justify-between items-center">
             <Link href="/">
               <span className="text-xl font-light tracking-tight text-gray-800 hover:text-primary transition-colors cursor-pointer">
-                mo<span className="font-bold">deen</span><span className="text-primary font-light">.media</span>
+                mo<span className="font-bold">deen</span>
+                <span className="text-primary font-light">.media</span>
               </span>
             </Link>
-            
+
             {/* Language Toggle */}
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-gray-600" />
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
+                onClick={() => setLanguage(language === "de" ? "en" : "de")}
                 className="text-sm"
               >
-                {language === 'de' ? t('language.english') : t('language.german')}
+                {language === "de"
+                  ? t("language.english")
+                  : t("language.german")}
               </Button>
             </div>
           </div>
@@ -37,44 +40,43 @@ export default function Imprint() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <h1 className="text-4xl font-light text-gray-900 mb-12 text-center">
-          {t('imprint.title')}
+          {t("imprint.title")}
         </h1>
 
         <div className="space-y-12">
           {/* Imprint Section */}
           <section className="bg-white rounded-lg shadow-sm p-8 border border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-              {t('imprint.section')}
+              {t("imprint.section")}
             </h2>
-            
+
             <div className="space-y-6 text-gray-700">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  {t('imprint.companyInfo')}
+                  {t("imprint.companyInfo")}
                 </h3>
                 <p className="leading-relaxed">
-                  {t('imprint.companyName')}<br />
-                  {t('imprint.address')}
+                  {t("imprint.companyName")}
+                  <br />
+                  {t("imprint.address")}
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  {t('imprint.contact')}
+                  {t("imprint.contact")}
                 </h3>
                 <p className="leading-relaxed">
-                  {t('imprint.email')}<br />
-                  {t('imprint.phone')}
+                  {t("imprint.email")}
+                  <br />
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  {t('imprint.taxId')}
+                  {t("imprint.taxId")}
                 </h3>
-                <p className="leading-relaxed">
-                  {t('imprint.taxIdNumber')}
-                </p>
+                <p className="leading-relaxed">{t("imprint.taxIdNumber")}</p>
               </div>
             </div>
           </section>
@@ -82,57 +84,66 @@ export default function Imprint() {
           {/* Privacy Policy Section */}
           <section className="bg-white rounded-lg shadow-sm p-8 border border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-              {t('privacy.section')}
+              {t("privacy.section")}
             </h2>
-            
+
             <div className="space-y-6 text-gray-700">
-              <p className="leading-relaxed text-lg">
-                {t('privacy.intro')}
-              </p>
+              <p className="leading-relaxed">{t("privacy.intro")}</p>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  1. {t('privacy.dataCollection')}
+                  1. {t("privacy.dataCollection")}
                 </h3>
                 <p className="leading-relaxed">
-                  {t('privacy.dataCollectionText')}
+                  {t("privacy.dataCollectionText")}
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  2. {t('privacy.dataUsage')}
+                  2. {t("privacy.dataUsage")}
                 </h3>
-                <p className="leading-relaxed">
-                  {t('privacy.dataUsageText')}
-                </p>
+                <p className="leading-relaxed">{t("privacy.dataUsageText")}</p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  3. {t('privacy.dataSecurity')}
+                  3. {t("privacy.stripe")}
                 </h3>
-                <p className="leading-relaxed">
-                  {t('privacy.dataSecurityText')}
-                </p>
+                <p className="leading-relaxed">{t("privacy.stripeText")}</p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  4. {t('privacy.cookies')}
+                  4. {t("privacy.3rdparty")}
                 </h3>
-                <p className="leading-relaxed">
-                  {t('privacy.cookiesText')}
-                </p>
+                <p className="leading-relaxed">{t("privacy.3rdpartyText")}</p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  5. {t('privacy.rights')}
+                  5. {t("privacy.duration")}
                 </h3>
-                <p className="leading-relaxed">
-                  {t('privacy.rightsText')}
-                </p>
+                <p className="leading-relaxed">{t("privacy.durationText")}</p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  6. {t("privacy.rights")}
+                </h3>
+                <p className="leading-relaxed">{t("privacy.rightsText")}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  7. {t("privacy.ssl")}
+                </h3>
+                <p className="leading-relaxed">{t("privacy.sslText")}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  8. {t("privacy.changes")}
+                </h3>
+                <p className="leading-relaxed">{t("privacy.changesText")}</p>
               </div>
             </div>
           </section>
@@ -142,11 +153,12 @@ export default function Imprint() {
         <div className="mt-12 text-center">
           <Link href="/">
             <Button variant="outline" size="lg">
-              ← {language === 'de' ? 'Zurück zur Startseite' : 'Back to Homepage'}
+              ←{" "}
+              {language === "de" ? "Zurück zur Startseite" : "Back to Homepage"}
             </Button>
           </Link>
         </div>
       </main>
     </div>
   );
-} 
+}
