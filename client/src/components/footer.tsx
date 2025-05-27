@@ -64,6 +64,11 @@ export function Footer() {
                   {t('footer.imprint')}
                 </a>
               </Link>
+              <Link href="/agb">
+                <a className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light block">
+                  {t('footer.agb')}
+                </a>
+              </Link>
               <a href="#" className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light block">
                 {t('footer.madeWith')}
               </a>

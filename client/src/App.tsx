@@ -10,6 +10,7 @@ import Admin from "@/pages/admin";
 import Checkout from "@/pages/checkout";
 import PaymentSuccess from "@/pages/payment-success";
 import Imprint from "@/pages/imprint";
+import AGB from "@/pages/agb";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/payment-success" component={PaymentSuccess} />
       <Route path="/imprint" component={Imprint} />
+      <Route path="/agb" component={AGB} />
       <Route component={NotFound} />
     </Switch>
   );
