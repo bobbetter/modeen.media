@@ -33,6 +33,7 @@ export interface IStorage {
 
   // Download links methods
   createDownloadLink(downloadLink: InsertDownloadLink): Promise<DownloadLink>;
+  updateDownloadLinkWithSignedUrl(id: number, signed_s3_url: string): Promise<DownloadLink | undefined>;
   getDownloadLinks(): Promise<DownloadLink[]>;
   getDownloadLinksByProductId(productId: number): Promise<DownloadLink[]>;
   getDownloadLinksBySessionId(sessionId: string): Promise<DownloadLink[]>;
@@ -169,6 +170,25 @@ export class DatabaseStorage implements IStorage {
     return updated || undefined;
   }
 
+  // Update Download Link with signed S3 URL
+  async updateDownloadLinkWithSignedUrl(
+    id: number,
+    signed_s3_url: string,
+  ): Promise<DownloadLink | undefined> {
+    console.log(
+      "-----Updating download link with id:",
+      id,
+      "and signed S3 URL:",
+      signed_s3_url,
+    );
+    const [updated] = await db
+      .update(download_links)
+      .set({ signed_s3_url: signed_s3_url })
+      .where(eq(download_links.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
   async getDownloadLinks(): Promise<DownloadLink[]> {
     return await db.select().from(download_links);
   }
@@ -198,6 +218,22 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(download_links)
       .where(eq(download_links.session_id, sessionId));
+    return downloadLink || undefined;
+  }
+
+  async getDownloadLinkBySessionAndProduct(
+    sessionId: string,
+    productId: number,
+  ): Promise<DownloadLink | undefined> {
+    const [downloadLink] = await db
+      .select()
+      .from(download_links)
+      .where(
+        and(
+          eq(download_links.session_id, sessionId),
+          eq(download_links.product_id, productId)
+        )
+      );
     return downloadLink || undefined;
   }
 

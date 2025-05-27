@@ -257,7 +257,7 @@ export default function PaymentSuccess() {
                     </div>
 
                     <Button
-                      className="w-full bg-green-600 hover:bg-green-700"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
                       onClick={handleDownload}
                     >
                       <Download className="h-4 w-4 mr-2" />

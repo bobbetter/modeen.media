@@ -6,6 +6,7 @@ import { registerProductRoutes } from "./product";
 import { registerDownloadRoutes } from "./downloads";
 import { registerPaymentRoutes } from "./payment";
 import { registerConfigRoutes } from "./config";
+import { registerUploadRoutes } from "./upload";
 
 export function registerAllRoutes(app: Express): void {
   registerAuthRoutes(app);
@@ -14,4 +15,5 @@ export function registerAllRoutes(app: Express): void {
   registerDownloadRoutes(app);
   registerPaymentRoutes(app);
   registerConfigRoutes(app);
+  registerUploadRoutes(app);
 }

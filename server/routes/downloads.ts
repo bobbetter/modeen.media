@@ -11,11 +11,7 @@ import {
   ProductTokenPayload,
 } from "../utils/jwt";
 import { createOrGetDownloadLink } from "../utils/downloadLink";
-import { upload } from "../middleware/upload";
-import path from "path";
-import { uploadToObjectStorage, getFileFromObjectStorage } from "../utils/replitObjectStorage";
-import { promisify } from "util";
-import fs from "fs";
+import { getFileFromObjectStorage } from "../utils/replitObjectStorage";
 export function registerDownloadRoutes(app: Express): void {
   // Download Links Routes
   // Get all download links
@@ -208,26 +204,16 @@ export function registerDownloadRoutes(app: Express): void {
         return res
           .status(404)
           .json({ error: "Download link has been removed" });
+      } 
+      if (downloadLink.signed_s3_url) {
+      // Redirect to the signed url
+        return res.redirect(downloadLink.signed_s3_url);
+      } else {
+        return res.status(404).json({ error: "No signed url found for this download link" });
       }
-
-      // Get the file from object storage
-      const { buffer, filename, contentType } = await getFileFromObjectStorage(
-        product.fileUrl,
-      );
-
-      // Set appropriate headers for file download
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="${filename}"`,
-      );
-      res.setHeader("Content-Type", contentType);
-      res.setHeader("Content-Length", buffer.length);
-
-      // Send the file as a buffer
-      res.send(buffer);
     } catch (error) {
       console.error("Error serving download:", error);
-      return res.status(500).json({ error: "Failed to download file" });
+      return res.status(500).json({ error: "Failed to redirect to signed url" });
     }
   });
   // Get a specific download link
@@ -431,58 +417,5 @@ export function registerDownloadRoutes(app: Express): void {
     },
   );
 
-  // File upload endpoint
-  app.post(
-    "/api/upload",
-    authMiddleware,
-    adminMiddleware,
-    upload.single("file"),
-    async (req: AuthRequest & { file?: Express.Multer.File }, res) => {
-      try {
-        console.log("File upload request received");
-        console.log("Request body:", req.body);
-        console.log("Request file:", req.file);
 
-        if (!req.file) {
-          console.log("No file found in request");
-          return res.status(400).json({
-            success: false,
-            message: "No file uploaded",
-          });
-        }
-
-        // Get the original filename and file path
-        const originalName = req.file.originalname;
-        const fileName = path.basename(req.file.path);
-        console.log("File details:", {
-          originalName,
-          fileName,
-          path: req.file.path,
-        });
-
-        // Upload file to Replit Object Storage
-        console.log("Uploading file to Replit Object Storage...");
-        const fileUrl = await uploadToObjectStorage(req.file.path, fileName);
-        console.log("File uploaded to Object Storage at:", fileUrl);
-
-        // Delete temporary file after storage
-        await promisify(fs.unlink)(req.file.path);
-        console.log("Temporary file deleted");
-
-        return res.status(200).json({
-          success: true,
-          data: {
-            fileUrl,
-            originalName,
-          },
-        });
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        return res.status(500).json({
-          success: false,
-          message: "An error occurred during file upload",
-        });
-      }
-    },
-  );
 }
