@@ -53,6 +53,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
   Loader2,
   Plus,
   Trash,
@@ -84,6 +92,19 @@ type ApiResponse<T> = {
   data: T;
 };
 
+// Define paginated response type
+type PaginatedApiResponse<T> = {
+  success: boolean;
+  message?: string;
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
 export function DownloadsTab() {
   const [isDownloadLinkDialogOpen, setIsDownloadLinkDialogOpen] = useState(false);
   const [isDeleteDownloadLinkDialogOpen, setIsDeleteDownloadLinkDialogOpen] = useState(false);
@@ -91,6 +112,8 @@ export function DownloadsTab() {
   const [isViewSessionIdDialogOpen, setIsViewSessionIdDialogOpen] = useState(false);
   const [currentDownloadLink, setCurrentDownloadLink] = useState<DownloadLink | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
   const { toast } = useToast();
 
   // Fetch products
@@ -105,17 +128,24 @@ export function DownloadsTab() {
   // Extract products data from API response
   const productsData = productsApiResponse?.data || [];
 
-  // Fetch download links
+  // Fetch download links with pagination
   const {
     data: downloadLinksApiResponse,
     isLoading: isDownloadLinksLoading,
     isError: isDownloadLinksError,
-  } = useQuery<ApiResponse<DownloadLink[]>>({
-    queryKey: ["/api/download-links"],
+  } = useQuery<PaginatedApiResponse<DownloadLink>>({
+    queryKey: ["/api/download-links", currentPage, pageSize],
+    queryFn: async () => {
+      const response = await fetch(`/api/download-links?page=${currentPage}&limit=${pageSize}`, {
+        credentials: "include",
+      });
+      return response.json();
+    },
   });
 
   // Extract download links data from API response
   const downloadLinksData = downloadLinksApiResponse?.data || [];
+  const pagination = downloadLinksApiResponse?.pagination;
 
   // Create download link mutation
   const createDownloadLinkMutation = useMutation({
@@ -460,6 +490,58 @@ export function DownloadsTab() {
               </TableBody>
             </Table>
           </div>
+          
+          {/* Pagination Controls */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="flex items-center justify-between px-2 py-4">
+              <div className="text-sm text-muted-foreground">
+                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, pagination.total)} of {pagination.total} entries
+              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {/* Page numbers */}
+                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                    let pageNumber;
+                    if (pagination.totalPages <= 5) {
+                      pageNumber = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNumber = i + 1;
+                    } else if (currentPage >= pagination.totalPages - 2) {
+                      pageNumber = pagination.totalPages - 4 + i;
+                    } else {
+                      pageNumber = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(pageNumber)}
+                          isActive={currentPage === pageNumber}
+                          className="cursor-pointer"
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
+                      className={currentPage === pagination.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         )}
       </div>
 

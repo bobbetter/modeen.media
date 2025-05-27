@@ -13,7 +13,15 @@ import {
   type InsertDownloadLink,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc, count } from "drizzle-orm";
+
+export interface PaginatedDownloadLinks {
+  data: DownloadLink[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -35,6 +43,7 @@ export interface IStorage {
   createDownloadLink(downloadLink: InsertDownloadLink): Promise<DownloadLink>;
   updateDownloadLinkWithSignedUrl(id: number, signed_s3_url: string): Promise<DownloadLink | undefined>;
   getDownloadLinks(): Promise<DownloadLink[]>;
+  getDownloadLinksPaginated(page: number, limit: number): Promise<PaginatedDownloadLinks>;
   getDownloadLinksByProductId(productId: number): Promise<DownloadLink[]>;
   getDownloadLinksBySessionId(sessionId: string): Promise<DownloadLink[]>;
   getDownloadLinkBySessionAndProduct(sessionId: string, productId: number): Promise<DownloadLink | undefined>;
@@ -191,6 +200,25 @@ export class DatabaseStorage implements IStorage {
 
   async getDownloadLinks(): Promise<DownloadLink[]> {
     return await db.select().from(download_links);
+  }
+
+  async getDownloadLinksPaginated(page: number, limit: number): Promise<PaginatedDownloadLinks> {
+    const [totalResult] = await db.select({ count: count() }).from(download_links);
+    const totalCount = totalResult.count;
+    const totalPages = Math.ceil(totalCount / limit);
+    const data = await db
+      .select()
+      .from(download_links)
+      .orderBy(desc(download_links.id))
+      .limit(limit)
+      .offset((page - 1) * limit);
+    return {
+      data,
+      total: totalCount,
+      page,
+      limit,
+      totalPages,
+    };
   }
 
   async getDownloadLinksByProductId(

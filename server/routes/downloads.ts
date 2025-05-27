@@ -14,17 +14,34 @@ import { createOrGetDownloadLink } from "../utils/downloadLink";
 import { getFileFromObjectStorage } from "../utils/replitObjectStorage";
 export function registerDownloadRoutes(app: Express): void {
   // Download Links Routes
-  // Get all download links
+  // Get all download links with pagination
   app.get(
     "/api/download-links",
     authMiddleware,
     adminMiddleware,
     async (req: AuthRequest, res) => {
       try {
-        const downloadLinks = await storage.getDownloadLinks();
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+
+        // Validate pagination parameters
+        if (page < 1 || limit < 1 || limit > 100) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid pagination parameters. Page must be >= 1, limit must be between 1 and 100.",
+          });
+        }
+
+        const paginatedResult = await storage.getDownloadLinksPaginated(page, limit);
         return res.status(200).json({
           success: true,
-          data: downloadLinks,
+          data: paginatedResult.data,
+          pagination: {
+            page: paginatedResult.page,
+            limit: paginatedResult.limit,
+            total: paginatedResult.total,
+            totalPages: paginatedResult.totalPages,
+          },
         });
       } catch (error) {
         console.error("Error fetching download links:", error);
