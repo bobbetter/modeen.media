@@ -279,16 +279,12 @@ export function ProductsTab() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      
-      // Check if file is at least 100MB (required for multipart upload)
-      if (file.size < 100 * 1024 * 1024) {
-        toast({
-          title: "File too small",
-          description: "File must be at least 100MB for multipart upload",
-          variant: "destructive",
-        });
-        return;
-      }
+      console.log("[ProductsTab] File selected:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        sizeInMB: (file.size / (1024 * 1024)).toFixed(2) + " MB"
+      });
       
       setSelectedFile(file);
     }
@@ -297,6 +293,12 @@ export function ProductsTab() {
   // Handle file upload using multipart upload
   const handleFileUpload = async () => {
     if (!selectedFile) return;
+
+    console.log("[ProductsTab] Starting file upload:", {
+      fileName: selectedFile.name,
+      fileSize: selectedFile.size,
+      fileSizeInMB: (selectedFile.size / (1024 * 1024)).toFixed(2) + " MB"
+    });
 
     setUploadModalOpen(true);
     setUploadStatus("uploading");
@@ -310,14 +312,21 @@ export function ProductsTab() {
       const result = await uploader.upload({
         file: selectedFile,
         onProgress: (progress) => {
+          console.log("[ProductsTab] Upload progress:", {
+            percentage: progress.percentage + "%",
+            uploadedParts: `${progress.uploadedParts}/${progress.totalParts}`,
+            uploadedMB: (progress.uploadedBytes / (1024 * 1024)).toFixed(2) + " MB",
+            totalMB: (progress.totalBytes / (1024 * 1024)).toFixed(2) + " MB"
+          });
           setUploadProgress(progress);
         },
         onError: (error) => {
-          console.error("Upload error:", error);
+          console.error("[ProductsTab] Upload error:", error);
           setUploadError(error.message);
           setUploadStatus("error");
         },
         onComplete: (result) => {
+          console.log("[ProductsTab] Upload completed successfully:", result);
           // Set the file URL in the form
           form.setValue("fileUrl", result.key);
           setUploadStatus("completed");
@@ -328,7 +337,7 @@ export function ProductsTab() {
         },
       });
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error("[ProductsTab] Upload failed:", error);
       setUploadError(error instanceof Error ? error.message : "Upload failed");
       setUploadStatus("error");
     } finally {
@@ -338,6 +347,7 @@ export function ProductsTab() {
 
   // Cancel upload
   const handleCancelUpload = async () => {
+    console.log("[ProductsTab] Cancelling upload");
     if (uploaderRef.current) {
       await uploaderRef.current.abort();
       setUploadModalOpen(false);
@@ -594,7 +604,7 @@ export function ProductsTab() {
                 name="fileUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Upload File (min 100MB)</FormLabel>
+                    <FormLabel>Upload File</FormLabel>
                     <FormControl>
                       <div className="space-y-2">
                         {/* Hidden actual file input */}

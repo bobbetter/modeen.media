@@ -17,7 +17,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 // Validation schemas
 const initiateUploadSchema = z.object({
   fileName: z.string().min(1, "File name is required"),
-  fileSize: z.number().min(100 * 1024 * 1024, "File must be at least 100MB").max(10 * 1024 * 1024 * 1024, "File must be less than 10GB"),
+  fileSize: z.number().min(1, "File size must be at least 1 byte").max(10 * 1024 * 1024 * 1024, "File must be less than 10GB"),
   contentType: z.string().optional(),
   partSize: z.number().min(5 * 1024 * 1024).max(100 * 1024 * 1024).optional(), // 5MB to 100MB per part
 });
@@ -65,18 +65,40 @@ function calculateParts(fileSize: number, partSize: number): number {
  * Initiates a multipart upload and returns signed URLs for all parts
  */
 async function initiateUpload(req: Request, res: Response): Promise<void> {
+  console.log("[Upload] Initiate upload request received:", {
+    body: req.body,
+    userId: req.session?.userId
+  });
+
   try {
     const validatedData = initiateUploadSchema.parse(req.body);
     const { fileName, fileSize, contentType, partSize = DEFAULT_PART_SIZE } = validatedData;
 
+    console.log("[Upload] Validated data:", {
+      fileName,
+      fileSize,
+      fileSizeInMB: (fileSize / (1024 * 1024)).toFixed(2) + " MB",
+      contentType,
+      partSize,
+      partSizeInMB: (partSize / (1024 * 1024)).toFixed(2) + " MB"
+    });
+
     // Generate unique S3 key
     const key = generateS3Key(fileName, req.session?.userId?.toString());
+    console.log("[Upload] Generated S3 key:", key);
 
     // Calculate number of parts
     const totalParts = calculateParts(fileSize, partSize);
+    console.log("[Upload] Calculated parts:", {
+      totalParts,
+      fileSize,
+      partSize,
+      lastPartSize: fileSize - (totalParts - 1) * partSize
+    });
 
     // Validate part count (S3 limit is 10,000 parts)
     if (totalParts > 10000) {
+      console.error("[Upload] Too many parts:", totalParts);
       res.status(400).json({
         error: "File too large for current part size. Please use a larger part size.",
         maxParts: 10000,
@@ -86,9 +108,12 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
     }
 
     // Initiate multipart upload
+    console.log("[Upload] Initiating multipart upload in S3");
     const uploadInfo = await initiateMultipartUpload(S3_BUCKET, key, contentType);
+    console.log("[Upload] Multipart upload initiated:", uploadInfo);
 
     // Generate signed URLs for all parts
+    console.log("[Upload] Generating signed URLs for", totalParts, "parts");
     const signedUrls = await generateSignedUrlsForParts(
       S3_BUCKET,
       key,
@@ -96,8 +121,9 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
       totalParts,
       SIGNED_URL_EXPIRY
     );
+    console.log("[Upload] Generated", signedUrls.length, "signed URLs");
 
-    res.json({
+    const response = {
       uploadId: uploadInfo.uploadId,
       key: uploadInfo.key,
       bucket: uploadInfo.bucket,
@@ -105,9 +131,18 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
       partSize,
       signedUrls,
       expiresIn: SIGNED_URL_EXPIRY,
+    };
+
+    console.log("[Upload] Sending initiate response:", {
+      uploadId: response.uploadId,
+      key: response.key,
+      totalParts: response.totalParts,
+      signedUrlsCount: response.signedUrls.length
     });
+
+    res.json(response);
   } catch (error) {
-    console.error("Error initiating upload:", error);
+    console.error("[Upload] Error initiating upload:", error);
     
     if (error instanceof z.ZodError) {
       res.status(400).json({
@@ -129,12 +164,30 @@ async function initiateUpload(req: Request, res: Response): Promise<void> {
  * Completes a multipart upload
  */
 async function completeUpload(req: Request, res: Response): Promise<void> {
+  console.log("[Upload] Complete upload request received:", {
+    uploadId: req.body.uploadId,
+    key: req.body.key,
+    partsCount: req.body.parts?.length
+  });
+
   try {
     const validatedData = completeUploadSchema.parse(req.body);
     const { uploadId, key, parts } = validatedData;
 
+    console.log("[Upload] Completing multipart upload:", {
+      uploadId,
+      key,
+      partsCount: parts.length,
+      parts: parts.map(p => ({ PartNumber: p.PartNumber, ETag: p.ETag }))
+    });
+
     // Complete the multipart upload
     const location = await completeMultipartUpload(S3_BUCKET, key, uploadId, parts);
+    console.log("[Upload] Upload completed successfully:", {
+      location,
+      key,
+      uploadId
+    });
 
     res.json({
       success: true,
@@ -144,7 +197,7 @@ async function completeUpload(req: Request, res: Response): Promise<void> {
       message: "Upload completed successfully",
     });
   } catch (error) {
-    console.error("Error completing upload:", error);
+    console.error("[Upload] Error completing upload:", error);
     
     if (error instanceof z.ZodError) {
       res.status(400).json({
@@ -166,12 +219,23 @@ async function completeUpload(req: Request, res: Response): Promise<void> {
  * Aborts a multipart upload
  */
 async function abortUpload(req: Request, res: Response): Promise<void> {
+  console.log("[Upload] Abort upload request received:", {
+    uploadId: req.body.uploadId,
+    key: req.body.key
+  });
+
   try {
     const validatedData = abortUploadSchema.parse(req.body);
     const { uploadId, key } = validatedData;
 
+    console.log("[Upload] Aborting multipart upload:", {
+      uploadId,
+      key
+    });
+
     // Abort the multipart upload
     await abortMultipartUpload(S3_BUCKET, key, uploadId);
+    console.log("[Upload] Upload aborted successfully");
 
     res.json({
       success: true,
@@ -180,7 +244,7 @@ async function abortUpload(req: Request, res: Response): Promise<void> {
       key,
     });
   } catch (error) {
-    console.error("Error aborting upload:", error);
+    console.error("[Upload] Error aborting upload:", error);
     
     if (error instanceof z.ZodError) {
       res.status(400).json({
@@ -202,6 +266,11 @@ async function abortUpload(req: Request, res: Response): Promise<void> {
  * Gets the status of a multipart upload
  */
 async function getUploadStatus(req: Request, res: Response): Promise<void> {
+  console.log("[Upload] Get upload status request:", {
+    uploadId: req.params.uploadId,
+    key: req.params.key
+  });
+
   try {
     const { uploadId, key } = req.params;
 
@@ -213,7 +282,9 @@ async function getUploadStatus(req: Request, res: Response): Promise<void> {
     }
 
     // List uploaded parts
+    console.log("[Upload] Listing uploaded parts");
     const uploadedParts = await listUploadParts(S3_BUCKET, decodeURIComponent(key), uploadId);
+    console.log("[Upload] Found", uploadedParts.length, "uploaded parts");
 
     res.json({
       uploadId,
@@ -222,7 +293,7 @@ async function getUploadStatus(req: Request, res: Response): Promise<void> {
       parts: uploadedParts,
     });
   } catch (error) {
-    console.error("Error getting upload status:", error);
+    console.error("[Upload] Error getting upload status:", error);
     
     res.status(500).json({
       error: "Failed to get upload status",
@@ -236,6 +307,12 @@ async function getUploadStatus(req: Request, res: Response): Promise<void> {
  * Regenerates signed URLs for remaining parts (in case of expiry)
  */
 async function regenerateSignedUrls(req: Request, res: Response): Promise<void> {
+  console.log("[Upload] Regenerate signed URLs request:", {
+    uploadId: req.body.uploadId,
+    key: req.body.key,
+    partNumbers: req.body.partNumbers
+  });
+
   try {
     const { uploadId, key, partNumbers } = req.body;
 
@@ -246,6 +323,7 @@ async function regenerateSignedUrls(req: Request, res: Response): Promise<void> 
       return;
     }
 
+    console.log("[Upload] Regenerating signed URLs for", partNumbers.length, "parts");
     const signedUrls: SignedUrlPart[] = [];
 
     // Generate signed URLs for specific parts
@@ -272,12 +350,14 @@ async function regenerateSignedUrls(req: Request, res: Response): Promise<void> 
       });
     }
 
+    console.log("[Upload] Regenerated", signedUrls.length, "signed URLs");
+
     res.json({
       signedUrls,
       expiresIn: SIGNED_URL_EXPIRY,
     });
   } catch (error) {
-    console.error("Error regenerating signed URLs:", error);
+    console.error("[Upload] Error regenerating signed URLs:", error);
     
     res.status(500).json({
       error: "Failed to regenerate signed URLs",
@@ -290,6 +370,7 @@ async function regenerateSignedUrls(req: Request, res: Response): Promise<void> 
  * Register upload routes
  */
 export function registerUploadRoutes(app: Express): void {
+  console.log("[Upload] Registering upload routes");
   app.post("/api/upload/initiate", initiateUpload);
   app.post("/api/upload/complete", completeUpload);
   app.post("/api/upload/abort", abortUpload);
