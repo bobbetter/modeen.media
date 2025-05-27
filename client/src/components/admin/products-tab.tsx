@@ -9,6 +9,8 @@ import {
   Product,
   insertProductSchema,
 } from "@shared/schema";
+import { MultipartUploader, UploadProgress } from "@/lib/multipart-upload";
+import { UploadProgressModal } from "@/components/upload-progress-modal";
 
 import {
   Form,
@@ -95,9 +97,15 @@ export function ProductsTab() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const { toast } = useToast();
-  const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Upload progress state
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "completed" | "error">("idle");
+  const [uploadError, setUploadError] = useState<string>("");
+  const uploaderRef = useRef<MultipartUploader | null>(null);
 
   // Fetch products
   const {
@@ -217,57 +225,6 @@ export function ProductsTab() {
     },
   });
 
-  // File upload mutation
-  const uploadFileMutation = useMutation({
-    mutationFn: async (file: File) => {
-      console.log("Starting file upload for:", file.name);
-
-      const formData = new FormData();
-      formData.append("file", file);
-      console.log("FormData created with file");
-
-      console.log("Sending upload request to /api/upload");
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      console.log("Upload response status:", response.status);
-      const responseData = await response.json();
-      console.log("Upload response data:", responseData);
-
-      return responseData;
-    },
-    onSuccess: (response) => {
-      if (response.success) {
-        // Set the file URL in the form
-        form.setValue("fileUrl", response.data.fileUrl);
-        setUploadingFile(false);
-        toast({
-          title: "File uploaded",
-          description: "File has been uploaded successfully",
-        });
-      } else {
-        setUploadingFile(false);
-        toast({
-          title: "Error",
-          description: response.message || "Failed to upload file",
-          variant: "destructive",
-        });
-      }
-    },
-    onError: (error) => {
-      console.error("File upload error:", error);
-      setUploadingFile(false);
-      toast({
-        title: "Error",
-        description: "Failed to upload file",
-        variant: "destructive",
-      });
-    },
-  });
-
   // Product form
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -321,15 +278,75 @@ export function ProductsTab() {
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      
+      // Check if file is at least 100MB (required for multipart upload)
+      if (file.size < 100 * 1024 * 1024) {
+        toast({
+          title: "File too small",
+          description: "File must be at least 100MB for multipart upload",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setSelectedFile(file);
     }
   };
 
-  // Handle file upload
-  const handleFileUpload = () => {
-    if (selectedFile) {
-      setUploadingFile(true);
-      uploadFileMutation.mutate(selectedFile);
+  // Handle file upload using multipart upload
+  const handleFileUpload = async () => {
+    if (!selectedFile) return;
+
+    setUploadModalOpen(true);
+    setUploadStatus("uploading");
+    setUploadProgress(null);
+    setUploadError("");
+
+    const uploader = new MultipartUploader();
+    uploaderRef.current = uploader;
+
+    try {
+      const result = await uploader.upload({
+        file: selectedFile,
+        onProgress: (progress) => {
+          setUploadProgress(progress);
+        },
+        onError: (error) => {
+          console.error("Upload error:", error);
+          setUploadError(error.message);
+          setUploadStatus("error");
+        },
+        onComplete: (result) => {
+          // Set the file URL in the form
+          form.setValue("fileUrl", result.key);
+          setUploadStatus("completed");
+          setSelectedFile(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        },
+      });
+    } catch (error) {
+      console.error("Upload failed:", error);
+      setUploadError(error instanceof Error ? error.message : "Upload failed");
+      setUploadStatus("error");
+    } finally {
+      uploaderRef.current = null;
+    }
+  };
+
+  // Cancel upload
+  const handleCancelUpload = async () => {
+    if (uploaderRef.current) {
+      await uploaderRef.current.abort();
+      setUploadModalOpen(false);
+      setUploadStatus("idle");
+      setUploadProgress(null);
+      toast({
+        title: "Upload cancelled",
+        description: "File upload has been cancelled",
+      });
     }
   };
 
@@ -577,7 +594,7 @@ export function ProductsTab() {
                 name="fileUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Upload File</FormLabel>
+                    <FormLabel>Upload File (min 100MB)</FormLabel>
                     <FormControl>
                       <div className="space-y-2">
                         {/* Hidden actual file input */}
@@ -594,15 +611,7 @@ export function ProductsTab() {
                               <div className="flex items-center">
                                 <FileText className="h-5 w-5 mr-2 text-primary" />
                                 <a
-                                  href={
-                                    field.value.includes(
-                                      "replit.com/object-storage",
-                                    )
-                                      ? field.value
-                                      : field.value.startsWith("/uploads")
-                                        ? `https://replit.com/object-storage/storage/v1/b/replit-objstore-bf7ec12e-6e09-4fdd-8155-f15c6f7589c4/o/products%2F${field.value.split("/").pop()}?alt=media`
-                                        : field.value
-                                  }
+                                  href={make_download_url(field.value)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-sm text-blue-600 hover:underline truncate max-w-[200px]"
@@ -632,7 +641,6 @@ export function ProductsTab() {
                                   type="button"
                                   variant="secondary"
                                   onClick={() => fileInputRef.current?.click()}
-                                  disabled={uploadingFile}
                                 >
                                   <Upload className="h-4 w-4 mr-2" />
                                   Choose File
@@ -648,7 +656,6 @@ export function ProductsTab() {
                                       size="sm"
                                       onClick={handleRemoveFile}
                                       className="ml-auto"
-                                      disabled={uploadingFile}
                                     >
                                       <X className="h-4 w-4" />
                                     </Button>
@@ -660,19 +667,9 @@ export function ProductsTab() {
                                   type="button"
                                   className="w-full"
                                   onClick={handleFileUpload}
-                                  disabled={uploadingFile}
                                 >
-                                  {uploadingFile ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                      Uploading...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Upload className="h-4 w-4 mr-2" />
-                                      Upload
-                                    </>
-                                  )}
+                                  <Upload className="h-4 w-4 mr-2" />
+                                  Upload
                                 </Button>
                               )}
                             </div>
@@ -768,6 +765,21 @@ export function ProductsTab() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Upload Progress Modal */}
+      <UploadProgressModal
+        isOpen={uploadModalOpen}
+        onClose={() => {
+          setUploadModalOpen(false);
+          setUploadStatus("idle");
+          setUploadProgress(null);
+        }}
+        fileName={selectedFile?.name || ""}
+        progress={uploadProgress}
+        status={uploadStatus}
+        error={uploadError}
+        onCancel={handleCancelUpload}
+      />
     </div>
   );
 } 
