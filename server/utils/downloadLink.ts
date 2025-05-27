@@ -49,9 +49,10 @@ export async function createOrGetDownloadLink(data: CreateDownloadLinkData) {
     }
 
   // Generate signed URL for the S3 file
-  const s3Bucket = process.env.AWS_S3_BUCKET;
+  const s3Bucket = process.env.S3_BUCKET_NAME
+  ;
   if (!s3Bucket) {
-    throw new Error("AWS_S3_BUCKET environment variable not set");
+    throw new Error("S3_BUCKET_NAME environment variable not set");
   }
 
   // Extract the S3 key from the fileUrl
