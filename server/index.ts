@@ -25,6 +25,7 @@ app.use(
       secure: sessionConfig.secure,
       sameSite: "lax", // Helps with CSRF protection while still allowing redirects
       maxAge: sessionConfig.maxAge,
+      domain: sessionConfig.domain,
     },
   }),
 );

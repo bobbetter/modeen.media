@@ -133,7 +133,21 @@ export class EnvironmentManager {
       maxAge: this.isDevelopment()
         ? 1000 * 60 * 60 * 24 * 7
         : 1000 * 60 * 60 * 24, // 7 days dev, 1 day prod
+      domain: this.getCookieDomain(),
     };
+  }
+
+  private getCookieDomain(): string | undefined {
+    // In production deployment, get domain from REPLIT_DOMAINS
+    if (this.isProduction() && process.env.REPLIT_DOMAINS) {
+      const domains = process.env.REPLIT_DOMAINS.split(',');
+      const primaryDomain = domains[0];
+      // Return the domain without protocol for cookie domain
+      return primaryDomain;
+    }
+    
+    // In development, don't set a domain (defaults to current host)
+    return undefined;
   }
 }
 

@@ -68,4 +68,48 @@ export function registerAuthRoutes(app: Express): void {
       data: req.user,
     });
   });
+
+  // Debug route to check session status (only in development)
+  app.get("/api/auth/debug", (req, res) => {
+    if (process.env.NODE_ENV === "production") {
+      return res.status(404).json({ message: "Not found" });
+    }
+    
+    return res.status(200).json({
+      success: true,
+      data: {
+        sessionId: req.sessionID,
+        userId: req.session?.userId,
+        hasSession: !!req.session,
+        cookieSettings: {
+          secure: req.session?.cookie?.secure,
+          domain: req.session?.cookie?.domain,
+          sameSite: req.session?.cookie?.sameSite,
+          maxAge: req.session?.cookie?.maxAge,
+        },
+        environment: {
+          nodeEnv: process.env.NODE_ENV,
+          replitDomains: process.env.REPLIT_DOMAINS,
+          replitDevDomain: process.env.REPLIT_DEV_DOMAIN,
+        },
+      },
+    });
+  });
+
+  // Route to clear session cookies (for troubleshooting domain changes)
+  app.post("/api/auth/clear-session", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Error clearing session:", err);
+      }
+      
+      // Clear the session cookie
+      res.clearCookie('connect.sid');
+      
+      return res.status(200).json({
+        success: true,
+        message: "Session cleared successfully",
+      });
+    });
+  });
 }

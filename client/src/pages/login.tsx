@@ -49,6 +49,7 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Ensure cookies are sent
       });
       
       const result = await response.json();
@@ -80,6 +81,25 @@ export default function Login() {
       });
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function clearSession() {
+    try {
+      await fetch("/api/auth/clear-session", {
+        method: "POST",
+        credentials: "include",
+      });
+      
+      toast({
+        title: "Session cleared",
+        description: "All session data has been cleared. Please try logging in again.",
+      });
+      
+      // Invalidate user data
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    } catch (error) {
+      console.error("Error clearing session:", error);
     }
   }
 
@@ -134,6 +154,20 @@ export default function Login() {
             </form>
           </Form>
         </CardContent>
+        <CardFooter className="flex flex-col space-y-2">
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            onClick={clearSession}
+            className="text-xs"
+          >
+            Clear Session Data
+          </Button>
+          <p className="text-xs text-muted-foreground text-center">
+            Having trouble logging in? Try clearing session data first.
+          </p>
+        </CardFooter>
       </Card>
     </div>
   );
