@@ -8,6 +8,7 @@ import Login from "@/pages/login";
 import Admin from "@/pages/admin";
 import Checkout from "@/pages/checkout";
 import PaymentSuccess from "@/pages/payment-success";
+import Legal from "@/pages/legal";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/payment-success" component={PaymentSuccess} />
+      <Route path="/legal" component={Legal} />
       <Route component={NotFound} />
     </Switch>
   );

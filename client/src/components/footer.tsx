@@ -55,8 +55,11 @@ export function Footer() {
             <p className="text-white/50 text-sm font-light">
               &copy; {currentYear} modeen.media. All rights reserved.
             </p>
-            <div className="mt-3">
-              <a href="#" className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light">
+            <div className="mt-3 space-y-1">
+              <Link href="/legal" className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light block">
+                Imprint & Privacy Policy
+              </Link>
+              <a href="#" className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light block">
                 Made with ♥ for creators worldwide
               </a>
             </div>
