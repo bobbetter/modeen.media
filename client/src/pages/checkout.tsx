@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Product } from "@shared/schema";
 
 import SignatureSoundpack from "../assets/signature-soundpack-cover.png";
@@ -28,6 +29,7 @@ export default function Checkout() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -178,6 +180,44 @@ export default function Checkout() {
                 </div>
 
                 <div className="border-t pt-4 mt-auto">
+                  {/* Terms and Conditions Checkbox */}
+                  <Card className="border-2 border-muted/50 ">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="terms"
+                          checked={termsAccepted}
+                          onCheckedChange={(checked) => {
+                            if (checked && !termsAccepted) {
+                              setTermsAccepted(true);
+                            }
+                          }}
+                          className="mt-1"
+                        />
+                        <label
+                          htmlFor="terms"
+                          className="text-sm leading-relaxed cursor-pointer"
+                        >
+                          By checking this box, I agree to the immediate
+                          execution of the contract and expressly waive my right
+                          of withdrawal once the download begins. I also confirm
+                          that I have read and accepted the{" "}
+                          <a
+                            href="/agb"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline font-medium"
+                          >
+                            Terms & Conditions
+                          </a>
+                          .
+                        </label>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <div className="h-4"></div>
+
+                  {/* Total Price */}
                   <div className="flex justify-between items-center text-lg">
                     <span className="font-semibold">Total:</span>
                     <span className="text-2xl font-bold text-primary">
@@ -191,13 +231,28 @@ export default function Checkout() {
 
           {/* Payment Form */}
           <div className="space-y-6 h-full">
-            <div id="checkout" className="h-full">
+            {/* Checkout Form with Overlay */}
+            <div id="checkout" className="h-full relative">
               <EmbeddedCheckoutProvider
                 stripe={stripePromise}
                 options={{ clientSecret: clientSecret }}
               >
                 <EmbeddedCheckout />
               </EmbeddedCheckoutProvider>
+
+              {/* Overlay when terms not accepted */}
+              {!termsAccepted && (
+                <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
+                  <div className="bg-background/90 p-6 rounded-lg border shadow-lg text-center">
+                    <p className="text-lg font-medium text-foreground">
+                      Please agree to the Terms & Conditions
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Check the box on the left to proceed with your purchase
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

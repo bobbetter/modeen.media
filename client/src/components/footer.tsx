@@ -2,9 +2,11 @@ import { Facebook, Twitter, Instagram } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
+import { LanguageToggle } from "@/components/language-toggle";
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
   
   const scrollToTop = () => {
     window.scrollTo({
@@ -30,9 +32,9 @@ export function Footer() {
               </span>
             </a>
             <p className="text-white/60 text-sm mb-4 font-light">
-              Premium audio solutions for creators
+              {t('footer.tagline')}
             </p>
-            <div className="flex space-x-5 mb-6">
+            <div className="flex items-center space-x-5 mb-6">
               <a href="#" className="text-white/40 hover:text-primary transition-all duration-500">
                 <Facebook className="h-5 w-5 hover:scale-110 transition-transform duration-300" />
               </a>
@@ -49,15 +51,26 @@ export function Footer() {
                 </Button>
               </Link>
             </div>
+            <LanguageToggle />
           </div>
           
           <div className="mt-8 md:mt-0 text-right">
             <p className="text-white/50 text-sm font-light">
-              &copy; {currentYear} modeen.media. All rights reserved.
+              {t('footer.copyright')}
             </p>
-            <div className="mt-3">
-              <a href="#" className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light">
-                Made with ♥ for creators worldwide
+            <div className="mt-3 space-y-2">
+              <Link href="/imprint">
+                <a className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light block">
+                  {t('footer.imprint')}
+                </a>
+              </Link>
+              <Link href="/agb">
+                <a className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light block">
+                  {t('footer.agb')}
+                </a>
+              </Link>
+              <a href="#" className="text-white/60 hover:text-primary text-sm transition-colors duration-300 font-light block">
+                {t('footer.madeWith')}
               </a>
             </div>
           </div>

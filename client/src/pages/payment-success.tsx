@@ -285,11 +285,16 @@ export default function PaymentSuccess() {
                     What's next?
                   </h4>
                   <ul className="space-y-1 text-xl">
-                    <li>• You will receive an email confirmation shortly</li>
-                    <li>• Download links are available immediately</li>
-                    <li>• Keep your receipt for your records</li>
+                    <li>• Use the download link on the left!</li>
+                    <li>
+                      • You will also receive an email confirmation with a
+                      receipt and the download link
+                    </li>
                     <li>
                       • Download links have limited uses and expiration dates
+                    </li>
+                    <li>
+                      • Enjoy! If you have any questions, feel free to reach out
                     </li>
                   </ul>
                 </div>
