@@ -1,6 +1,7 @@
 import { storage } from "../storage";
 import { create_jwt_token, make_download_url } from "./jwt";
 import { insertDownloadLinkSchema } from "@shared/schema";
+import { generateDownloadSignedUrl } from "./s3ObjectStorage";
 
 export interface CreateDownloadLinkData {
   product_id: number;
@@ -32,32 +33,58 @@ export async function createOrGetDownloadLink(data: CreateDownloadLinkData) {
     throw new Error("Product not found");
   }
 
-  // Check if a download link already exists for this session_id and product_id
+    // Check if a download link already exists for this session_id and product_id
   if (validation.data.session_id) {
-    const existingDownloadLink = await storage.getDownloadLinkBySession(
-      validation.data.session_id
-    );
-    
-    if (existingDownloadLink) {
-      // Return the existing download link
-      return {
-        downloadLink: existingDownloadLink,
-        product,
-      };
+      const existingDownloadLink = await storage.getDownloadLinkBySession(
+        validation.data.session_id
+      );
+      
+      if (existingDownloadLink) {
+        // Return the existing download link
+        return {
+          downloadLink: existingDownloadLink,
+          product,
+        };
+      }
     }
+
+  // Generate signed URL for the S3 file
+  const s3Bucket = process.env.AWS_S3_BUCKET;
+  if (!s3Bucket) {
+    throw new Error("AWS_S3_BUCKET environment variable not set");
   }
 
-  // Create the download link
-  const downloadLink = await storage.createDownloadLink(validation.data);
+  // Extract the S3 key from the fileUrl
+  const s3Key = product.fileUrl;
+  if (!s3Key) {
+    throw new Error("Product does not have a fileUrl");
+  }
+
+  // Generate signed URL with expiration based on expire_after_seconds or default to 1 hour
+  const expiresIn = validation.data.expire_after_seconds || 3600;
+  const signedUrl = await generateDownloadSignedUrl(
+    s3Bucket,
+    s3Key,
+    expiresIn,
+    product.name // Use product name as the download filename
+  );
+
+  // Create the download link with the signed URL
+  const downloadLinkDataWithSignedUrl = {
+    ...validation.data,
+    signed_s3_url: signedUrl, // Use the S3 signed URL instead of JWT URL
+  };
+    
+  const tempDownloadLinkData = await storage.createDownloadLink(downloadLinkDataWithSignedUrl);
   
   // Generate JWT token and download URL
-  const jwt_token = create_jwt_token(data.product_id, downloadLink.id);
-  const download_url = make_download_url(jwt_token);
+  const jwt_token = create_jwt_token(data.product_id, tempDownloadLinkData.id);
+  const external_download_url = make_download_url(jwt_token);
 
   // Update the download link with the actual URL
   const updatedDownloadLink = await storage.updateDownloadLink(
-    downloadLink.id,
-    download_url,
+    tempDownloadLinkData.id,
+    external_download_url,
   );
 
   if (!updatedDownloadLink) {

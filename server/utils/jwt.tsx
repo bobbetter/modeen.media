@@ -1,7 +1,26 @@
 import jwt from "jsonwebtoken";
 
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
-const BASE_APP_URL = "https://modeenmedia-dustinhamerla.replit.app"
+
+// Get the deployment URL dynamically
+function getBaseAppUrl(): string {
+  // Check if running in a Replit deployment
+  if (process.env.REPLIT_DEPLOYMENT === "1" && process.env.REPLIT_DOMAINS) {
+    // In deployment, use the first domain from REPLIT_DOMAINS
+    const domains = process.env.REPLIT_DOMAINS.split(',');
+    return `https://${domains[0]}`;
+  }
+  
+  // In development, use REPLIT_DEV_DOMAIN if available
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  }
+  
+  // Fallback to the original URL if environment variables are not available
+  return "https://modeenmedia-dustinhamerla.replit.app";
+}
+
+const BASE_APP_URL = getBaseAppUrl();
 
 export interface ProductTokenPayload {
   product_id: number;

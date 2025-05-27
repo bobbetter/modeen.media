@@ -204,26 +204,16 @@ export function registerDownloadRoutes(app: Express): void {
         return res
           .status(404)
           .json({ error: "Download link has been removed" });
+      } 
+      if (downloadLink.signed_s3_url) {
+      // Redirect to the signed url
+        return res.redirect(downloadLink.signed_s3_url);
+      } else {
+        return res.status(404).json({ error: "No signed url found for this download link" });
       }
-
-      // Get the file from object storage
-      const { buffer, filename, contentType } = await getFileFromObjectStorage(
-        product.fileUrl,
-      );
-
-      // Set appropriate headers for file download
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="${filename}"`,
-      );
-      res.setHeader("Content-Type", contentType);
-      res.setHeader("Content-Length", buffer.length);
-
-      // Send the file as a buffer
-      res.send(buffer);
     } catch (error) {
       console.error("Error serving download:", error);
-      return res.status(500).json({ error: "Failed to download file" });
+      return res.status(500).json({ error: "Failed to redirect to signed url" });
     }
   });
   // Get a specific download link

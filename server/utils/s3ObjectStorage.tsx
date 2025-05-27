@@ -4,7 +4,8 @@ import {
   UploadPartCommand,
   CompleteMultipartUploadCommand,
   AbortMultipartUploadCommand,
-  ListPartsCommand
+  ListPartsCommand,
+  GetObjectCommand
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -159,6 +160,30 @@ export async function listUploadParts(
     ETag: part.ETag!,
     PartNumber: part.PartNumber!,
   }));
+}
+
+/**
+ * Generates a signed URL for downloading a file from S3
+ */
+export async function generateDownloadSignedUrl(
+  bucket: string,
+  key: string,
+  expiresIn: number = 3600, // 1 hour default
+  filename?: string
+): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ResponseContentDisposition: filename 
+      ? `attachment; filename="${filename}"`
+      : undefined,
+  });
+
+  const signedUrl = await getSignedUrl(s3Client, command, {
+    expiresIn,
+  });
+
+  return signedUrl;
 }
 
 export { s3Client };
