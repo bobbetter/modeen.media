@@ -138,12 +138,10 @@ export class EnvironmentManager {
   }
 
   private getCookieDomain(): string | undefined {
-    // In production deployment, get domain from REPLIT_DOMAINS
-    if (this.isProduction() && process.env.REPLIT_DOMAINS) {
-      const domains = process.env.REPLIT_DOMAINS.split(',');
-      const primaryDomain = domains[0];
-      // Return the domain without protocol for cookie domain
-      return primaryDomain;
+    // In production, don't set a specific domain to allow cookies to work
+    // on any domain the app is deployed to (including custom domains)
+    if (this.isProduction()) {
+      return undefined; // Let the browser handle the domain automatically
     }
     
     // In development, don't set a domain (defaults to current host)
